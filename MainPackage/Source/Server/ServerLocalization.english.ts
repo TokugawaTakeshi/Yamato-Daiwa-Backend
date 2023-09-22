@@ -1,7 +1,9 @@
-import PoliteErrorsMessagesBuilder from "../Utils/PoliteErrorsMessagesBuilder";
 import type ServerLocalization from "./ServerLocalization";
 import type { SuccessLog } from "@yamato-daiwa/es-extensions";
-import { ImproperUsageError } from "@yamato-daiwa/es-extensions";
+import {
+  PoliteErrorsMessagesBuilder,
+  ImproperUsageError
+} from "@yamato-daiwa/es-extensions";
 
 
 const ServerLocalization__English: ServerLocalization = {
@@ -121,7 +123,7 @@ const ServerLocalization__English: ServerLocalization = {
     requestedResourceNotFound: {
       title: "Requested resource not found",
       generateDescription: ({ potentialRawRelatedPathToPublicFile }: { potentialRawRelatedPathToPublicFile: string; }): string =>
-        `Public file refers to '${ potentialRawRelatedPathToPublicFile }' was not found.`
+        `The path '${ potentialRawRelatedPathToPublicFile }' refers to unknown resource.`
     },
 
     fileStatisticsRetrievingFailure: "Unexpected error occurred during retrieving of the file statistics.",
@@ -130,6 +132,11 @@ const ServerLocalization__English: ServerLocalization = {
       title: "Directory has been requested",
       generateDescription: ({ targetPath }: { targetPath: string; }): string =>
           `The directory with path '${ targetPath }' has been requested. Was it consciously?`
+    },
+
+    publicFileSubmittingFailed: {
+      title: "Public file submitting failed",
+      generateDescription: ({ targetPath }: { targetPath: string; }): string => `Failed to submit public file '${ targetPath }'.`
     }
   },
 
