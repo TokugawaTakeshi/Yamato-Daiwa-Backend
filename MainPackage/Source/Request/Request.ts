@@ -7,11 +7,13 @@ import InvalidURI_QueryParametersError from "../Errors/InvalidURI_QueryParameter
 /* ─── General Utils ──────────────────────────────────────────────────────────────────────────────────────────────── */
 import {
   Logger,
-  isNotUndefined,
+  RawObjectDataProcessor,
   type HTTP_Methods,
-  type ParsedJSON_Object,
   type Log,
-  RawObjectDataProcessor
+  type ReadonlyParsedJSON_Object,
+  ImproperUsageError,
+  isUndefined,
+  isNotUndefined
 } from "@yamato-daiwa/es-extensions";
 import parseCookieHTTP_Header from "../Utils/parseCookieHTTP_Header";
 
@@ -29,7 +31,6 @@ class Request {
   public readonly subdomainParameters: Request.SubdomainParameters;
 
   protected readonly rawRoutePathParameters?: Request.RawRoutePathParameters;
-  protected readonly rawURI_QueryParameters?: Request.RawURI_QueryParameters;
   protected readonly stringifiedRoute?: string;
 
 
@@ -39,7 +40,6 @@ class Request {
       URI,
       cookieHTTP_Header,
       rawRoutePathParameters,
-      rawURI_QueryParameters,
       subdomainParameters,
       routePathTemplate
     }: Readonly<{
@@ -47,7 +47,6 @@ class Request {
       URI: Readonly<Omit<URL, "hash">>;
       cookieHTTP_Header?: string;
       rawRoutePathParameters?: Request.RawRoutePathParameters;
-      rawURI_QueryParameters?: Request.RawURI_QueryParameters;
       subdomainParameters?: Request.SubdomainParameters;
       routePathTemplate?: string;
     }>
@@ -62,7 +61,6 @@ class Request {
     this.subdomainParameters = subdomainParameters ?? {};
 
     this.rawRoutePathParameters = rawRoutePathParameters;
-    this.rawURI_QueryParameters = rawURI_QueryParameters;
 
     if (isNotUndefined(routePathTemplate)) {
       this.stringifiedRoute = `${ this.HTTP_Method }::${ routePathTemplate }`;
@@ -75,18 +73,28 @@ class Request {
     ProcessedRoutePathParameters extends Request.ProcessedRoutePathParameters
   >(validationAndProcessing: RawObjectDataProcessor.PropertiesSpecification): ProcessedRoutePathParameters {
 
+    if (isUndefined(this.stringifiedRoute)) {
+      Logger.throwErrorAndLog({
+        errorInstance: new ImproperUsageError(
+          Request.localization.errors.unableToAccessToProcessedRoutePathParameters.description
+        ),
+        title: Request.localization.errors.unableToAccessToProcessedRoutePathParameters.title,
+        occurrenceLocation: "ImproperUsageError.validateAndProcessRoutePathParameters(validationAndProcessing)"
+      });
+    }
+
+
     const routePathParametersProcessingResult: RawObjectDataProcessor.ProcessingResult<ProcessedRoutePathParameters> =
           RawObjectDataProcessor.process(
             this.rawRoutePathParameters,
             {
-              nameForLogging: Request.localization.titles.routePath.
-                  generate({ stringifiedRoute: this.stringifiedRoute ?? "" }), // FIXME
-              subtype: RawObjectDataProcessor.ObjectSubtypes.fixedKeyAndValuePairsObject,
+              nameForLogging: Request.localization.titles.routePath.generate({ stringifiedRoute: this.stringifiedRoute }),
+              subtype: RawObjectDataProcessor.ObjectSubtypes.fixedSchema,
               properties: validationAndProcessing
             }
           );
 
-    if (routePathParametersProcessingResult.rawDataIsInvalid) {
+    if (routePathParametersProcessingResult.isRawDataInvalid) {
       Logger.throwErrorAndLog({
         errorInstance: new InvalidRoutePathParametersError({
           route: this.stringifiedRoute,
@@ -94,7 +102,7 @@ class Request {
               formatValidationErrorsList(routePathParametersProcessingResult.validationErrorsMessages)
         }),
         title: InvalidRoutePathParametersError.localization.defaultTitle,
-        occurrenceLocation: "request.validateAndProcessRoutePathParameters(validationAndProcessing)",
+        occurrenceLocation: "request.validateAndProcessRoutePathParameters(validationAndProcessing)"
       });
     }
 
@@ -107,18 +115,28 @@ class Request {
     ProcessedURI_QueryParameters extends Request.ProcessedURI_QueryParameters
   >(validationAndProcessing: RawObjectDataProcessor.PropertiesSpecification): ProcessedURI_QueryParameters {
 
+    if (isUndefined(this.stringifiedRoute)) {
+      Logger.throwErrorAndLog({
+        errorInstance: new ImproperUsageError(
+            Request.localization.errors.unableToAccessToProcessedURI_QueryParameters.description
+        ),
+        title: Request.localization.errors.unableToAccessToProcessedURI_QueryParameters.title,
+        occurrenceLocation: "ImproperUsageError.validateAndProcessURI_QueryParameters(validationAndProcessing)"
+      });
+    }
+
+
     const URI_QueryParametersProcessingResult: RawObjectDataProcessor.ProcessingResult<ProcessedURI_QueryParameters> =
           RawObjectDataProcessor.process(
-            this.rawURI_QueryParameters,
+            this.URI.searchParams,
             {
-              nameForLogging: Request.localization.titles.URI_Query.
-                  generate({ stringifiedRoute: this.stringifiedRoute ?? "" }), // FIXME
-              subtype: RawObjectDataProcessor.ObjectSubtypes.fixedKeyAndValuePairsObject,
+              nameForLogging: Request.localization.titles.URI_Query.generate({ stringifiedRoute: this.stringifiedRoute }),
+              subtype: RawObjectDataProcessor.ObjectSubtypes.fixedSchema,
               properties: validationAndProcessing
             }
           );
 
-    if (URI_QueryParametersProcessingResult.rawDataIsInvalid) {
+    if (URI_QueryParametersProcessingResult.isRawDataInvalid) {
       Logger.throwErrorAndLog({
         errorInstance: new InvalidURI_QueryParametersError({
           route: this.stringifiedRoute,
@@ -143,8 +161,7 @@ namespace Request {
   export type RawRoutePathParameters = Router.RoutePathParameters;
   export type ProcessedRoutePathParameters = Readonly<{ [parameterName: string]: string | number | undefined; }>;
 
-  export type RawURI_QueryParameters = ParsedJSON_Object;
-  export type ProcessedURI_QueryParameters = ParsedJSON_Object;
+  export type ProcessedURI_QueryParameters = ReadonlyParsedJSON_Object;
 
   export type SubdomainParameters = Readonly<{ [parameterName: string]: string | undefined; }>;
 

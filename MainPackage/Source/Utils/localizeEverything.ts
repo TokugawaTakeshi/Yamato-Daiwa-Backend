@@ -18,7 +18,7 @@ export function localizeEverything(
     configurationNormalizer: ConfigurationNormalizer.Localization;
     errors: Readonly<{
       invalidRoutePathParameters: InvalidRoutePathParametersError.Localization;
-      InvalidURI_QueryParameters: InvalidURI_QueryParametersError.Localization;
+      invalidURI_QueryParameters: InvalidURI_QueryParametersError.Localization;
     }>;
   }>
 ): void {
@@ -28,6 +28,6 @@ export function localizeEverything(
   ConfigurationNormalizer.localization = configurationNormalizerLocalization;
 
   InvalidRoutePathParametersError.localization = errorsLocalization.invalidRoutePathParameters;
-  InvalidURI_QueryParametersError.localization = errorsLocalization.InvalidURI_QueryParameters;
+  InvalidURI_QueryParametersError.localization = errorsLocalization.invalidURI_QueryParameters;
 
 }

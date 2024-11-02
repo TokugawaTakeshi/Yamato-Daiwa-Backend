@@ -1,14 +1,23 @@
 # Yamato Daiwa Backend 〔YDB〕
 
+[![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@yamato-daiwa/backend)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/TokugawaTakeshi/Yamato-Daiwa-Backend)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![MIT](https://img.shields.io/badge/MIT-green?style=for-the-badge)
+
+[![NPM Version](https://img.shields.io/npm/v/@yamato-daiwa/backend)](https://www.npmjs.com/package/@yamato-daiwa/es-extensions)
+[![No any type](https://img.shields.io/badge/Type_safety-No_any-brightgreen.svg?style=flat)]()
+
+
 Back-end framework with built-in TypeScript type safety.
 Clean API, no husk.
 Intended to be used in full-stack applications where both client and server part written in TypeScript.
 
 ![Main visual of Yamato Daiwa Backend framework](https://user-images.githubusercontent.com/41653501/168190921-78edc07d-58cc-4298-8b59-182468cf280a.png)
 
-* [Official documentation (Under construction)](https://backend-es.yamato-daiwa.com/)
-* [Main package](MainPackage/README.md)
-* [🌎 Issues](https://github.com/TokugawaTakeshi/yamato_daiwa-backend/issues)
++ [Installation](#installation)
++ [Quick Examples](#quick-examples)
+  + ["Hello, world!"](#hello-world)
 
 
 ## Installation
@@ -25,11 +34,12 @@ npm i @yamato-daiwa/backend -E
 > For this, the splitting of the code to files and code itself has been minified, but this approach is unfit
 > for the development of the real applications from the viewpoint of architecture.
 
+
 ### "Hello, world!"
 
 ```typescript
 import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+import { HTTP_Methods } from "fundamental-constants";
 
 
 Server.initializeAndStart({
@@ -37,11 +47,10 @@ Server.initializeAndStart({
   HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
   routing: [
     {
-      route: { HTTP_Method: HTTP_Methods.get, pathTemplate: "/" },
+      HTTP_Method: HTTP_Methods.get,
+      pathTemplate: "/",
       async handler(request: Request, response: Response): Promise<void> {
-        return response.submitWithSuccess({
-          HTML_Content: "<h1>Hello, world!</h1>"
-        });
+        return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
       }
     }
   ]
@@ -52,34 +61,43 @@ See the ["Hello, world!"](https://backend-es.yamato-daiwa.com/Tutorials/00-Hello
   tutorial for the details.
 
 
-### HTTPS support
+### HTTPS Support
 
 ```typescript
 import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+import { HTTP_Methods } from "fundamental-constants";
+import Path from "path";
 
 
 Server.initializeAndStart({
   IP_Address: "127.0.0.1",
+  HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
   HTTPS: {
+    
     port: ProtocolDependentDefaultPorts.HTTPS,
-    SSL_CertificateFileRelativeOrAbsolutePath: "SSL/cert.pem",
-    SSL_KeyFileRelativeOrAbsolutePath: "SSL/key.pem"
+    
+    SSL_CertificateFileRelativeOrAbsolutePath: "SSL/SSL_Certificate.pem",
+    SSL_KeyFileRelativeOrAbsolutePath: "SSL/SSL_Key.pem",
+    
+    // Or pass the raw strings:
+    // SSL_CertificateFileRelativeOrAbsolutePath: Path.resolve(__dirname, "./SSL/SSL_Certificate.pem"),
+    // SSL_KeyFileRelativeOrAbsolutePath: Path.resolve(__dirname, "./SSL/SSL_Key.pem"),
+    
   },
   routing: [
     {
-      route: { HTTP_Method: HTTP_Methods.get, pathTemplate: "/" },
-      async handler(_request: Request, response: Response): Promise<void> {
-        return response.submitWithSuccess({
-          HTML_Content: "<h1>Hello, world!</h1>"
-        });
+      HTTP_Method: HTTP_Methods.get,
+      pathTemplate: "/",
+      async handler(request: Request, response: Response): Promise<void> {
+        return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
       }
     }
   ]
 });
 ```
 
-See the [HTTPS support](https://backend-es.yamato-daiwa.com/Tutorials/01-HTTPS/HTTPS_TutorialPage.english.html) tutorial for the details.
+See the [HTTPS support](https://backend-es.yamato-daiwa.com/Tutorials/01-HTTPS/HTTPS_TutorialPage.english.html) 
+  tutorial for the details.
 
 
 #### Vs. Express

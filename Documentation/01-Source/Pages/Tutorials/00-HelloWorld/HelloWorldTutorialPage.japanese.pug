@@ -145,17 +145,17 @@ block append SpecificContent
     }).Article-Heading2
 
     p.Article-Paragraph.
-      当アプリケーションは#[+SecondaryEntity__Code--YDID http://127.0.0.1:80/]アドレス宛ての#[+Term__Contrast--YDID GET]型の
+      此の簡易なアプリケーションは#[+SecondaryEntity__Code--YDID http://127.0.0.1:80/]アドレス宛ての#[+Term__Contrast--YDID GET]型の
         #[+Term--YDID HTTPリクエスト]への返事として#[+SecondaryEntity__Code--YDID 「Hello, world!」]と言う本文を含んでいる
         #[+SecondaryEntity__Code--YDID h1]見出しから成り立っている#[+Term--YDID HTMLコード]を返す。
-      実は、妥当な#[+Term--YDID HTMLページ]を代表しているコードには成っていないが、テスト目的の為に送信しても現在のブラウザーなら表示させる。
+      実は、妥当な#[+Term--YDID HTMLページ]を代表しているコードには成っていないが、テスト目的の為なら送信しても現在のブラウザーなら表示させる。
       此の#[+Term--YDID リクエスト]を送る前に当単純な例のコードを考察しておこう。
 
     +CodeViewer--YDF
 
       +CodeViewer-TabPanel--YDF({
         codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
-        fileLabel: "Source code"
+        fileLabel: "エントリーポイント"
       })
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda
@@ -201,28 +201,29 @@ block append SpecificContent
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="2" indentationString="  ")
           routing: [
             {
-              route: { HTTP_Method: HTTP_Methods.get, pathTemplate: "/" },
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/",
         +CodeViewer-Explanation--YDF.
-          和訳から自明的に成ってもいて、良質の名付けの場合自明的ではなければいけないのだが、#[+ImportantEntity__Code--YDID routing]
-            #[+Term--YDID プロパティ]は#[+DefinableTerm--YDID ルーチング]
-            （#[+Keyphrase--YDID #[+Term--YDID サーバ向けウェブ開発]の文脈に於いて]#[+Term--YDID URI]の原型に依り異なる返事の生成）に該当。
-          これからの授業の際[+DefinableTerm--YDID ルーチング]を詳しく考察するのだが、今にとって大切な事は
-            #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/]#[+Term--YDID URI]に該当している
-            #[+Keyword--YDID 単一の]#[+Keyword__Contrast--YDID 根の]#[+Term--YDID ルート]
-            （#[+Term--YDID 片仮名]上、「root」と「route」は何方でも「ルート」だが、本題に両方出ている）専用#[+Keyword--YDID のみ]返事が生成される
-            事に成る。
-          其れ#[+Keyword--YDID 以外の]ルートの場合例えば#[+SecondaryEntity__Code--YDID /foo]（#[+Term--YDID URI]の
+          #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/]と言う#[+ImportantEntity--YDID URI]宛てに#[+Term--YDID GET型]
+            の#[+Term--YDID リクエスト]を送る事に成る。
+          #[+Term--YDID ITアドレス]と#[+Term--YDID ポート]番号の#[+Keyword--YDID 後に]行く#[+ImportantEntity--YDID URI]の
+            #[+Keyword--YDID 部分]を#[+ImportantEntity__Code--YDID pathTemplate]で指定する事（今の場合だと、
+            単に「根」とも呼ぶ#[+SecondaryEntity__Code--YDID /]）。
+          実は、#[+Keyword--YDID パス]の話しになってはいるが、#[+Term--YDID パス]の後でも#[+ImportantEntity--YDID URI]の其の他の部分
+            も存在している。
+          此の授業が膨らまない様に、今は#[+ImportantEntity--YDID URI]の構成に就いて細かい話はしないが、現時点では大臣な事は、他の
+            #[+Term--YDID ルート]、例えば#[+SecondaryEntity__Code--YDID /foo]（#[+Term--YDID URI]の
             #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/foo]に該当）又は#[+SecondaryEntity__Code--YDID /bar/baz]
-            （#[+Term--YDID URI]の#[+SecondaryEntity__Code--YDID http://127.0.0.1:80/bar/baz]に該当）、サーバが
-            「見つからなかった」と言うエラーを含む#[+Term--YDID レスポンス]を返す。
+            （#[+Term--YDID URI]の#[+SecondaryEntity__Code--YDID http://127.0.0.1:80/bar/baz]に該当）宛てに
+            #[+Term--YDID リクエスト]を送信してみると、サーバが「見つからなかった」と言うエラーを含む#[+Term--YDID レスポンス]を返す。
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="4" indentationString="  ")
           async handler(request: Request, response: Response): Promise<void> {
         +CodeViewer-Explanation--YDF
 
           p.Article-Paragraph.
-            #[+DefinableTerm--YDID handler]は送信された#[+Term--YDID リクエスト]が#[+ImportantEntity__Code--YDID route]で指定された
-              #[+Term--YDID ルート]を満たしている時、何方の行動をすれば良いか、定義する#[+Term--YDID 関数]である。
+            #[+DefinableTerm--YDID handler]は送信された#[+Term--YDID リクエスト]が指定された#[+Term--YDID HTTPメソッド]と
+              #[+Term--YDID パス]の組み合わせを満たしている時、何方の行動をすれば良いか、定義する#[+Term--YDID 関数]である。
             #[+Term--YDID レスポンス]の送信は一瞬で感じられる事が有っても#[+Keyword--YDID 事実上]一瞬では#[+Keyword--YDID ない]ので、
               此の#[+Term--YDID 関数]は#[+Keyword--YDID アプリオリ]#[+Keyphrase--YDID 非同期]（
               此処では明示的か、暗黙的で#[+ImportantEntity__Code--YDID Promise]の#[+Term--YDID インスタンス]を返す
@@ -231,8 +232,6 @@ block append SpecificContent
               #[+Term--YDID 関数]も「非同期」と呼ばれる）。
             然も、#[+Term--YDID リクエスト]の#[+Term__Contrast--YDID ハンドラ]によく其の他の非同期処理が行われる事が多い
               （例えば、#[+Term--YDID データベース]との取り引き又は#[+Term--YDID ファイル]のへのアクセス）。
-            実質として、#[+ImportantEntity__Code--YDID route]と#[+ImportantEntity__Code--YDID handler]は#[+Term--YDID 条件文]
-              も#[+Keyword--YDID 同然]。
 
           p.Article-Paragraph.
             普通だと、#[+Term--YDID レスポンス]は#[+ImportantEntity--YDID 一引数目]で渡された#[+Term--YDID リクエスト]の

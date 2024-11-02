@@ -64,3 +64,7 @@ routingInYDB:
           $heading: `routingInYDB.pathParameters.numeric.$heading`
           $anchor: ROUTING_IN_YDB-PATH_PARAMETERS-NUMERIC--SECTION
 
+    controllers:
+
+      $heading: `routingInYDB.controllers.$heading`
+      $anchor: ROUTING_IN_YDB-CONTROLLERS--SECTION

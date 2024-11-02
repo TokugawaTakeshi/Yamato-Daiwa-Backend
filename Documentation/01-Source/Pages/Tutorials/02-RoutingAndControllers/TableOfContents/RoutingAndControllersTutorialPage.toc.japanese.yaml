@@ -40,3 +40,7 @@ routingInYDB:
     numeric:
 
       $heading: "数型のルート引数"
+
+  controllers:
+
+    $heading: "コントローラー"

@@ -50,6 +50,6 @@ relatedTypes:
           $heading: <code>HTTPS</code>
           $anchor: RAW_CONFIG-HTTPS--SECTION
 
-#        routing:
-#          $heading: <code>routing</code>
-#          $anchor: RAW_CONFIG-ROUTING--SECTION
+        routing:
+          $heading: <code>routing</code>
+          $anchor: RAW_CONFIG-ROUTING--SECTION

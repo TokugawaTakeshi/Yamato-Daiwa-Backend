@@ -276,7 +276,8 @@ block append SpecificContent
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="2" indentationString="  ")
           routing: [
               {
-                route: { HTTP_Method: HTTP_Methods.get, pathTemplate: "/" },
+                HTTP_Method: HTTP_Methods.get,
+                pathTemplate: "/",
                 async handler(_request: Request, response: Response): Promise<void> {
                   return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
                 }

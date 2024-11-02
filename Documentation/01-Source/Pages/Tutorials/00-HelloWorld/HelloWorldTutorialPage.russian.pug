@@ -150,21 +150,23 @@ block append SpecificContent
     }).Article-Heading2
 
     p.Article-Paragraph.
-      Это приложение отправит #[+Term--YDID HTML-код], состоящий из заголовка #[+SecondaryEntity__Code--YDID h1] с
-        текстовым содержимым #[+SecondaryEntity__Code--YDID «Hello, world!»] в ответ на #[+Term--YDID HTTP-запрос] типа
-        #[+Term__Contrast--YDID GET] по адресу #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/].
+      Это примитивное серверное приложение отправит #[+Term--YDID HTML-код], состоящий из заголовка
+        #[+SecondaryEntity__Code--YDID h1] с текстовым содержимым #[+SecondaryEntity__Code--YDID «Hello, world!»]
+        в ответ на #[+Term--YDID HTTP-запрос] типа #[+Term__Contrast--YDID GET] по адресу
+        #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/].
       Вообще, такой код #[+Keyword--YDID не]&nbsp;является валидной #[+Term--YDID HTML-страницей], но
-        в тестовых целях отправка одного только #[+Term--YDID тела HTML-документа] возможна — современные браузеры
-        его отобразят.
-      Перед тем, как отправить #[+Term--YDID запрос], разберём код данного простейшего примера.
+        #[+Keyphrase--YDID в тестовых целях] отправка одного только #[+Term--YDID тела HTML-документа] возможна —
+        современные браузеры его отобразят.
+      Но перед тем, как отправить #[+Term--YDID запрос], разберём код данного простейшего примера.
 
     +CodeViewer--YDF
 
       +CodeViewer-TabPanel--YDF({
         codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
-        fileLabel: "Source code"
+        fileLabel: "Точки входа"
       })
 
+        //- TODO Баг YDA: "метода" и "с" слитно
         +CodeViewer-PartialListing--YDF: :code_listing--yda
           import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
           import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
@@ -181,17 +183,17 @@ block append SpecificContent
           |   в качестве #[+Keyphrase--YDID первого и единственного] #[+Term--YDID параметра].
           | Перевод имени #[+Term--YDID метода] с английского языка «инициализировать и запустить» вкупе с контекстом
           |   #[+SecondaryEntity__Code--YDID Server] («сервер») не&nbsp;должен оставлять вопросов о том, что этот
-          | метод делает.
+          | #[+Term--YDID метод] делает.
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="2" indentationString="  ")
           IP_Address: "127.0.0.1",
         +CodeViewer-Explanation--YDF
           | #[+Term--YDID Свойство] #[+ImportantEntity__Code--YDID IP_Address] сделано #[+Keyword--YDID обязательным]
-          |   #[+Keyword--YDID не]&nbsp;случайно, потому что Вы как инженер #[+Keyword--YDID обязаны] понимать,
+          |   #[+Keyword__Contrast--YDID не]&nbsp;случайно, потому что Вы как инженер #[+Keyword--YDID обязаны] понимать,
           |   по какому #[+Term--YDID IP-адресу] хотите сделать доступным своё серверное приложение.
-          | Если говорить о реальном проекте, то #[+Term--YDID IP-адрес] будет зависеть от режима (локальная разработка,
+          | Если говорить о реальном проекте, то #[+Term--YDID IP-адрес] будет зависеть от среды (локальная разработка,
           |   инсценирование, продакшен).
-          | В будущих уроках мы обсудим, как эту опцию сделать зависимой от режима, а сейчас установим значение
+          | В будущих уроках мы обсудим, как эту опцию сделать зависимой от среды, а сейчас установим значение
           |   #[+SecondaryEntity--YDID 127.0.0.1] — первый адрес в диапазоне
           |
           +Link--YDF({
@@ -203,7 +205,8 @@ block append SpecificContent
           HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
         +CodeViewer-Explanation--YDF.
           #[+ImportantEntity--YDID 80] — значение #[+ImportantEntity__Code--YDID ProtocolDependentDefaultPorts.HTTP] —
-            это номер #[+Term--YDID порта] #[+Keyword--YDID по умолчанию] #[+Keyphrase--YDID для #[+Term--YDID протокола HTTP]].
+            это номер #[+Term--YDID порта] по #[+Keyword--YDID умолчанию]
+            #[+Keyphrase--YDID для #[+Term--YDID протокола HTTP]].
           Указывать его явно нужно по той же причине, что и #[+ImportantEntity__Code--YDID IP_Address], однако
             поскольку полагаться на человеческую память #[+Keyword--YDID опасно], номера #[+Term--YDID портов]
             по умолчанию для разных #[+Term--YDID протоколов] были помещены в #[+Term--YDID перечисление]
@@ -213,50 +216,47 @@ block append SpecificContent
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="2" indentationString="  ")
           routing: [
             {
-              route: { HTTP_Method: HTTP_Methods.get, pathTemplate: "/" },
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/",
         +CodeViewer-Explanation--YDF.
-          Свойство #[+ImportantEntity__Code--YDID routing], как это очевидно и должно быть очевидно при качественном
-            именовании, позволяет определить #[+DefinableTerm--YDID роутинг] —
-            #[+Keyphrase--YDID в контексте #[+Term--YDID серверной веб-разработки]], формирование различных
-            #[+Term--YDID ответов] в зависимости от соответствия #[+Term--YDID запроса] конкретным шаблонам
-            #[+Term--YDID URI].
-          Мы разберём #[+Term--YDID роутинг] подробнее в одном из следующих уроков, а сейчас важно лишь то, что мы
-            будем отправлять ответ только для #[+Keyword--YDID одного], #[+Keyword__Contrast--YDID корневого]
-            #[+Term--YDID маршрута], соответствующего #[+Term--YDID URI]
+          Мы будем отправлять ответ на #[+Term--YDID GET-запрос] по #[+ImportantEntity--YDID URI]
             #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/].
-          По #[+Keyword--YDID всем] #[+Keyword__Contrast--YDID остальным] #[+Term--YDID маршрутам], скажем
-            #[+SecondaryEntity__Code--YDID /foo] (соответствует #[+Term--YDID URI]
+          Через #[+ImportantEntity__Code--YDID pathTemplate] #[+Keyword--YDID необходимо] указать #[+Keyword--YDID часть]
+            #[+ImportantEntity--YDID URI], которая идёт #[+Keyword--YDID после] #[+Term--YDID IP-адреса] и
+            #[+Term--YDID порта] — в нашем случае это просто #[+SecondaryEntity__Code--YDID /] («корень»).
+          Вообще говоря, сейчас речь идёт о #[+Keyword--YDID пути], но #[+ImportantEntity--YDID URI] может иметь и
+            другие части #[+Keyword--YDID после] #[+Term--YDID пути] — сейчас мы в этом вдаваться не&nbsp;будем, чтобы
+            не&nbsp;перегружать урок.
+          На данный момент важно, что если мы отправим запрос по другому #[+Term--YDID пути], например
+            #[+SecondaryEntity__Code--YDID /foo] (соответствует #[+ImportantEntity--YDID URI]
             #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/foo]) или #[+SecondaryEntity__Code--YDID /bar/baz]
-            (соответствует #[+Term--YDID URI] #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/bar/baz]),
+            (соответствует #[+ImportantEntity--YDID URI] #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/bar/baz]),
             сервер отправит #[+Term--YDID ответ] с ошибкой «не найдено».
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="4" indentationString="  ")
           async handler(request: Request, response: Response): Promise<void> {
         +CodeViewer-Explanation--YDF
 
+          //- TODO Баг YDA: "асинхронной" и "по" слитно
           p.Article-Paragraph.
             #[+DefinableTerm--YDID handler] — #[+Term--YDID обработчик запроса] — определяет, какие действия нужно
-              выполнить,　когда отправленный #[+Term--YDID запрос] удовлетворяет #[+Term--YDID маршруту], указанному выше
-              в #[+ImportantEntity__Code--YDID route].
-            Это #[+Term--YDID функция] #[+Keyword--YDID априори] #[+Term--YDID асинхронная] (явно
-              #[+Keyword--YDID или] неявно　возвращает #[+Term--YDID экземпляр]　#[+ImportantEntity__Code--YDID Promise],
+              выполнить, когда отправленный #[+Term--YDID запрос] удовлетворяет указанной комбинации
+              #[+Term--YDID HTTP-метода] и #[+Term--YDID пути].
+            Эта #[+Term--YDID функция] #[+Keyword--YDID априори] #[+Term--YDID асинхронная] (явно
+              #[+Keyword--YDID или] неявно возвращает #[+Term--YDID экземпляр] #[+ImportantEntity__Code--YDID Promise],
               хотя с точки зрения #[+ImportantEntity__Code--YDID ECMAScript] это #[+Keyword--YDID не]&nbsp;совсем
               точное определение, так как #[+Term--YDID функции], получающие через #[+Term--YDID параметры]
-              #[+Term--YDID коллбэки] — #[+Term--YDID функции] для их вызова по завершению какого-либо процесса —
-              тоже называют «асинхронными»), так как отправка #[+Term--YDID ответа],　которую надо в итоге сделать,　
-              является #[+Keyword--YDID асинхронной] по своей природе.
+              #[+Term--YDID коллбэки] — #[+Term__Contrast--YDID функции] для их вызова по завершению какого-либо процесса —
+              #[+Keyword--YDID тоже] называют «асинхронными»), так как отправка #[+Term--YDID ответа], которую надо в
+              итоге сделать, является #[+Keyword--YDID асинхронной] по своей природе.
             К тому же, в #[+Term--YDID обработчике запроса] часто выполняются и другие асинхронные операции,
               например обращение к #[+Term--YDID базе данных] или работа с файлами.
 
           p.Article-Paragraph.
-            По сути, #[+ImportantEntity__Code--YDID route] и #[+ImportantEntity__Code--YDID handler] — это как
-              #[+Term--YDID условное выражение] и действие, выполняемое когда это #[+Term--YDID выражение] истинно.
-
-          p.Article-Paragraph.
             Обычно #[+Term--YDID ответ] формируется в зависимости от #[+Term--YDID запроса], #[+Term--YDID экземпляр]
-              которого представлен #[+Keyword--YDID первым]　#[+Term--YDID параметром].
+              которого представлен #[+Keyword--YDID первым] #[+Term--YDID параметром].
             Например, в случае #[+Term--YDID GET-запроса] нам могут понадобиться #[+Term--YDID query parameters]
-              (дословно это означает «параметры запроса», но без контекста — #[+Term--YDID URI] — этот перевод
+              (дословно это означает «параметры запроса», но без контекста — #[+ImportantEntity--YDID URI] — этот перевод
               может сильно запутать), а в случае #[+Term--YDID POST-] или #[+Term--YDID PUT-запросов] — доступ к данным,
               содержащимся с #[+Term--YDID теле запроса].
             Однако работу с #[+Term--YDID экземпляром] #[+Term__Contrast--YDID класса] #[+ImportantEntity--YDID Response]
@@ -268,8 +268,8 @@ block append SpecificContent
           return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
         +CodeViewer-Explanation--YDF
           p.Article-Paragraph.
-            Как известно, #[+Term--YDID HTTP-ответ] имеет #[+Term__Contrast--YDID статус], идентифицируемый
-              #[+Keyword--YDID трёхзначным]　шифром.
+            #[+Term--YDID HTTP-ответ] имеет #[+Term__Contrast--YDID статус], идентифицируемый
+              #[+Keyword--YDID трёхзначным] шифром.
             Сейчас важно, что эти #[+Term--YDID статусы] разделяются на #[+ImportantEntity--YDID 5] групп:
 
           ol.Article-OrderedList
@@ -285,7 +285,7 @@ block append SpecificContent
               (по умолчанию — #[+ImportantEntity__Code--YDID 200]).
             Указывая #[+Term--YDID свойство] #[+ImportantEntity__Code--YDID HTML_Content]
               #[+Keyphrase--YDID первого и единственного] #[+Term--YDID параметра] #[+Term__Contrast--YDID метода]
-              #[+ImportantEntity__Code--YDID submitWithSuccess], мы сообщаем, что хотим
+              #[+ImportantEntity__Code--YDID submitWithSuccess], мы указываем фреймворку, что хотим
               отправить #[+Term--YDID HTML-код], в связи с чем фреймворк #[+Keyword--YDID автоматически] установит
               нужные #[+Term--YDID HTTP-заголовки].
         +CodeViewer-PartialListing--YDF: :code_listing--yda
@@ -364,7 +364,7 @@ block append SpecificContent
       }).Article-Link иконку на вкладке браузера
       | .
       | Если бы #[+Term--YDID фреймворк] не&nbsp;был готов к такому запросу, то отправил #[+Term--YDID ответ] с ошибкой
-      |   «не найдено», однако #[+Term--YDID фреймворк] #[+ImportantEntity--YDID YDB] #[+Keyword--YDID по умолчанию]
+      |   «не найдено», однако #[+Term--YDID фреймворк] #[+ImportantEntity--YDID YDB] #[+Keyphrase--YDID по умолчанию]
       |   отправляет свою иконку.
       | Разумеется, её можно заменить на другую, что мы и сделаем в одном из будущих уроков.
 

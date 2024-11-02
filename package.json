@@ -1,9 +1,0 @@
-{
-  "private": true,
-  "scripts": {
-    "Install All Dependendies": "lerna bootstrap"
-  },
-  "devDependencies": {
-    "lerna": "4.0.0"
-  }
-}

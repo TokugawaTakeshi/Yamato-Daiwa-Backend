@@ -1,23 +1,23 @@
-/* --- Framework --------------------------------------------------------------------------------------------------- */
+/* ─── Framework ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 import type Request from "./Request/Request";
 import type Response from "./Response/Response";
-import type { ControllerInheritingClass } from "./Controller/Controller";
 import type Controller from "./Controller/Controller";
+import type { ControllerInheritingClass } from "./Controller/Controller";
 import type URI_QueryParametersDeserializer from "./URI_QueryParametersDeserializer";
 
-/* --- Utils ------------------------------------------------------------------------------------------------------- */
+/* ─── Utils ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 import {
   HTTP_Methods,
   isUndefined,
   isNotUndefined,
   removeSpecificCharacterFromCertainPosition
 } from "@yamato-daiwa/es-extensions";
-import type { RawObjectDataProcessor } from "@yamato-daiwa/es-extensions";
 import removeSlashes from "./UtilsIncubator/removeSlashes";
 
 
 abstract class Router {
 
+  /* ━━━ Public Methods ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   public static normalizeRouting(routesAndHandlersData: Router.RawRouting): Router.NormalizedRouting {
 
     const normalizedRouting: Router.NormalizedRouting = {
@@ -35,13 +35,11 @@ abstract class Router {
 
     const mappedRoutesAndHandlers: Map<Router.Route, Router.RouteHandler> = new Map<Router.Route, Router.RouteHandler>();
 
-
     for (const variadicArrayElement of routesAndHandlersData) {
 
       if ("handler" in variadicArrayElement) {
 
-        const routeAndHandlerPair: Router.RouteAndHandlerPair = variadicArrayElement;
-        mappedRoutesAndHandlers.set(routeAndHandlerPair.route, routeAndHandlerPair.handler);
+        mappedRoutesAndHandlers.set(variadicArrayElement, variadicArrayElement.handler);
 
       } else {
 
@@ -51,7 +49,9 @@ abstract class Router {
         for (const [ route, handler ] of controller.getRoutesAndHandlers()) {
           mappedRoutesAndHandlers.set(route, handler.bind(controller));
         }
+
       }
+
     }
 
 
@@ -61,25 +61,27 @@ abstract class Router {
           normalizedRouting[route.HTTP_Method];
 
       Router.addRouteAndHandlerPairToNormalizedRoutesOfSpecificHTTP_MethodMutableObject({
-        normalizedRoutesOfCurrentHTTP_Method,
+        normalizedRoutesOfTargetHTTP_Method: normalizedRoutesOfCurrentHTTP_Method,
         route,
         handler
       });
+
     }
 
     return normalizedRouting;
+
   }
 
   public static getRouteMatch(
-    {
-      URI_Path,
-      HTTP_Method,
-      normalizedRouting
-    }: {
-      URI_Path: string;
-      HTTP_Method: HTTP_Methods;
-      normalizedRouting: Router.NormalizedRouting;
-    }
+      {
+        URI_Path,
+        HTTP_Method,
+        normalizedRouting
+      }: {
+        URI_Path: string;
+        HTTP_Method: HTTP_Methods;
+        normalizedRouting: Router.NormalizedRouting;
+      }
   ): Router.RouteMatch | null {
 
     const matchesActualForCurrentHTTP_Method: Router.NormalizedRouting.RoutesOfSpecificHTTP_Method =
@@ -89,14 +91,15 @@ abstract class Router {
 
     if (URI_PathSegments.length === 1 && URI_PathSegments[0].length === 0) {
 
-      const handlerForPathOfCurrentLength: Router.RouteHandler | undefined =
-          matchesActualForCurrentHTTP_Method["/"]?.handlerForPathOfCurrentLength;
+      const routeForRootPath: Router.NormalizedRouting.RouteForPathOfSpecificDepth | undefined =
+          matchesActualForCurrentHTTP_Method["/"]?.routeForPathOfCurrentLength;
 
-      return isNotUndefined(handlerForPathOfCurrentLength) ? {
-        handler: handlerForPathOfCurrentLength,
-        routePathParameters,
-        routePathTemplate: "/"
-      } : null;
+      return isNotUndefined(routeForRootPath) ?
+          {
+            handler: routeForRootPath.handler,
+            routePathParameters,
+            routePathTemplate: "/"
+          } : null;
 
     }
 
@@ -115,15 +118,15 @@ abstract class Router {
 
       if (isLastSegment) {
 
-        if (isUndefined(matchesForCurrentPathSegmentsCount.handlerForPathOfCurrentLength)) {
+        if (isUndefined(matchesForCurrentPathSegmentsCount.routeForPathOfCurrentLength)) {
           return null;
         }
 
 
         return {
-          handler: matchesForCurrentPathSegmentsCount.handlerForPathOfCurrentLength,
-          routePathParameters,
-          routePathTemplate: "(Wait until refactor will done)" // FIXME
+          handler: matchesForCurrentPathSegmentsCount.routeForPathOfCurrentLength.handler,
+          routePathTemplate: matchesForCurrentPathSegmentsCount.routeForPathOfCurrentLength.pathTemplate,
+          routePathParameters
         };
 
       }
@@ -132,11 +135,11 @@ abstract class Router {
       const nextPathSegment: string = URI_PathSegments[index + 1];
       const routingForStaticPathSegmentsAtNextPosition: Router.NormalizedRouting.
           RoutingForStaticPathSegmentsAtNextPosition | undefined =
-              matchesForCurrentPathSegmentsCount.routingForStaticPathSegmentsAtNextPosition;
+          matchesForCurrentPathSegmentsCount.routingForStaticPathSegmentsAtNextPosition;
 
       if (
-        isNotUndefined(routingForStaticPathSegmentsAtNextPosition) &&
-        isNotUndefined(routingForStaticPathSegmentsAtNextPosition[nextPathSegment])
+          isNotUndefined(routingForStaticPathSegmentsAtNextPosition) &&
+          isNotUndefined(routingForStaticPathSegmentsAtNextPosition[nextPathSegment])
       ) {
         matchesForCurrentPathSegmentsCount = routingForStaticPathSegmentsAtNextPosition[nextPathSegment];
         continue;
@@ -148,47 +151,46 @@ abstract class Router {
             routingForRoutePathParameterAtNextPosition.parameterName] = nextPathSegment;
         matchesForCurrentPathSegmentsCount = matchesForCurrentPathSegmentsCount.routingForRoutePathParameterAtNextPosition;
       }
+
     }
 
     return null;
+
   }
 
 
-  private static addRouteAndHandlerPairToNormalizedRoutesOfSpecificHTTP_MethodMutableObject(
-    {
-      normalizedRoutesOfCurrentHTTP_Method,
-      route,
-      handler
-    }: {
-      normalizedRoutesOfCurrentHTTP_Method: Router.NormalizedRouting.RoutesOfSpecificHTTP_Method;
-      route: Router.Route;
-      handler: Router.RouteHandler;
-    }
+  /* ━━━ Protected Methods ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  protected static addRouteAndHandlerPairToNormalizedRoutesOfSpecificHTTP_MethodMutableObject(
+      {
+        normalizedRoutesOfTargetHTTP_Method,
+        route,
+        handler
+      }: {
+        normalizedRoutesOfTargetHTTP_Method: Router.NormalizedRouting.RoutesOfSpecificHTTP_Method;
+        route: Router.Route;
+        handler: Router.RouteHandler;
+      }
   ): void {
 
     if (route.pathTemplate === "/") {
-      normalizedRoutesOfCurrentHTTP_Method["/"] = {
-        handlerForPathOfCurrentLength: handler
-      };
+      normalizedRoutesOfTargetHTTP_Method["/"] = { routeForPathOfCurrentLength: { handler, pathTemplate: "/" } };
       return;
     }
 
 
-    const pathSegments: Array<string> = removeSlashes(route.pathTemplate, { leading: true, trailing: true }).split("/");
+    const pathSegments: ReadonlyArray<string> = removeSlashes(
+        route.pathTemplate, { leading: true, trailing: true }
+    ).split("/");
 
     let normalizedRoutingDataForSpecificPathSegment: Router.NormalizedRouting.RoutingDataForSpecificPathSegment;
     const normalizedRoutingDataForFirstPathSegment: Router.NormalizedRouting.RoutingDataForSpecificPathSegment | undefined =
-        normalizedRoutesOfCurrentHTTP_Method[pathSegments[0]];
+        normalizedRoutesOfTargetHTTP_Method[pathSegments[0]];
 
     if (isNotUndefined(normalizedRoutingDataForFirstPathSegment)) {
       normalizedRoutingDataForSpecificPathSegment = normalizedRoutingDataForFirstPathSegment;
     } else {
-
-      /* [ Mnemonic ] Create platform -> mount platform -> climb to platform */
-      const normalizedRoutingDataForSpecificPosition__referableObject:
-          Router.NormalizedRouting.RoutingDataForSpecificPathSegment = {};
-      normalizedRoutesOfCurrentHTTP_Method[pathSegments[0]] = normalizedRoutingDataForSpecificPosition__referableObject;
-      normalizedRoutingDataForSpecificPathSegment = normalizedRoutingDataForSpecificPosition__referableObject;
+      normalizedRoutingDataForSpecificPathSegment = {};
+      normalizedRoutesOfTargetHTTP_Method[pathSegments[0]] = normalizedRoutingDataForSpecificPathSegment;
     }
 
     for (const [ index ] of pathSegments.entries()) {
@@ -197,9 +199,12 @@ abstract class Router {
 
       if (isLastSegment) {
 
-        normalizedRoutingDataForSpecificPathSegment.handlerForPathOfCurrentLength = handler;
+        normalizedRoutingDataForSpecificPathSegment.routeForPathOfCurrentLength = {
+          handler, pathTemplate: route.pathTemplate
+        };
 
         continue;
+
       }
 
 
@@ -219,8 +224,8 @@ abstract class Router {
           normalizedRoutingDataForSpecificPathSegment = normalizedRoutingDataForSpecificPathSegment.
               routingForRoutePathParameterAtNextPosition;
 
-
           continue;
+
         }
 
 
@@ -228,12 +233,13 @@ abstract class Router {
             routingForRoutePathParameterAtNextPosition;
 
         continue;
+
       }
 
 
       const routingForStaticPathSegmentsAtNextPosition: Router.NormalizedRouting.
           RoutingForStaticPathSegmentsAtNextPosition | undefined =
-              normalizedRoutingDataForSpecificPathSegment.routingForStaticPathSegmentsAtNextPosition;
+          normalizedRoutingDataForSpecificPathSegment.routingForStaticPathSegmentsAtNextPosition;
 
       if (isUndefined(routingForStaticPathSegmentsAtNextPosition)) {
 
@@ -244,7 +250,9 @@ abstract class Router {
         };
 
         normalizedRoutingDataForSpecificPathSegment = nextPathSegmentMatches;
+
         continue;
+
       }
 
 
@@ -260,7 +268,9 @@ abstract class Router {
 
 
       normalizedRoutingDataForSpecificPathSegment = routingDataForStaticPathSegmentAtNextPosition;
+
     }
+
   }
 
   private static isSegmentIsRouteParameter(targetURL_Segment: string): boolean {
@@ -272,18 +282,18 @@ abstract class Router {
 
 namespace Router {
 
-  export type RawRouting = ReadonlyArray<ControllerInheritingClass | RouteAndHandlerPair>;
-  export type RouteHandler = (request: Request, response: Response) => Promise<void>;
-
-  /* [ API ] For the user's convenience, it is better to refrain from namespacing of "RouteAndHandlerPair" a */
-  export type RouteAndHandlerPair = { readonly route: Route; readonly handler: RouteHandler; };
+  export type RawRouting = ReadonlyArray<ControllerInheritingClass | RouteAndHandler>;
 
   export type Route = Readonly<{
     HTTP_Method: HTTP_Methods;
     pathTemplate: string;
     queryParametersDeserializer?: URI_QueryParametersDeserializer;
-    queryParametersProcessing?: RawObjectDataProcessor.PropertiesSpecification;
   }>;
+
+  export type RouteHandler = (request: Request, response: Response) => Promise<void>;
+
+  /* [ API ] For the user's convenience, it is better to refrain from namespacing of "RouteAndHandlerPair". */
+  export type RouteAndHandler = Route & Readonly<{ handler: RouteHandler; }>;
 
   export type RouteMatch = Readonly<{
     handler: RouteHandler;
@@ -310,17 +320,22 @@ namespace Router {
   export namespace NormalizedRouting {
 
     export type RoutesOfSpecificHTTP_Method = {
-      [ pathSegment: string]: RoutingDataForSpecificPathSegment | undefined;
+      [pathSegment: string]: RoutingDataForSpecificPathSegment | undefined;
     };
 
     export type RoutingDataForSpecificPathSegment = {
-      handlerForPathOfCurrentLength?: RouteHandler;
+      routeForPathOfCurrentLength?: RouteForPathOfSpecificDepth;
       routingForStaticPathSegmentsAtNextPosition?: RoutingForStaticPathSegmentsAtNextPosition;
       routingForRoutePathParameterAtNextPosition?: RoutingForRouteParameterAtNextPosition;
     };
 
+    export type RouteForPathOfSpecificDepth = {
+      pathTemplate: string;
+      handler: RouteHandler;
+    };
+
     export type RoutingForStaticPathSegmentsAtNextPosition = {
-       [routePathSegment: string]: RoutingDataForSpecificPathSegment | undefined;
+      [routePathSegment: string]: RoutingDataForSpecificPathSegment | undefined;
     };
     export type RoutingForRouteParameterAtNextPosition = RoutingDataForSpecificPathSegment & Readonly<{ parameterName: string; }>;
   }

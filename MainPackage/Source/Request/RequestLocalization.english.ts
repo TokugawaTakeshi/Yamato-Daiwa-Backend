@@ -9,15 +9,15 @@ const requestLocalization__english: Request.Localization = {
     unableToAccessToProcessedRoutePathParameters: {
       title: ImproperUsageError.localization.defaultTitle,
       description:
-          "\"request.getRoutePathParameters\" has been called while processing of URI path parameters " +
-            "has not been defined at \"route.pathParameterProcessing\"."
+          "`request.validateAndProcessRoutePathParameters` could be called if and only if the specific route has been " +
+            "matched for target request."
     },
 
     unableToAccessToProcessedURI_QueryParameters: {
       title: ImproperUsageError.localization.defaultTitle,
       description:
-          "\"request.getURI_QueryParameters\" has been called while processing of URI query parameters " +
-            "has not been defined at \"route.queryParametersProcessing\"."
+          "`request.validateAndProcessURI_QueryParameters` could be called if and only if the specific route has been " +
+            "matched for target request."
     }
 
   },

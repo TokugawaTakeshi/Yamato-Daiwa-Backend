@@ -9,22 +9,23 @@ export default function removeSlashes(
     }
 ): string {
 
-  let transformingWorkpiece: string = targetString;
+  let workpiece: string = targetString;
 
-  if (options.leading && transformingWorkpiece.startsWith("/")) {
-    transformingWorkpiece = removeNthCharacter(transformingWorkpiece, {
+  if (options.leading && workpiece.startsWith("/")) {
+    workpiece = removeNthCharacter(workpiece, {
       targetCharacterNumber: 0,
       numerationFrom: 0
     });
   }
 
-  if (options.trailing && transformingWorkpiece.endsWith("/")) {
-    transformingWorkpiece = removeSpecificCharacterFromCertainPosition({
-      targetString: transformingWorkpiece,
+  if (options.trailing && workpiece.endsWith("/")) {
+    workpiece = removeSpecificCharacterFromCertainPosition({
+      targetString: workpiece,
       targetCharacter: "/",
       fromLastPosition: true
     });
   }
 
-  return transformingWorkpiece;
+  return workpiece;
+
 }

@@ -39,11 +39,6 @@ tutorials:
           japanese: 01-Source/Pages/Tutorials/02-RoutingAndControllers/TableOfContents/RoutingAndControllersTutorialPage.toc.japanese.yaml
           russian: 01-Source/Pages/Tutorials/02-RoutingAndControllers/TableOfContents/RoutingAndControllersTutorialPage.toc.russian.yaml
 
-    routePathParameters:
-      $heading: `tutorials.routePathParameters.$heading`
-      $URI: "https://github.com/TokugawaTakeshi/Yamato-Daiwa-Backend/blob/master/Tutorials/04-RoutePathParameters/README.md"
-      # $URI: `@All/Tutorials/02-RoutingAndControllers/RoutingAndControllers.${ fileNameLocalizationExtension }`
-
     routeQueryParameters:
       $heading: `tutorials.routeQueryParameters.$heading`
       $URI: "https://github.com/TokugawaTakeshi/Yamato-Daiwa-Backend/blob/master/Tutorials/05-RouteQueryParameters/README.md"

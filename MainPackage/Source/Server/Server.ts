@@ -10,11 +10,10 @@ import DomainNameSystem from "dns/promises";
 import Request from "../Request/Request";
 import Response from "../Response/Response";
 import Router from "../Router";
-import Middleware from "../Middleware/Middleware";
 import type URI_QueryParametersDeserializer from "../URI_QueryParametersDeserializer";
-
-/* ─── Build-in Middlewares ───────────────────────────────────────────────────────────────────────────────────────── */
-import CORS_Middleware from "../Middleware/CORS_Middleware";
+import Middleware from "../Middleware/Middleware";
+import ClassTypeMiddleware from "../Middleware/ClassTypeMiddleware";
+import type FunctionTypeMiddleware from "../Middleware/FunctionTypeMiddleware";
 
 /* ─── Applied Utils ──────────────────────────────────────────────────────────────────────────────────────────────── */
 import ConfigurationNormalizer from "../ConfigurationNormalizer/ConfigurationNormalizer";
@@ -45,6 +44,7 @@ import {
   isErrnoException
 } from "@yamato-daiwa/es-extensions-nodejs";
 import InvalidRoutePathParametersError from "../Errors/InvalidRoutePathParameters/InvalidRoutePathParametersError";
+import InvalidURI_QueryParametersError from "../Errors/InvalidURI_QueryParameters/InvalidURI_QueryParametersError";
 
 /* ─── Localization ───────────────────────────────────────────────────────────────────────────────────────────────── */
 import serverLocalization__english from "./ServerLocalization.english";
@@ -62,7 +62,7 @@ class Server {
 
   /* ━━━ Instance Fields ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   private readonly configuration: Server.NormalizedConfiguration;
-  private readonly middlewares: Array<Middleware> = [ CORS_Middleware ];
+  private readonly middlewares: ReadonlyArray<FunctionTypeMiddleware | ClassTypeMiddleware>;
 
 
   /* ━━━ Public Static Methods ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -78,6 +78,7 @@ class Server {
   /* ━━━ Constructor ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   private constructor(configuration: Server.RawConfiguration) {
     this.configuration = ConfigurationNormalizer.normalize(configuration);
+    this.middlewares = configuration.middlewares ?? [];
   }
 
 
@@ -401,6 +402,7 @@ class Server {
 
       rawResponse.writeHead(HTTP_StatusCodes.internalServerError).end();
       return;
+
     }
 
 
@@ -471,7 +473,6 @@ class Server {
       URI: normalizedURI,
       cookieHTTP_Header: rawRequest.headers.cookie,
       rawRoutePathParameters: routeMatch?.routePathParameters,
-      rawURI_QueryParameters: {}, // TODO
       subdomainParameters: actualSubdomainConfig?.parameterizedHostNameLabels_Values,
       routePathTemplate: routeMatch?.routePathTemplate
     });
@@ -480,13 +481,17 @@ class Server {
 
     for (const middleware of this.middlewares) {
 
-      let middlewareCompletionSignal: Middleware.CompletionSignal;
+      let middlewareCompletionSignal: Middleware.CompletionSignals;
 
       try {
 
         /* eslint-disable-next-line no-await-in-loop --
          * The middleware handlers must be executed sequentially. */
-        middlewareCompletionSignal = await middleware(normalizedRequest, response, this.configuration);
+        middlewareCompletionSignal = await (
+          middleware instanceof ClassTypeMiddleware ?
+              middleware.handleRequest(normalizedRequest, response, this.configuration) :
+              middleware(normalizedRequest, response, this.configuration)
+        );
 
       } catch (error: unknown) {
 
@@ -495,7 +500,7 @@ class Server {
       }
 
 
-      if (middlewareCompletionSignal === Middleware.CompletionSignal.finishRequestHandling) {
+      if (middlewareCompletionSignal === Middleware.CompletionSignals.finishRequestHandling) {
         return;
       }
 
@@ -738,7 +743,23 @@ class Server {
 
     }
 
-    // TODO InvalidInvalidURI_QueryParametersError
+
+    if (error instanceof InvalidURI_QueryParametersError) {
+
+      Logger.logError({
+        errorType: InvalidURI_QueryParametersError.NAME,
+        title: InvalidURI_QueryParametersError.localization.defaultTitle,
+        description: error.message,
+        occurrenceLocation: "Server.handleErrorAndSubmitResponse(response, error)"
+      });
+
+      return response.submitWithError({
+        statusCode: ClientErrorsHTTP_StatusCodes.badRequest,
+        plainTextContent: error.message
+      });
+
+    }
+
 
     Logger.logError({
       errorType: "RequestHandlerError",
@@ -748,6 +769,7 @@ class Server {
     });
 
     return response.submitWithError({ statusCode: ServerErrorsHTTP_StatusCodes.internalServerError });
+
   }
 
 }
@@ -773,6 +795,7 @@ namespace Server {
     HTTP?: RawConfiguration.HTTP;
     HTTPS?: RawConfiguration.HTTPS;
     routing?: Router.RawRouting;
+    middlewares?: ReadonlyArray<FunctionTypeMiddleware | ClassTypeMiddleware>;
     publicDirectoriesAbsoluteOrRelativePaths?: ReadonlyArray<string>;
     security?: RawConfiguration.Security;
     subdomains?: RawConfiguration.Subdomains;
@@ -966,7 +989,6 @@ namespace Server {
         ) => string;
       }>;
 
-      // TODO 統一
       middlewareExecutionFailed: Pick<Log, "title" | "description">;
       routeHandlerExecutionFailed: Pick<Log, "title" | "description">;
 

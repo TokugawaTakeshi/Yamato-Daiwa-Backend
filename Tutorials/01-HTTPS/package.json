@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "scripts": {
+    "start": "tsx EntryPoint.ts"
+  },
+  "dependencies": {
+    "@yamato-daiwa/backend": "../../MainPackage",
+    "fundamental-constants": "0.8.0"
+  },
+  "devDependencies": {
+    "tsx": "4.20.3",
+    "typescript": "5.8.3"
+  }
+}

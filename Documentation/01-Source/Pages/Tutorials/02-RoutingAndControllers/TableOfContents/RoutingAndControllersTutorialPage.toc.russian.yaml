@@ -39,3 +39,7 @@ routingInYDB:
     numeric:
 
       $heading: "Числовые параметры пути"
+
+  controllers:
+
+    $heading: "Контроллеры"

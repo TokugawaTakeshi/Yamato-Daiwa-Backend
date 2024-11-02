@@ -22,7 +22,7 @@ theory:
 
   primitiveRoutingImplementation:
 
-    $heading: "Routing Primitive Implementation"
+    $heading: "Primitive Routing Implementation"
 
 routingInYDB:
 
@@ -39,3 +39,7 @@ routingInYDB:
     numeric:
 
       $heading: "Numeric Path Parameters"
+
+  controllers:
+
+    $heading: "Controllers"

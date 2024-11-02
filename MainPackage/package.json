@@ -20,7 +20,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=18.0"
+    "node": ">=22.0"
   },
   "homepage": "https://backend-es.yamato-daiwa.com",
   "repository": {
@@ -36,31 +36,32 @@
     "Distributable",
     "favicon.ico"
   ],
-  "scripts": {
-    "Incremental building": "tsc --watch",
-    "Distributable updating": "rimraf Distributable && tsc",
-    "Linting": "eslint . --ext .ts",
-    "Alpha realize": "npm publish --tag alpha"
-  },
   "dependencies": {
     "@types/pug": "2.0.10",
-    "@types/qs": "6.9.15",
-    "@yamato-daiwa/es-extensions": "1.7.0",
+    "@types/qs": "6.9.17",
+    "@yamato-daiwa/es-extensions": "1.7.2",
     "@yamato-daiwa/es-extensions-nodejs": "1.7.0",
-    "fundamental-constants": "0.1.0",
+    "fundamental-constants": "0.6.0",
+    "@types/qs": "6.14.0",
+    "fundamental-constants": "0.8.0",
     "handlebars": "4.7.8",
     "pug": "3.0.3",
-    "qs": "6.12.1"
+    "qs": "6.14.0"
   },
   "devDependencies": {
-    "@types/mocha": "10.0.7",
-    "@types/node": "20.14.9",
-    "@yamato-daiwa/style_guides": "0.2.9",
-    "mocha": "10.5.2",
-    "nodemon": "3.1.4",
-    "rimraf": "5.0.7",
+    "@types/node": "22.15.31",
+    "@yamato-daiwa/style_guides": "0.7.0",
+    "nodemon": "3.1.10",
+    "rimraf": "6.0.1",
     "ts-node": "10.9.2",
     "tsconfig-paths": "4.2.0",
-    "typescript": "5.5.2"
+    "typescript": "5.8.3"
+  },
+  "scripts": {
+    "Lint": "eslint",
+    "Rebuild Distributable Without Preliminary Cleaning": "tsc",
+    "Rebuild Distributable": "rimraf Distributable && tsc",
+    "Rebuild Distributable and Realize Alpha": "npm run \"Rebuild Distributable\" && npm publish --tag alpha",
+    "Rebuild Distributable and Realize RC": "npm run \"Rebuild Distributable\" && npm publish --tag rc"
   }
 }
