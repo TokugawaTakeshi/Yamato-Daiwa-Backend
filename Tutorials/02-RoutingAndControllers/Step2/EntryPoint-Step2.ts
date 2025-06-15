@@ -38,7 +38,8 @@ Server.initializeAndStart({
         const targetProductID: string = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: string; }>({
           PRODUCT_ID: {
             type: String,
-            required: true
+            isUndefinedForbidden: true,
+            isNullForbidden: true
           }
         }).PRODUCT_ID;
 

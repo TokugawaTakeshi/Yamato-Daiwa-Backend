@@ -16,9 +16,14 @@ block append Metadata
 
   -
 
+    const {
+      $heading: topHeading,
+      $sectioning: localizedSectioning
+    } = routing.japanese.tutorials.$children.helloWorld;
+
     RegularWebPageTemplate__YDF.configure({
       metadata: {
-        title: buildHTML_PageTitle("Hello, world!"),
+        title: buildHTML_PageTitle(topHeading),
         description:
             "「やまとダイワバックエンド」（技術名：「Yamato Daiwa Backend」、略：「YDB」）というNode.jsフレームワークで作られた最小のサーバアプリケーションの例"
       },
@@ -36,8 +41,6 @@ block append Metadata
       english: routing.english.tutorials.$children.helloWorld.$URI,
       russian: routing.russian.tutorials.$children.helloWorld.$URI
     });
-
-    const localizedSectioning = routing.japanese.tutorials.$children.helloWorld.$sectioning;
 
 
 block append HeadScripts
@@ -107,34 +110,19 @@ block append SpecificContent
       dt= `@yamato-daiwa/backend [${ DependenciesVersions["@yamato-daiwa/backend"] }]`
       dd 当フレームワークの主要な#[+Term--YDID npmパッケージ]
 
-      dt= `@yamato-daiwa/es-extensions [${ DependenciesVersions["@yamato-daiwa/es-extensions"] }]`
-      dd.
-        #[+ImportantEntity--YDID Node.js]・#[+ImportantEntity--YDID ブラウザー専用JavaScript]不問の補助機能。
-        当授業内、#[+ImportantEntity--YDID HTTP_Methods]#[+Term--YDID 列挙]のみ必要に成るが、プロジェクトの拡大と共にもっと必要に成る予定。
+      dt= `typescript [${DependenciesVersions.typescript}]`
+      dd #[+ImportantEntity--YDID TypeScript]言語の主要#[+Term--YDID npmパッケージ]。
 
-      dt= `ts-node [${ DependenciesVersions["ts-node"] }]`
-      dd.
-        #[+ImportantEntity--YDID TypeScript]言語専用の
-          #[+Link--YDF({ unendorsedExternalURI: "https://ja.wikipedia.org/wiki/REPL" }).Article-Link REPL]。
-        #[+ImportantEntity--YDID TypeScript]は自分の#[+Term--YDID ランタイム]を持っている効果を作り、
-          当授業内コンパイル済みの#[+Term--YDID JavaScriptファイル]関連面倒を避ける。
-
-      dt= `typescript [${ DependenciesVersions.typescript }]`
-      dd.
-        #[+ImportantEntity--YDID TypeScript]言語の主要#[+Term--YDID npmパッケージ]。
-        #[+ImportantEntity--YDID ts-node]は当パッケージの導入を求める
-          （#[+ImportantEntity--YDID npm]の用語を使って言い換えると、#[+ImportantEntity--YDID typescript]は
-          #[+ImportantEntity--YDID ts-node]に対する#[+Term--YDID peer dependency]である）。
-        現在の#[+ImportantEntity--YDID npm]は#[+Term--YDID ピア依存性]を自動的に導入しているが、我々は此の#[+Term--YDID パッケージ]の
-          特定バージョンを#[+Term--YDID 意識的に]導入する。
+      dt= `tsx [${ DependenciesVersions["tsx"] }]`
+      dd #[+Term--YDID JavaScriptファイル]をドライブに書き出さずに#[+ImportantEntity--YDID TypeScript]で書かれたコードを実行する為の手段。
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.Bash })
-        | #{ dependenciesInstalationConsoleCommand }
+        | #{ nonDevelopmentDependenciesInstallationConsoleCommand }
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.Bash }).
-        npm i ts-node@#{ DependenciesVersions["ts-node"] } typescript@#{ DependenciesVersions.typescript } -D
+        npm i typescript@#{ DependenciesVersions.typescript } tsx@#{ DependenciesVersions["tsx"] } -D
 
 
     //- ━━━ コード ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -159,8 +147,13 @@ block append SpecificContent
       })
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda
-          import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-          import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+          import {
+            Server,
+            Request,
+            Response,
+            ProtocolDependentDefaultPorts,
+            HTTP_Methods
+          } from "@yamato-daiwa/backend";
 
 
           Server.initializeAndStart({
@@ -277,11 +270,20 @@ block append SpecificContent
     }).Article-Heading2
 
     p.Article-Paragraph.
-      #[+ImportantEntity--YDID ts-node]でアプリケーションを起動しよう。
+      #[+ImportantEntity--YDID tsx]でアプリケーションを起動しよう。
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.Bash }).
-        ts-node EntryPoint.ts
+        tsx EntryPoint.ts
+
+    p.Article-Paragraph.
+      「tsxが見つからなかった」と言う様なエラーが発生した場合、当ユーティリティのグローバルインストールと他に
+        #[+ImportantEntity__Code--YDID "start": "tsx EntryPoint.ts"]の様なスクリプトを#[+ImportantEntity--YDID package.json]に
+        追加した上で下記のコマンドを実行すると良い。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.Bash }).
+        npm run start
 
     p.Article-Paragraph.
       コードに間違いが無い場合、成功起動に関する下記の通知はターミナルに表示。

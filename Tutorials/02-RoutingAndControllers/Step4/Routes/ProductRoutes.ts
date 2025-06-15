@@ -28,7 +28,8 @@ export default [
           preValidationModifications: convertPotentialStringToNumberIfPossible,
           type: Number,
           numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber,
-          required: true
+          isUndefinedForbidden: true,
+          isNullForbidden: true
         }
       }).PRODUCT_ID;
 

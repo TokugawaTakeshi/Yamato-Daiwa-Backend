@@ -16,9 +16,14 @@ block append Metadata
 
   -
 
+    const {
+      $heading: topHeading,
+      $sectioning: localizedSectioning
+    } = routing.russian.tutorials.$children.helloWorld;
+
     RegularWebPageTemplate__YDF.configure({
       metadata: {
-        title: buildHTML_PageTitle("Hello, world!"),
+        title: buildHTML_PageTitle(topHeading),
         description:
             "Минимальный пример серверного приложения, написанного с использованием Node.js-фреймворка " +
               "«Yamato Daiwa Backend» (сокращённо: «YDB»)."
@@ -37,8 +42,6 @@ block append Metadata
       english: routing.english.tutorials.$children.helloWorld.$URI,
       japanese: routing.japanese.tutorials.$children.helloWorld.$URI
     });
-
-    const localizedSectioning = routing.russian.tutorials.$children.helloWorld.$sectioning;
 
 
 block append HeadScripts
@@ -110,36 +113,21 @@ block append SpecificContent
       dt= `@yamato-daiwa/backend [${ DependenciesVersions["@yamato-daiwa/backend"] }]`
       dd Главный #[+Term--YDID npm-пакет] данного фреймворка
 
-      dt= `@yamato-daiwa/es-extensions [${ DependenciesVersions["@yamato-daiwa/es-extensions"] }]`
-      dd.
-        Вспомогательная функциональность, которая актуальна как для #[+ImportantEntity--YDID Node.js], так и для
-          #[+ImportantEntity--YDID браузерного JavaScript-а].
-        В данном уроке нам потребуется лишь #[+Term--YDID перечисление] #[+ImportantEntity--YDID HTTP_Methods],
-          но в будущем — гораздо больше.
+      dt= `typescript [${DependenciesVersions.typescript}]`
+      dd Основной #[+Term--YDID npm-пакет] языка #[+ImportantEntity--YDID TypeScript].
 
-      dt= `ts-node [${ DependenciesVersions["ts-node"] }]`
+      dt= `tsx [${ DependenciesVersions["tsx"] }]`
       dd.
-        #[+Link--YDF({ unendorsedExternalURI: "https://ru.wikipedia.org/wiki/REPL" }).Article-Link REPL] для языка
-          #[+ImportantEntity--YDID TypeScript].
-        Создаёт эффект того, что #[+ImportantEntity--YDID TypeScript] имеет собственную #[+Term--YDID среду выполнения],
-          что позволит нам на время этого урока рутины, связанные с выходными #[+Term--YDID JavaScript-файлами].
-
-      dt= `typescript [${ DependenciesVersions.typescript }]`
-      dd.
-        Основной #[+Term--YDID npm-пакет] языка #[+ImportantEntity--YDID TypeScript].
-        #[+ImportantEntity--YDID ts-node] требует #[+Keyword--YDID отдельной] установки этого пакета
-          (говоря терминологией #[+ImportantEntity--YDID npm], #[+ImportantEntity--YDID typescript] является
-          #[+Term--YDID одноранговой зависимостью] по отношению к #[+ImportantEntity--YDID ts-node]).
-        Хотя в современный #[+ImportantEntity--YDID npm] устанавливает #[+Term--YDID одноранговые зависимости]
-          автоматически, мы будем осознанно устанавливать #[+Keyword--YDID конкретную] версию этого #[+Term--YDID пакета].
+        Инструмент для выполнения кода, написанного на языке #[+ImportantEntity--YDID TypeScript] без записи на диск
+          выходных #[+Term--YDID JavaScript-файлов].
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.Bash })
-        | #{ dependenciesInstalationConsoleCommand }
+        | #{ nonDevelopmentDependenciesInstallationConsoleCommand }
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.Bash }).
-        npm i ts-node@#{ DependenciesVersions["ts-node"] } typescript@#{ DependenciesVersions.typescript } -D
+        npm i typescript@#{ DependenciesVersions.typescript } tsx@#{ DependenciesVersions["tsx"] } -D
 
 
     //- ━━━ Код ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -168,8 +156,13 @@ block append SpecificContent
 
         //- TODO Баг YDA: "метода" и "с" слитно
         +CodeViewer-PartialListing--YDF: :code_listing--yda
-          import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-          import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+          import {
+            Server,
+            Request,
+            Response,
+            ProtocolDependentDefaultPorts,
+            HTTP_Methods
+          } from "@yamato-daiwa/backend";
 
 
           Server.initializeAndStart({
@@ -303,12 +296,20 @@ block append SpecificContent
     }).Article-Heading2
 
     p.Article-Paragraph.
-      Запустим приложение с помощью #[+ImportantEntity--YDID ts-node].
+      Запустим приложение с помощью #[+ImportantEntity--YDID tsx].
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.Bash }).
-        ts-node EntryPoint.ts
+        tsx EntryPoint.ts
 
+    p.Article-Paragraph.
+      Если в Вас в консоли появилось сообщение о том, что утилита #[+ImportantEntity--YDID tsx] не&nbsp;найдена, то
+        помимо глобальной установки этой утилиты можно в #[+ImportantEntity--YDID package.json] добавить
+        #[+Term--YDID скрипт] наподобие #[+ImportantEntity__Code--YDID "start": "tsx EntryPoint.ts"] и запустить его:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.Bash }).
+        npm run start
 
     p.Article-Paragraph.
       Если в коде нет ошибок, то Вы будете проинформированы об успешном запуске приложения следующим выводом в терминал:

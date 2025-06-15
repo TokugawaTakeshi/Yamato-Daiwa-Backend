@@ -28,8 +28,9 @@ export default class ProductController extends Controller {
       ID: {
         preValidationModifications: convertPotentialStringToIntegerIfPossible,
         type: Number,
-        required: true,
-        numbersSet: RawObjectDataProcessor.NumbersSets.nonNegativeInteger
+        numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+        isUndefinedForbidden: true,
+        isNullForbidden: true
       }
     }).ID;
 

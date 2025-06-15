@@ -2,11 +2,9 @@
 
   const DependenciesVersions = {
     "@yamato-daiwa/backend": "0.4.0",
-    "@yamato-daiwa/es-extensions": "1.7.0",
-    "ts-node": "10.9.2",
-    typescript: "5.5.4"
+    "tsx": "4.20.3",
+    "typescript": "5.8.3"
   }
 
-  const dependenciesInstalationConsoleCommand = `npm i ` +
-      `@yamato-daiwa/backend@${ DependenciesVersions["@yamato-daiwa/backend"] } ` +
-      `@yamato-daiwa/es-extensions@${ DependenciesVersions["@yamato-daiwa/es-extensions"] }`;
+  const nonDevelopmentDependenciesInstallationConsoleCommand = `npm i ` +
+      `@yamato-daiwa/backend@${ DependenciesVersions["@yamato-daiwa/backend"] }`;

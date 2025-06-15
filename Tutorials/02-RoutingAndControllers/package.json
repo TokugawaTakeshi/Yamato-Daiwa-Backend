@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "dependencies": {
     "@yamato-daiwa/backend": "../../MainPackage",
-    "@yamato-daiwa/es-extensions": "1.7.0"
+    "@yamato-daiwa/es-extensions": "1.8.0-experimental.0"
   },
   "devDependencies": {
     "ts-node": "10.9.2",
-    "typescript": "5.5.4"
+    "typescript": "5.8.3"
   }
 }

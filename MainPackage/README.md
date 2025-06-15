@@ -2,18 +2,22 @@
 
 [![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@yamato-daiwa/backend)
 [![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/TokugawaTakeshi/Yamato-Daiwa-Backend)
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![MIT](https://img.shields.io/badge/MIT-green?style=for-the-badge)
+![TypeScript](https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 
-[![NPM Version](https://img.shields.io/npm/v/@yamato-daiwa/backend)](https://www.npmjs.com/package/@yamato-daiwa/es-extensions)
+[![NPM Version](https://img.shields.io/npm/v/@yamato-daiwa/backend)](https://www.npmjs.com/package/@yamato-daiwa/backend)
 [![No any type](https://img.shields.io/badge/Type_safety-No_any-brightgreen.svg?style=flat)]()
+[![PayPal](https://img.shields.io/badge/Donate-PayPal-ff3f59.svg)](https://www.paypal.com/paypalme/tokugawatakeshi)
+
+
+![Main visual of Yamato Daiwa Backend framework](https://user-images.githubusercontent.com/41653501/168190921-78edc07d-58cc-4298-8b59-182468cf280a.png)
 
 
 Back-end framework with built-in TypeScript type safety.
 Clean API, no husk.
 Intended to be used in full-stack applications where both client and server part written in TypeScript.
 
-![Main visual of Yamato Daiwa Backend framework](https://user-images.githubusercontent.com/41653501/168190921-78edc07d-58cc-4298-8b59-182468cf280a.png)
 
 + [Installation](#installation)
 + [Quick Examples](#quick-examples)
@@ -166,8 +170,7 @@ supportClassSyntax(expressApplication);
 
 HTTPS_Server.listen(443, "127.0.0.1");
 ```
-
-
+[//]: # ( === TODO ============================================================================================================)
 ### Routing and controllers
 #### Entry point
 

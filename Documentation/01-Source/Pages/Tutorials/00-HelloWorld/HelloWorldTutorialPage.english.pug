@@ -16,9 +16,14 @@ block append Metadata
 
   -
 
+    const {
+      $heading: topHeading,
+      $sectioning: localizedSectioning
+    } = routing.english.tutorials.$children.helloWorld;
+
     RegularWebPageTemplate__YDF.configure({
       metadata: {
-        title: buildHTML_PageTitle("Hello, world!"),
+        title: buildHTML_PageTitle(topHeading),
         description:
             "The minimal example of the server application created by the \"Yamato Daiwa Backend\" " +
               "(abbreviation: \"YDB\"), the Node.js-framework."
@@ -37,8 +42,6 @@ block append Metadata
       japanese: routing.japanese.tutorials.$children.helloWorld.$URI,
       russian: routing.russian.tutorials.$children.helloWorld.$URI
     });
-
-    const localizedSectioning = routing.english.tutorials.$children.helloWorld.$sectioning;
 
 
 block append HeadScripts
@@ -113,33 +116,21 @@ block append SpecificContent
       dt= `@yamato-daiwa/backend [${ DependenciesVersions["@yamato-daiwa/backend"] }]`
       dd The main #[+Term--YDID npm package] of this framework
 
-      dt= `@yamato-daiwa/es-extensions [${ DependenciesVersions["@yamato-daiwa/es-extensions"] }]`
-      dd.
-        Auxiliaries actual for both #[+ImportantEntity--YDID Node.js] and #[+ImportantEntity--YDID Browser JavaScript].
-        For this tutorial, we will need only #[+ImportantEntity--YDID HTTP_Methods] #[+Term--YDID enumeration] from this
-          package, but much more in the future.
+      dt= `typescript [${DependenciesVersions.typescript}]`
+      dd The #[+Term--YDID npm package] package of the #[+ImportantEntity--YDID TypeScript] language.
 
-      dt= `ts-node [${ DependenciesVersions["ts-node"] }]`
+      dt= `tsx [${ DependenciesVersions["tsx"] }]`
       dd.
-        The #[+Link--YDF({ unendorsedExternalURI: "https://w.wiki/Hh8" }).Article-Link REPL] for the
-          #[+ImportantEntity--YDID TypeScript] language.
-        Creating the effect such that #[+ImportantEntity--YDID TypeScript] has own #[+Term--YDID runtime],
-          thanks to what we will not spend our time to routines with output #[+Term--YDID JavaScript files].
-
-      dt= `typescript [${ DependenciesVersions.typescript }]`
-      dd.
-        The #[+Term--YDID npm package] package of the #[+ImportantEntity--YDID TypeScript] language, the
-          #[+Term--YDID peer dependency] of #[+ImportantEntity__Code--YDID ts-node].
-        Although modern versions of #[+ImportantEntity--YDID npm] installs such dependencies automatically, we will
-          #[+Keyword--YDID consciously] install the specific version of this #[+Term--YDID package].
+        The too for the execution of the code written by #[+ImportantEntity--YDID TypeScript] execution tool without
+          outputting of #[+ImportantEntity--YDID JavaScript] files to drive.
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.Bash })
-        | #{ dependenciesInstalationConsoleCommand }
+        | #{ nonDevelopmentDependenciesInstallationConsoleCommand }
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.Bash }).
-        npm i ts-node@#{ DependenciesVersions["ts-node"] } typescript@#{ DependenciesVersions.typescript } -D
+        npm i typescript@#{ DependenciesVersions.typescript } tsx@#{ DependenciesVersions["tsx"] } -D
 
 
     //- ━━━ Code ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -167,8 +158,13 @@ block append SpecificContent
       })
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda
-          import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-          import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+          import {
+            Server,
+            Request,
+            Response,
+            ProtocolDependentDefaultPorts,
+            HTTP_Methods
+          } from "@yamato-daiwa/backend";
 
 
           Server.initializeAndStart({
@@ -297,12 +293,20 @@ block append SpecificContent
     }).Article-Heading2
 
     p.Article-Paragraph.
-      Let us launch our application by #[+ImportantEntity--YDID ts-node].
+      Let us launch our application by #[+ImportantEntity--YDID tsx].
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.Bash }).
-        ts-node EntryPoint.ts
+        tsx EntryPoint.ts
 
+    p.Article-Paragraph.
+      If you got the message about #[+ImportantEntity--YDID tsx] not found, besides the global installation of this
+        utility you can add the script like #[+ImportantEntity__Code--YDID "start": "tsx EntryPoint.ts"] to your
+        #[+ImportantEntity--YDID package.json] and execute it:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.Bash }).
+        npm run start
 
     p.Article-Paragraph.
       If the code has no mistakes, you will be informed about application successful launching by the following
