@@ -35,7 +35,7 @@ namespace Product {
   export namespace Description {
     export const NAME: string = "description";
     export const TYPE: StringConstructor = String;
-    export const REQUIRED: boolean = true;
+    export const REQUIRED: boolean = false;
     export const MINIMAL_CHARACTERS_COUNT: number = 2;
     export const MAXIMAL_CHARACTERS_COUNT: number = 500;
   }

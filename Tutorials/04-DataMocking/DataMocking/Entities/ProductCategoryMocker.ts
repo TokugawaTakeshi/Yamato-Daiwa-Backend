@@ -1,24 +1,45 @@
-import ProductCategory from "../../BusinessRules/Entities/ProductCategory";
+/* ─── Entities ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+import ProductCategory from "../../BusinessRules/Entities/Product/ProductCategory";
 
-import { v4 as generateUniversallyUniqueIdentifierOfVersion4 } from "uuid";
+/* ─── Services ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+import type ProductsCategoriesIDsGeneratingService from
+    "../../Services/IDsGenerators/ProductsCategoriesIDsGeneratingService";
+
+/* ─── Utils ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 import {
   getRandomString,
   getArithmeticMean,
+  adjustCharactersCount,
   isNotUndefined
 } from "@yamato-daiwa/es-extensions";
 
 
-export default class ProductCategoryMocker {
+export default abstract class ProductCategoryMocker {
 
-  public static generate(
-      preDefinedFields: Partial<ProductCategory>,
-      options: Readonly<{ nameInfixForSearchingImitation?: string; }> = {}
-  ): ProductCategory {
+  public static async generate(
+    {
+      requirements,
+      preDefinedFields = {},
+      options = {}
+    }: Readonly<{
+      requirements: Readonly<{
+        IDsGenerator: ProductsCategoriesIDsGeneratingService;
+      }>;
+      preDefinedFields?: Partial<ProductCategory>;
+      options?: Readonly<{ nameInfixForSearchingImitation?: string; }>;
+    }>
+  ): Promise<ProductCategory> {
 
-    const ID: ProductCategory.ID = preDefinedFields.ID ?? generateUniversallyUniqueIdentifierOfVersion4();
+    const ID: ProductCategory.ID = preDefinedFields.ID ?? await requirements.IDsGenerator.generateID();
 
-    const name: string =
-        preDefinedFields.name ??
+    const name: string = isNotUndefined(preDefinedFields.name) ?
+        adjustCharactersCount({
+          targetString: preDefinedFields.name,
+          minimalCharactersCount: ProductCategory.Name.MINIMAL_CHARACTERS_COUNT,
+          maximalCharactersCount: ProductCategory.Name.MAXIMAL_CHARACTERS_COUNT,
+          filling: { toStart: true },
+          cropping: { fromEnd: true }
+        }) :
         getRandomString({
           minimalCharactersCount: ProductCategory.Name.MINIMAL_CHARACTERS_COUNT,
           maximalCharactersCount: ProductCategory.Name.MAXIMAL_CHARACTERS_COUNT,

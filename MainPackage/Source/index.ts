@@ -26,3 +26,18 @@ export { default as BooleanParameterDefaultPreValidationModifier } from
     "./DefaultConventions/BooleanParameterDefaultPreValidationModifier";
 
 export { localizeEverything } from "./Utils/localizeEverything";
+
+
+export {
+  HTTP_DEFAULT_PORT,
+  HTTPS_DEFAULT_PORT,
+  NETWORK_PORT_MAXIMAL_VALUE,
+  NETWORK_PORT_MINIMAL_VALUE,
+  HTTP_Methods,
+  HTTP_StatusCodes,
+  InformationalResponsesHTTP_StatusCodes,
+  SuccessfulResponsesHTTP_StatusCodes,
+  RedirectionResponsesHTTP_StatusCodes,
+  ClientErrorsHTTP_StatusCodes,
+  ServerErrorsHTTP_StatusCodes
+} from "fundamental-constants";

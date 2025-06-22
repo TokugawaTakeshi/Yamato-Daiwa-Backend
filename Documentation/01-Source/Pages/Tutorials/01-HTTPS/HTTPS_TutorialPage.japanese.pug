@@ -11,9 +11,14 @@ block append Metadata
 
   -
 
+    const {
+      $heading: topHeading,
+      $sectioning: localizedSectioning
+    } = routing.japanese.tutorials.$children.HTTPS;
+
     RegularWebPageTemplate__YDF.configure({
       metadata: {
-        title: buildHTML_PageTitle("HTTPS利用"),
+        title: buildHTML_PageTitle(topHeading),
         description: "「やまとダイワバックエンド」（技術名：「Yamato Daiwa Backend」、略：「YDB」）はHTTPSプロトコルの対応も取り組みで、構文も簡潔。"
       },
       stylesSheetsURIs: [
@@ -30,8 +35,6 @@ block append Metadata
       english: routing.english.tutorials.$children.HTTPS.$URI,
       russian: routing.russian.tutorials.$children.HTTPS.$URI
     });
-
-    const localizedSectioning = routing.japanese.tutorials.$children.HTTPS.$sectioning;
 
 
 block append HeadScripts
@@ -217,8 +220,13 @@ block append SpecificContent
       +CodeViewer-TabPanel--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript })
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda
-          import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-          import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+          import {
+            Server,
+            Request,
+            Response,
+            ProtocolDependentDefaultPorts,
+            HTTP_Methods
+          } from "@yamato-daiwa/backend";
           import Path from "path";
 
 

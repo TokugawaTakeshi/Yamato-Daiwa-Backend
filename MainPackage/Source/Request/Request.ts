@@ -26,6 +26,9 @@ class Request {
   public static localization: Request.Localization = requestLocalization__english;
 
   public readonly HTTP_Method: HTTP_Methods;
+
+  /* eslint-disable-next-line id-length --
+   * Although the object properties are allowed by ESLint preset, currently there is no option for class fields. */
   public readonly URI: Readonly<Omit<URL, "hash">>;
   public readonly parsedCookies: ReadonlyMap<string, string>;
   public readonly subdomainParameters: Request.SubdomainParameters;
@@ -74,7 +77,7 @@ class Request {
   >(validationAndProcessing: RawObjectDataProcessor.PropertiesSpecification): ProcessedRoutePathParameters {
 
     if (isUndefined(this.stringifiedRoute)) {
-      Logger.throwErrorAndLog({
+      Logger.throwErrorWithFormattedMessage({
         errorInstance: new ImproperUsageError(
           Request.localization.errors.unableToAccessToProcessedRoutePathParameters.description
         ),
@@ -95,7 +98,7 @@ class Request {
           );
 
     if (routePathParametersProcessingResult.isRawDataInvalid) {
-      Logger.throwErrorAndLog({
+      Logger.throwErrorWithFormattedMessage({
         errorInstance: new InvalidRoutePathParametersError({
           route: this.stringifiedRoute,
           preFormattedValidationErrorsMessage: RawObjectDataProcessor.
@@ -116,7 +119,7 @@ class Request {
   >(validationAndProcessing: RawObjectDataProcessor.PropertiesSpecification): ProcessedURI_QueryParameters {
 
     if (isUndefined(this.stringifiedRoute)) {
-      Logger.throwErrorAndLog({
+      Logger.throwErrorWithFormattedMessage({
         errorInstance: new ImproperUsageError(
             Request.localization.errors.unableToAccessToProcessedURI_QueryParameters.description
         ),
@@ -137,7 +140,7 @@ class Request {
           );
 
     if (URI_QueryParametersProcessingResult.isRawDataInvalid) {
-      Logger.throwErrorAndLog({
+      Logger.throwErrorWithFormattedMessage({
         errorInstance: new InvalidURI_QueryParametersError({
           route: this.stringifiedRoute,
           preFormattedValidationErrorsMessage: RawObjectDataProcessor.

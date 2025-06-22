@@ -3,12 +3,16 @@
 [![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@yamato-daiwa/backend)
 [![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/TokugawaTakeshi/Yamato-Daiwa-Backend)
 ![MIT](https://img.shields.io/badge/MIT-green?style=for-the-badge)
-![TypeScript](https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 
 [![NPM Version](https://img.shields.io/npm/v/@yamato-daiwa/backend)](https://www.npmjs.com/package/@yamato-daiwa/backend)
-[![No any type](https://img.shields.io/badge/Type_safety-No_any-brightgreen.svg?style=flat)]()
-[![PayPal](https://img.shields.io/badge/Donate-PayPal-ff3f59.svg)](https://www.paypal.com/paypalme/tokugawatakeshi)
+![Minimal Node Version](https://img.shields.io/badge/Minimal_Node.js_Version-22.0.0-brightgreen.svg?style=flat)
+![No any type](https://img.shields.io/badge/Type_Safety-No_any-brightgreen.svg?style=flat)
+
+[![GitHub Sponsors](https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white)](https://github.com/TokugawaTakeshi/Yamato-Daiwa-Backend?sponsor=1)
+[![PAYPAL](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/tokugawatakeshi)
+[![LIBERAPAY](	https://img.shields.io/badge/Liberapay-F6C915?style=for-the-badge&logo=liberapay&logoColor=black)](https://liberapay.com/TokugawaT-YD)
 
 
 ![Main visual of Yamato Daiwa Backend framework](https://user-images.githubusercontent.com/41653501/168190921-78edc07d-58cc-4298-8b59-182468cf280a.png)
@@ -22,6 +26,10 @@ Intended to be used in full-stack applications where both client and server part
 + [Installation](#installation)
 + [Quick Examples](#quick-examples)
   + ["Hello, world!"](#hello-world)
+  + [HTTPS Support](#https-support)
+  + [Routing and Controllers](#routing-and-controllers)
++ API
+  + [Server](https://backend-es.yamato-daiwa.com/API/Server/Server.english.html)
 
 
 ## Installation
@@ -42,10 +50,18 @@ npm i @yamato-daiwa/backend -E
 ### "Hello, world!"
 
 ```typescript
-import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-import { HTTP_Methods } from "fundamental-constants";
+import {
+  Server,
+  Request,
+  Response,
+  ProtocolDependentDefaultPorts,
+  HTTP_Methods
+} from "@yamato-daiwa/backend";
 
 
+/* Running the test:
+ *  tsx EntryPoint.ts   OR   npm run start
+ * */
 Server.initializeAndStart({
   IP_Address: "127.0.0.1",
   HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
@@ -68,8 +84,13 @@ See the ["Hello, world!"](https://backend-es.yamato-daiwa.com/Tutorials/00-Hello
 ### HTTPS Support
 
 ```typescript
-import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-import { HTTP_Methods } from "fundamental-constants";
+import {
+  Server,
+  Request,
+  Response,
+  ProtocolDependentDefaultPorts,
+  HTTP_Methods
+} from "@yamato-daiwa/backend";
 import Path from "path";
 
 
@@ -170,40 +191,168 @@ supportClassSyntax(expressApplication);
 
 HTTPS_Server.listen(443, "127.0.0.1");
 ```
-[//]: # ( === TODO ============================================================================================================)
-### Routing and controllers
-#### Entry point
+
+
+### Routing and Controllers
+
+#### Minimal Example
 
 ```typescript
-import ProductController from "./ProductController";
-
-import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+import {
+  Server,
+  Request,
+  Response,
+  ProtocolDependentDefaultPorts,
+  HTTP_Methods
+} from "@yamato-daiwa/backend";
 
 
 Server.initializeAndStart({
   IP_Address: "127.0.0.1",
   HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
   routing: [
+
     {
-      route: { HTTP_Method: HTTP_Methods.get, pathTemplate: "/" },
+      HTTP_Method: HTTP_Methods.get,
+      pathTemplate: "/",
       async handler(_request: Request, response: Response): Promise<void> {
         return response.submitWithSuccess({
-          HTML_Content: "<h1>Top page</h1>"
+          HTML_Content: "<h1>Top Page</h1>"
         });
       }
     },
-    ProductController
+
+    {
+      HTTP_Method: HTTP_Methods.get,
+      pathTemplate: "/products",
+      async handler(_request: Request, response: Response): Promise<void> {
+        return response.submitWithSuccess({
+          HTML_Content: "<h1>Products</h1>"
+        });
+      }
+    },
+
+    {
+      HTTP_Method: HTTP_Methods.get,
+      pathTemplate: "/checkout",
+      async handler(_request: Request, response: Response): Promise<void> {
+        return response.submitWithSuccess({
+          HTML_Content: "<h1>Checkout</h1>"
+        });
+      }
+    }
+
   ]
 });
 ```
 
+See [Functional API](https://backend-es.yamato-daiwa.com/Tutorials/02-RoutingAndControllers/RoutingAndControllersTutorialPage.english.html#ROUTING_IN_YDB-FUNCTIONAL_API--SECTION) 
+  section of [Routing and Controllers](https://backend-es.yamato-daiwa.com/Tutorials/02-RoutingAndControllers/RoutingAndControllersTutorialPage.english.html) 
+  tutorial for details.
 
-#### Controller
+
+#### Routes with Parameters
 
 ```typescript
+import { Server, Request, Response, ProtocolDependentDefaultPorts, HTTP_Methods } from "@yamato-daiwa/backend";
+
+Server.initializeAndStart({
+  IP_Address: "127.0.0.1",
+  HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+  routing: [
+
+    {
+      HTTP_Method: HTTP_Methods.get,
+      pathTemplate: "products/:PRODUCT_ID",
+      async handler(request: Request, response: Response): Promise<void> {
+
+        const targetProductID: number = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: number; }>({
+          PRODUCT_ID: {
+            preValidationModifications: convertPotentialStringToIntegerIfPossible,
+            type: Number,
+            numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+            isUndefinedForbidden: true,
+            isNullForbidden: true
+          }
+        }).PRODUCT_ID;
+
+        return response.submitWithSuccess({
+          HTML_Content: `<h1>Product with ID: ${ targetProductID }</h1>`
+        });
+
+      }
+    },
+
+    // ...
+
+  ]
+});
+```
+
+See [Defining of Routes with Path Parameters](https://backend-es.yamato-daiwa.com/Tutorials/02-RoutingAndControllers/RoutingAndControllersTutorialPage.english.html#ROUTING_IN_YDB-PATH_PARAMETERS--SECTION) 
+  section of [Routing and Controllers](https://backend-es.yamato-daiwa.com/Tutorials/02-RoutingAndControllers/RoutingAndControllersTutorialPage.english.html) 
+  tutorial for details.
+
+
+##### Numeric Parameters
+
+```typescript
+import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
+import {
+  HTTP_Methods,
+  convertPotentialStringToNumberIfPossible,
+  RawObjectDataProcessor
+} from "@yamato-daiwa/es-extensions";
+
+
+Server.initializeAndStart({
+  IP_Address: "127.0.0.1",
+  HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+  routing: [
+
+    {
+      HTTP_Method: HTTP_Methods.get,
+      pathTemplate: "products/:PRODUCT_ID",
+      async handler(request: Request, response: Response): Promise<void> {
+
+        const targetProductID: number = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: number; }>({
+          PRODUCT_ID: {
+            preValidationModifications: convertPotentialStringToNumberIfPossible,
+            type: Number,
+            numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+            isNaN_Forbidden: true,
+            isUndefinedForbidden: true,
+            isNullForbidden: true
+          }
+        }).PRODUCT_ID;
+
+        return response.submitWithSuccess({
+          HTML_Content: `<h1>Product with ID: ${ targetProductID }</h1>`
+        });
+
+      }
+    },
+
+    // ...
+
+  ]
+});
+```
+
+See [Numeric Path Parameters](https://backend-es.yamato-daiwa.com/Tutorials/02-RoutingAndControllers/RoutingAndControllersTutorialPage.english.html#ROUTING_IN_YDB-PATH_PARAMETERS-NUMERIC--SECTION) 
+  section of [Routing and Controllers](https://backend-es.yamato-daiwa.com/Tutorials/02-RoutingAndControllers/RoutingAndControllersTutorialPage.english.html) 
+  tutorial for details.
+
+
+##### Controllers
+
+```ts
 import { Request, Response, Controller } from "@yamato-daiwa/backend";
-import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+import {
+  HTTP_Methods,
+  convertPotentialStringToIntegerIfPossible,
+  RawObjectDataProcessor
+} from "@yamato-daiwa/es-extensions";
 
 
 export default class ProductController extends Controller {
@@ -212,171 +361,79 @@ export default class ProductController extends Controller {
     HTTP_Method: HTTP_Methods.get,
     pathTemplate: "products"
   })
-  public async generateProductsPage(_request: Request, response: Response): Promise<void> {
-    return response.submitWithSuccess({
+  public async generateProductsPage(_request: Request, response: Response): Promise<void> {    return response.submitWithSuccess({
       HTML_Content: "<h1>Products list</h1>"
     });
   }
 
   @Controller.RouteHandler({
     HTTP_Method: HTTP_Methods.get,
-    pathTemplate: "products/:ID"
-  })
-  public async generateProductProfilePage(request: Request, response: Response): Promise<void> {
-    return response.submitWithSuccess({
-      HTML_Content: `<h1>Product with ID: ${request.routePathParameters.ID}</h1>`
-    });
-  }
-}
-```
-
-See the [Routing and controllers](Tutorials/03-RoutingAndControllers/README.md) tutorial for the details.
-
-
-### Strongly typed route path parameters
-
-```typescript
-import { Request, Response, Controller } from "@yamato-daiwa/backend";
-import {
-  HTTP_Methods,
-  RawObjectDataProcessor,
-  convertPotentialStringToNumberIfPossible
-} from "@yamato-daiwa/es-extensions";
-
-
-export default class ProductController extends Controller {
-
-  @Controller.RouteHandler({
-    HTTP_Method: HTTP_Methods.get,
-    pathTemplate: "products/:ID",
-    pathParametersProcessing: {
-      ID: {
-        preValidationModifications: convertPotentialStringToNumberIfPossible,
-        type: Number,
-        required: true,
-        numbersSet: RawObjectDataProcessor.NumbersSets.nonNegativeInteger
-      }
-    }
+    pathTemplate: "products/:PRODUCT_ID"
   })
   public async generateProductProfilePage(request: Request, response: Response): Promise<void> {
 
-    const targetProductID: number = request.getProcessedRoutePathParameters<{ ID: number; }>().ID;
+    const targetProductID: number = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: number; }>({
+      PRODUCT_ID: {
+        preValidationModifications: convertPotentialStringToIntegerIfPossible,
+        type: Number,
+        numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+        isNaN_Forbidden: true,
+        isUndefinedForbidden: true,
+        isNullForbidden: true
+      }
+    }).PRODUCT_ID;
 
     return response.submitWithSuccess({
-      HTML_Content: `<h1>Product with ID: ${targetProductID}</h1>`
+      HTML_Content: `<h1>Product with ID: ${ targetProductID }</h1>`
     });
+
   }
+
 }
 ```
 
-See the [Strongly typed route path parameters](Tutorials/04-RoutePathParameters/README.md) tutorial for the details.
-
-
-### Strongly type route query parameters
-
-The query parameters default deserializer is [qs](https://www.npmjs.com/package/qs) with default configuration.
+Entry point example:
 
 ```typescript
-import { Request, Response, Controller, BooleanParameterDefaultPreValidationModifier } from "@yamato-daiwa/backend";
-import { HTTP_Methods, RawObjectDataProcessor, convertPotentialStringToNumberIfPossible } from "@yamato-daiwa/es-extensions";
+
+import ProductController from "./Controllers/ProductController";
+import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
+import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
 
 
-export default class ProductController extends Controller {
+Server.initializeAndStart({
+  IP_Address: "127.0.0.1",
+  HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+  routing: [
 
-  @Controller.RouteHandler({
-    HTTP_Method: HTTP_Methods.get,
-    pathTemplate: "api/products",
-    queryParametersProcessing: {
-      
-      paginationPageNumber: {
-        preValidationModifications: convertPotentialStringToNumberIfPossible,
-        type: Number,
-        required: true,
-        numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
-      },
-      itemsCountPerPaginationPage: {
-        preValidationModifications: convertPotentialStringToNumberIfPossible,
-        type: Number,
-        required: true,
-        numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
-      },
-      
-      // Valid URL example:
-      // http://127.0.0.1:80/api/products?forcedFiltering[makerID]=1&paginationPageNumber=1&itemsCountPerPaginationPage=20
-      forcedFiltering: {
-        type: Object,
-        required: false,
-        properties: {
-          makerID: {
-            preValidationModifications: convertPotentialStringToNumberIfPossible,
-            type: Number,
-            required: true,
-            numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
-          }
-        }
-      },
-      
-      consciousFiltering: {
-        type: Object,
-        required: false,
-        properties: {
-          fullOrPartialProductName: {
-            type: String,
-            required: false,
-            minimalCharactersCount: 2
-          },
+    {
+      HTTP_Method: HTTP_Methods.get,
+      pathTemplate: "/",
+      async handler(_request: Request, response: Response): Promise<void> {
+        return response.submitWithSuccess({
+          HTML_Content: "<h1>Top Page</h1>"
+        });
+      }
+    },
 
-          // Valid URL example:
-          // http://127.0.0.1:80/api/products?consciousFiltering[outOfStock]=true&paginationPageNumber=1&itemsCountPerPaginationPage=20
-          outOfStock: {
-            preValidationModifications: BooleanParameterDefaultPreValidationModifier,
-            type: Boolean,
-            required: false
-          },
-          
-          // Valid URL example:
-          // http://127.0.0.1:80/api/products?consciousFiltering[categoriesIDs][0]=1&consciousFiltering[categoriesIDs][1]=2&paginationPageNumber=1&itemsCountPerPaginationPage=20
-          categoriesIDs: {
-            type: Array,
-            required: false,
-            element: {
-              preValidationModifications: convertPotentialStringToNumberIfPossible,
-              type: Number,
-              numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
-            }
-          }
-        }
+    ProductController,
+    {
+      HTTP_Method: HTTP_Methods.get,
+      pathTemplate: "/checkout",
+      async handler(_request: Request, response: Response): Promise<void> {
+        return response.submitWithSuccess({
+          HTML_Content: "<h1>Checkout</h1>"
+        });
       }
     }
-  })
-  public async retrieveProductsSelection(request: Request, response: Response): Promise<void> {
 
-    const {
-      paginationPageNumber,
-      itemsCountPerPaginationPage,
-      forcedFiltering,
-      consciousFiltering
-    }: {
-      paginationPageNumber: number;
-      itemsCountPerPaginationPage: number;
-      forcedFiltering?: { makerID: number; };
-      consciousFiltering?: { fullOrPartialProductName?: number; };
-    } = request.getProcessedQueryParameters();
-
-    console.log(request.URI);
-    console.log(paginationPageNumber);
-    console.log(itemsCountPerPaginationPage);
-    console.log(forcedFiltering);
-    console.log(consciousFiltering);
-
-    
-    // The specific data retrieving is not target of this example
-    return response.submitWithSuccess({ JSON_Content: [] });
-  }
-}
+  ]
+});
 ```
 
-See the [Strongly typed route query parameters](Tutorials/05-RouteQueryParameters/README.md) tutorial for the details.
+See [Controllers](https://backend-es.yamato-daiwa.com/Tutorials/02-RoutingAndControllers/RoutingAndControllersTutorialPage.english.html#ROUTING_IN_YDB-CONTROLLERS--SECTION) 
+  section of [Routing and Controllers](https://backend-es.yamato-daiwa.com/Tutorials/02-RoutingAndControllers/RoutingAndControllersTutorialPage.english.html) 
+  tutorial for details.
 
 
 ### Dotenv config
@@ -496,31 +553,19 @@ See the [Console Line Interface configuration](Tutorials/07-ConsoleLineInterface
 
 
 
-## Functionality tutorials
+## Functionality Tutorials
 
 Please take the tutorials in following order.
 
 <dl>
 
-  <dt><a href="Tutorials/01-HelloWorld/README.md">Hello, world!</a></dt>
-  <dd>Retrieving on HTML code by HTTP</dd>
+  <dt><a href="https://backend-es.yamato-daiwa.com/Tutorials/00-HelloWorld/HelloWorldTutorialPage.english.html">Hello, World!</a></dt>
+  <dd>Retrieving of <b>HTML</b> code by <b>HTTP</b></dd>
 
-  <dt><a href="Tutorials/02-HTTPS_Support/README.md">HTTPS support</a></dt>
+  <dt><a href="https://backend-es.yamato-daiwa.com/Tutorials/01-HTTPS/HTTPS_TutorialPage.english.html">HTTPS Support</a></dt>
   <dd>Serving of both <b>HTTP</b> and <b>HTTPS</b></dd>
 
-  <dt><a href="Tutorials/03-RoutingAndControllers/README.md">Routing and controllers</a></dt>
+  <dt><a href="https://backend-es.yamato-daiwa.comTutorials/02-RoutingAndControllers/RoutingAndControllersTutorialPage.english.html">Routing and Controllers</a></dt>
   <dd>Defining the routing without and with controllers</dd>
-
-  <dt><a href="Tutorials/04-RoutePathParameters/README.md">Strongly typed route path parameters</a></dt>
-  <dd>Processing and type-safe accessing to route path parameters</dd>
-
-  <dt><a href="Tutorials/05-RouteQueryParameters/README.md">Strongly typed route query parameters</a></dt>
-  <dd>Processing and type-safe accessing to route query parameters</dd>
-
-  <dt><a href="Tutorials/06-DotenvConfig/README.md">Dotenv configuration</a></dt>
-  <dd>The retrieving of the configuration from the Dotenv files</dd>
-
-  <dt><a href="Tutorials/07-ConsoleLineInterface/README.md">Console Line Interface configuration</a></dt>
-  <dd>The retrieving of the configuration from the Console Line Interface</dd>
 
 </dl>

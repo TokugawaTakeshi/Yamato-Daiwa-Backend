@@ -11,6 +11,10 @@ block append Metadata
 
   -
 
+    const {
+      $heading: topHeading,
+      $sectioning: localizedSectioning
+    } = routing.russian.tutorials.$children.HTTPS;
 
     RegularWebPageTemplate__YDF.configure({
       metadata: {
@@ -33,8 +37,6 @@ block append Metadata
       english: routing.english.tutorials.$children.HTTPS.$URI,
       japanese: routing.japanese.tutorials.$children.HTTPS.$URI,
     });
-
-    const localizedSectioning = routing.russian.tutorials.$children.HTTPS.$sectioning;
 
 
 block append HeadScripts
@@ -249,8 +251,13 @@ block append SpecificContent
       +CodeViewer-TabPanel--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript })
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda
-          import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-          import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+          import {
+            Server,
+            Request,
+            Response,
+            ProtocolDependentDefaultPorts,
+            HTTP_Methods
+          } from "@yamato-daiwa/backend";
           import Path from "path";
 
 

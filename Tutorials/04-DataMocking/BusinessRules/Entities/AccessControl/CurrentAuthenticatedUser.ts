@@ -1,4 +1,4 @@
-import type User from "@Entities/AccessControl/User";
+import type User from "./User";
 
 
 type CurrentAuthenticatedUser = Pick<

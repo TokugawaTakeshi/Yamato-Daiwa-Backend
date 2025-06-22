@@ -4,8 +4,7 @@
     "start": "tsx EntryPoint.ts"
   },
   "dependencies": {
-    "@yamato-daiwa/backend": "../../MainPackage",
-    "fundamental-constants": "0.8.0"
+    "@yamato-daiwa/backend": "../../MainPackage"
   },
   "devDependencies": {
     "tsx": "4.20.3",

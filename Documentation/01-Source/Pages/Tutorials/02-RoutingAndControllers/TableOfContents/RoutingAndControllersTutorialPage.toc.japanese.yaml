@@ -18,16 +18,16 @@ theory:
 
   routingDefinition:
 
-    $heading: "ルーチング及び関連用語の定後"
+    $heading: "ルーティング及び関連用語の定後"
 
   primitiveRoutingImplementation:
 
-    $heading: "ルーチングの簡易な実装"
+    $heading: "ルーティングの簡易な実装"
 
 
 routingInYDB:
 
-  $heading: "YDBに於けるルーチング"
+  $heading: "YDBに於けるルーティング"
 
   functionalAPI:
 

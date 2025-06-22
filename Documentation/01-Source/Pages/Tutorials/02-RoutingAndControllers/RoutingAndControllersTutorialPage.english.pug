@@ -11,9 +11,14 @@ block append Metadata
 
   -
 
+    const {
+      $heading: topHeading,
+      $sectioning: localizedSectioning
+    } = routing.english.tutorials.$children.routingAndControllers;
+
     RegularWebPageTemplate__YDF.configure({
       metadata: {
-        title: buildHTML_PageTitle("Routing and controllers"),
+        title: buildHTML_PageTitle(topHeading),
         description:
           "Node.js framework \"Yamato Daiwa Backend\" (abbreviation: \"YDB\") allows to setup the routing with " +
             "controller classes or wihtout them."
@@ -33,8 +38,6 @@ block append Metadata
       russian: routing.russian.tutorials.$children.routingAndControllers.$URI
     });
 
-    const localizedSectioning = routing.english.tutorials.$children.routingAndControllers.$sectioning;
-
 
 block append HeadScripts
 
@@ -48,7 +51,7 @@ block append SpecificContent
   article
 
     //- ━━━ Routing and Controllers ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    h1.Article-Heading1!= routing.russian.tutorials.$children.routingAndControllers.$heading
+    h1.Article-Heading1= topHeading
 
     //- ━━━ Теория ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     +Heading--YDF({
@@ -546,8 +549,13 @@ block append SpecificContent
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
-        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-        import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+        import {
+          Server,
+          Request,
+          Response,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
 
 
         Server.initializeAndStart({
@@ -569,8 +577,13 @@ block append SpecificContent
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
-        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-        import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+        import {
+          Server,
+          Request,
+          Response,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
 
 
         Server.initializeAndStart({
@@ -638,3 +651,627 @@ block append SpecificContent
       Nevertheless, it is possible not&nbsp;only to avoid the usage of #[+Keyword--YDID detrimental]
         #[+ImportantEntity__Code--YDID any] type, but also corroborate the casting of more wide types to more narrow
         ones by the #[+Term--YDID validation].
+
+    p.Article-Paragraph.
+      To have something to compare it to, let us consider the case with #[+SecondaryEntity--YDID Express.js].
+      There, the #[+Term--YDID route] #[+SecondaryEntity__Code--YDID https://example.com/products/{ID}] is been defined
+        as below.
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import type { Express as ExpressApplication } from "express";
+        import type Express from "express";
+        import createExpressApplication from "express";
+
+
+        const expressApplication: ExpressApplication = createExpressApplication();
+
+        expressApplication.get(
+          "/products/:ID",
+          (request: Express.Request<{ ID: string; }>, response: Express.Response): void => {
+            response.send(`<h1>Product with ID: ${ request.params.ID }</h1>`);
+          }
+        );
+
+        expressApplication.listen(80, "127.0.0.1");
+
+    p.Article-Paragraph.
+      As can be seen the #[+SecondaryEntity__Code--YDID Express.Request] #[+Term--YDID type] is the
+        #[+Term--YDID generic] where the #[+Keyword--YDID first] #[+Term--YDID parameter] is the
+        #[+Term--YDID object] which #[+Keyword--YDID must] satisfy to
+        #[+ImportantEntity__Code--YDID { &lsqb;key: string&rsqb;: string; }] #[+Term--YDID constraint].
+      What kind of problems are there?
+
+    dl.Article-DescriptionList
+
+      dt Low lever of type safety
+      dd.
+        The #[+Term--YDID casting] of #[+ImportantEntity__Code--YDID { &lsqb;key: string&rsqb;: string; }]
+          #[+Term--YDID type] to #[+ImportantEntity__Code--YDID { ID: string; }] is #[+Keyword--YDID unsubstantiated].
+        Even though we have the #[+SecondaryEntity__Code--YDID "/products/:ID"] #[+Term--YDID path]
+          #[+Keyword--YDID template], we can specify completely unrelated #[+Term--YDID type]
+          (for example, #[+SecondaryEntity__Code--YDID { foo: string; bar: string; }]) and
+          #[+ImportantEntity--YDID TypeScript] will #[+Keyword--YDID not] suspect #[+Keyword--YDID anything].
+        #[+Keyword--YDID Fundamentally] this problem can&nbsp;#[+Keyword--YDID not]&nbsp;be solved because the
+          #[+Term--YDID type] annotation #[+Keyphrase--YDID ceases to exist] during the the #[+Term--YDID transpiling]
+          from #[+ImportantEntity--YDID TypeScript] to #[+ImportantEntity--YDID JavaScript], thus when executing the
+          #[+Term--YDID JavaScript code] by the #[+Term__Contrast--YDID Node.js server] the specified type
+          can&nbsp;#[+Keyword--YDID not]&nbsp;be referred to check does the actual
+          #[+ImportantEntity__Code--YDID request.params] #[+Term--YDID object] corresponding to specified
+          #[+Term--YDID type].
+        However, the #[+Term--YDID casting] of #[+ImportantEntity__Code--YDID { &lsqb;key: string&rsqb;: string; }] to
+         #[+ImportantEntity__Code--YDID { ID: string; }] must be reinforced by something, and it is primarily
+          a #[+Term--YDID validation].
+        The #[+SecondaryEntity--YDID Express.js] does&nbsp;#[+Keyword--YDID not]&nbsp;suggest such functionality,
+          but there are the third-party solutions like
+          #[+Link--YDF({ unendorsedExternalURI: "https://express-validator.github.io/docs" }).Article-Link express-validator].
+
+      dt Uncomfortable API
+      dd
+        | The #[+ImportantEntity__Code--YDID Express.Request] has whole #[+ImportantEntity--YDID 5]
+        |   #[+Term--YDID generic parameters], herewith if we need, for example, the forth one (the
+        |   #[+Term--YDID query parameters] represented as the #[+Term--YDID object]), it will required to specify the
+        |   previous three ones ever they are not actual for use, so we will have something like
+        |   #[+SecondaryEntity__Code--YDID Express.Request&lt;{}, {}, {}, { pageNumber: number; }&gt;].
+        |
+        +Link--YDF({
+          unendorsedExternalURI: sharedExternalLinks.ESLint.plugins.typeScript.top
+        }).Article-Link typescript-eslint
+        |   can
+        |
+        +Link--YDF({
+          unendorsedExternalURI: sharedExternalLinks.ESLint.plugins.typeScript.rules.noEmptyObjectType
+        }).Article-Link complain
+        |   about such code.
+
+    p.Article-Paragraph.
+      In #[+ImportantEntity--YDID YDB], #[+Keyword--YDID both] problems has solution out of box.
+
+    +AdmonitionBlock--YDF({
+      title: "Careful with Terminology",
+      SVG_Icon: true,
+      geometricVariation: AdmonitionBlock__YDF.GeometricVariations.stickyNoteLike,
+      decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.warning
+    })
+
+      p.Article-Paragraph.
+        The #[+Term--YDID "parameter"] term is too wide, bur from now #[+Keyword--YDID three] kinds of
+          #[+Term--YDID parameters] will be mentioned.
+
+      dl.Article-DescriptionList
+
+        dt Function / Method Parameters
+        dd.
+          Usually this kind of #[+Term--YDID parameters] is been associated first when "parameter" work has been said
+            (in programming context).
+          However, this term is being used not&nbsp;only in relation to #[+Term--YDID functions] and
+            #[+Term--YDID methods].
+
+        dt Generic Parameters
+        dd.
+          Actual for the programming languages with #[+Term--YDID static typing], which
+            #[+ImportantEntity--YDID TypeScript] can be called, even a stretch.
+
+        dt Route Parameters
+        dd.
+          Related with the #[+Term--YDID routing] concept, but #[+Keyword--YDID not]&nbsp;with specific
+            programming language.
+
+      p.Article-Paragraph.
+        This terminology is #[+Term--YDID common] and does&nbsp;#[+Keyword--YDID not]&nbsp;related with specifically
+          with #[+ImportantEntity--YDID YDB], but the programmes with low experience can be confused.
+
+    p.Article-Paragraph.
+      #[+ImportantEntity__Code--YDID request] #[+Term--YDID object] itself (of course, it has #[+Keyword--YDID different]
+        #[+Term--YDID type] with #[+ImportantEntity__Code--YDID Express.Request] one from
+        #[+SecondaryEntity--YDID Express.js] framework)
+        has&nbsp;#[+Keyword--YDID no]&nbsp;#[+Term--YDID generic parameters].
+      To access to #[+Term--YDID route parameters], invoke
+        #[+ImportantEntity__Code--YDID validateAndProcessRoutePathParameters] #[+Term--YDID method] of
+        #[+ImportantEntity__Code--YDID request] #[+Term--YDID object], herewith:
+
+    ul.Article-UnorderedList
+
+      li.
+        It if #[+Keyword--YDID required] to specify the #[+Term--YDID generic parameter] (once again:
+          when calling #[+ImportantEntity__Code--YDID validateAndProcessRoutePathParameters]
+          #[+Term--YDID method], #[+Keyword--YDID not]&nbsp;when annotating the #[+Term--YDID type] of
+          #[+ImportantEntity__Code--YDID request]), the #[+Term--YDID object-type] representing the
+          #[+Term--YDID route path parameters].
+        #[+ImportantEntity__Code--YDID validateAndProcessRoutePathParameters] #[+Term--YDID method] has
+        #[+Keyword--YDID only] #[+Keyword__Contrast--YDID one] #[+Term--YDID generic parameter].
+
+      li
+        | The #[+Term--YDID object] validation rules must be passed as #[+Keyword--YDID sole] #[+Term--YDID parameter] in
+        |
+        +Link--YDF({
+          endorsedExternalURI: sharedExternalLinks.YamatoDaiwaES_Extensions.RawObjectDataProcessor.PropertiesSpecification
+        }) RawObjectDataProcessor
+        |
+        | format from the
+        |
+        +Link--YDF({
+          endorsedExternalURI: sharedExternalLinks.YamatoDaiwaES_Extensions.top,
+        }) @yamato-daiwa/es-extensions
+        |   library.
+        | In this case we are specifying that the #[+Term--YDID route parameter] #[+SecondaryEntity__Code--YDID PRODUCT_ID]
+        |   must be required (in "#[+Keyword--YDID neither]&nbsp;#[+ImportantEntity__Code--YDID undefined]
+        |   #[+Keyword--YDID nor]&nbsp;#[+ImportantEntity__Code--YDID null] meaning) #[+Term--YDID string]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import { Server, Request, Response, ProtocolDependentDefaultPorts, HTTP_Methods } from "@yamato-daiwa/backend";
+
+        Server.initializeAndStart({
+          IP_Address: "127.0.0.1",
+          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          routing: [
+
+            {
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "products/:PRODUCT_ID",
+              async handler(request: Request, response: Response): Promise<void> {
+
+                const targetProductID: number = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: number; }>({
+                  PRODUCT_ID: {
+                    preValidationModifications: convertPotentialStringToIntegerIfPossible,
+                    type: Number,
+                    numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+                    isUndefinedForbidden: true,
+                    isNullForbidden: true
+                  }
+                }).PRODUCT_ID;
+
+                return response.submitWithSuccess({
+                  HTML_Content: `<h1>Product with ID: ${ targetProductID }</h1>`
+                });
+
+              }
+            },
+
+            // ...
+
+          ]
+        });
+
+    +QuestionAndAnswerBox--YDF({
+      type: QuestionAndAnswerBox__YDF.Types.criticism,
+      question: "Code got more. The Express.js version is simpler and cleaner."
+    }).
+      First, the above examples are #[+Keyword--YDID no]&nbsp;equivalent because #[+SecondaryEntity--YDID Express.js]
+        version has #[+Keyword--YDID no] validation of #[+Term--YDID route parameters].
+      Second, saying this you are #[+Keyword--YDID focused] one write the initial code ASAP, not on code
+        maintainability or minimizing of a logic error probability.
+      The low code #[+Keyword--YDID not]&nbsp;always gives the good maintainability, and sometimes these two
+        characteristics are conflicting.
+      "Much code" itself is #[+Keyword--YDID neither] good #[+Keyword__Contrast--YDID nor] bad, here is important
+        does large volume of the code justified, or actually can be reduces without maintainability impact.
+      #[+Keyphrase--YDID Is out case], there is such #[+Keyword--YDID justification].
+
+    p.Article-Paragraph.
+      Because the specifying of validation rules is #[+Keyword--YDID required] when calling
+        #[+ImportantEntity__Code--YDID validateAndProcessRoutePathParameters] #[+Term--YDID method],
+        this #[+Term--YDID method] #[+Keyword--YDID forces] the programmer to reinforce the casting to
+        #[+Term--YDID type] passed as #[+Term--YDID generic parameter] by the validation.
+      Of course, because of considered above #[+ImportantEntity--YDID TypeScript] limitations specified validation
+        rules may mismatch with the #[+Term--YDID type] passed as #[+Term--YDID generic parameter], but it is better
+        than just type casting and, as practice shows, even with such limitations the mistake probability will be
+        #[+Keyword--YDID significantly] #[+Keyword__Contrast--YDID less].
+      Later in this lesson we will improve this code and, this way, reduce the mistake probability again.
+
+
+    //- ─── Numeric Path Parameters ────────────────────────────────────────────────────────────────────────────────────
+    +Heading--YDF({
+      level: 4,
+      text: localizedSectioning.routingInYDB.$children.pathParameters.$children.numeric.$heading,
+      HTML_ID: localizedSectioning.routingInYDB.$children.pathParameters.$children.numeric.$anchor
+    }).Article-Heading4
+
+    p.Article-Paragraph.
+      #[+Keyphrase--YDID At first sight] it is obvious that #[+SecondaryEntity__Code--YDID 1] in
+        #[+SecondaryEntity__Code--YDID https://example.com/products/1] is the #[+Term--YDID number].
+      However a #[+Keyword--YDID majority] of frameworks (herewith not&nbsp;only #[+ImportantEntity--YDID Node.js] ones)
+        parses the #[+Term--YDID route path parameter] as #[+Keyword--YDID string] by default
+        (it #[+Keyword__Contrast--YDID natural] because #[+ImportantEntity--YDID URI] itself is a #[+Keyword--YDID string],
+        and trying to parse #[+Keyword--YDID each] #[+Term--YDID route parameter] for #[+Keyword--YDID all]
+        #[+ImportantEntity--YDID URI]s is the performance impact, even if not large impact.
+      In this way, when submitting of th request to #[+SecondaryEntity__Code--YDID /products/:PRODUCT_ID]
+        #[+Term--YDID route] we can specify not&nbsp;only #[+SecondaryEntity__Code--YDID 1], but also
+        #[+Keyword--YDID arbitrary] #[+Keyword__Contrast--YDID combination] of letters and digits.
+
+    p.Article-Paragraph.
+      Nevertheless, sometimes we are actually need the specific #[+Term--YDID route path parameters] be the
+        #[+Term--YDID numbers].
+      Particularly, for the storing of the entities in database, numeric #[+Term--YDID keys] are frequently being used,
+        moreover, usually the are #[+Keyword--YDID non-negative] #[+Keyword__Contrast--YDID integers].
+      (Although when building the #[+Term--YDID SQL request] everything will be turned to #[+Term--YDID string],
+        the respective of numeric type of #[+Term--YDID route path parameters] is still required is some cases,
+        and also, #[+Keyword--YDID not]&nbsp;all #[+Term--YDID database management system] are useing the
+        #[+ImportantEntity--YDID SQL]).
+      By other words, suc #[+ImportantEntity--YDID URI]s as
+        #[+SecondaryEntity__Code--YDID http://127.0.0.1/products/1.2] or
+        #[+SecondaryEntity__Code--YDID http://127.0.0.1/products/-3] will be considered as #[+Keyword--YDID invalid]
+        by us no matter it contains the number.
+
+    p.Article-Paragraph.
+      Although in the frameworks like #[+SecondaryEntity--YDID Express.js] when defining the
+        #[+Term--YDID route path parameter] we can use the #[+Term--YDID regular expressions] accepting only
+        #[+Term--YDID numbers], without third-party libraries we are still need to transform this #[+Term--YDID parameter]
+        to numeric #[+Term--YDID data type]:
+
+    +CodeViewer--YDF
+      +CodeViewer-TabPanel--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript })
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda
+          import type { Express as ExpressApplication } from "express";
+          import type Express from "express";
+          import createExpressApplication from "express";
+
+
+          const expressApplication: ExpressApplication = createExpressApplication();
+
+          expressApplication.get(
+            "/products/:ID(\\d+)",
+            (request: Express.Request<{ ID: string; }>, response: Express.Response): void => {
+              console.log(typeof request.params.ID);
+        +CodeViewer-Explanation--YDF.
+          Despite the regular expression guarantees only numeric characters, the console output will be
+            #[+SecondaryEntity__Code--YDID string].
+          Before do anything with it #[+Keyphrase--YDID as with number], wee need to transform it to numeric
+            #[+Term--YDID type] by #[+ImportantEntity__Code--YDID Number()] or
+            #[+ImportantEntity__Code--YDID parseInt], if we need the #[+Keyword--YDID integer] #[+Term--YDID type].
+        +CodeViewer-PartialListing--YDF: :code_listing--yda
+              response.send(`<h1>Product with ID: ${ request.params.ID }</h1>`);
+            }
+          );
+
+          expressApplication.listen(80, "127.0.0.1");
+
+    p.Article-Paragraph.
+      In #[+ImportantEntity--YDID YDB] case, as it obvious from
+        #[+ImportantEntity__Code--YDID validateAndProcessRoutePathParameters] #[+Term--YDID method] name,
+        this method not&nbsp;only validated the #[+Term--YDID route path parameters], but only cas process them,
+        in particular transform them to numeric type
+      It is simple, but needs the detailed explanation.
+
+    ul.Article-UnorderedList
+
+      li.
+        For transformation to #[+Keyword--YDID numeric] #[+Term--YDID type] (let repeat that #[+Keyword--YDID initially])
+          #[+Keyword--YDID all] #[+Term--YDID route path parameters] are #[+Term--YDID strings] and transforming to
+          #[+Term--YDID numbers] is #[+Keyword--YDID on-demand]), it is required to use the functionality which called
+          "pre validation modification" in #[+ImportantEntity--YDID RawObjectDataProcessor]'s #[+Term--YDID API].
+        In the essence it is the #[+Term--YDID function] #[+Keyword--YDID or] #[+Term--YDID array] of the
+          #[+Term--YDID functions], which accepts #[+ImportantEntity__Code--YDID unknown]-type #[+Term--YDID parameter]
+          and returns it's value either transformed or as is, in dependence of the targets for which functionality
+          being used.
+        In our case it is required to transform the #[+Keyword--YDID stringified] value to #[+Keyword--YDID number]
+          #[+Keyphrase--YDID only if it contains the valid number].
+        For such cases, there is the #[+Keyword--YDID pre-made] #[+Term--YDID function]
+          #[+ImportantEntity__Code--YDID convertPotentialStringToNumberIfPossible].
+        It also possible use the #[+ImportantEntity__Code--YDID convertPotentialStringToIntegerIfPossible]
+          #[+Term--YDID function], but if the #[+Term--YDID string] will contain the #[+Keyword--YDID non-integer]
+          #[+Term--YDID number], it will&nbsp;#[+Keyword--YDID not]&nbsp;transformed to number and the validation
+          error message may confuse.
+
+      li.
+        Now, when the #[+Term--YDID route parameter] has been successfully transformed to #[+Term--YDID number] (if
+          it was possible), the #[+Keyword--YDID expected] type specification #[+Keyword__Contrast--YDID type: String]
+          #[+Keyword--YDID must] be replaced with #[+Keyword__Contrast--YDID type: Number].
+
+      li.
+        According to #[+ImportantEntity__Code--YDID RawObjectDataProcessor]'s  #[+Term--YDID API], if
+          #[+Term--YDID number] is the expected type than it is #[+Keyword--YDID required] to specify the
+          #[+Term--YDID number set] #[+ImportantEntity__Code--YDID numbersSet] #[+Term--YDID property], and also
+          the #[+ImportantEntity__Code--YDID NaN] prohibition.
+        If you are expecting #[+Keyword--YDID only] #[+Keyword__Contrast--YDID positive] #[+Keyword--YDID integers],
+          specify #[+ImportantEntity__Code--YDID RawObjectDataProcessor.NumbersSets.naturalNumberOrZero],
+          and if you are want to forbid #[+ImportantEntity--YDID 0], it will be the
+          #[+ImportantEntity__Code--YDID RawObjectDataProcessor.NumbersSets.naturalNumber].
+        Also, there is #[+Keyword--YDID no]&nbsp;need to allow #[+ImportantEntity--YDID NaN].
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
+        import {
+          HTTP_Methods,
+          convertPotentialStringToNumberIfPossible,
+          RawObjectDataProcessor
+        } from "@yamato-daiwa/es-extensions";
+
+
+        Server.initializeAndStart({
+          IP_Address: "127.0.0.1",
+          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          routing: [
+
+            {
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "products/:PRODUCT_ID",
+              async handler(request: Request, response: Response): Promise<void> {
+
+                const targetProductID: number = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: number; }>({
+                  PRODUCT_ID: {
+                    preValidationModifications: convertPotentialStringToNumberIfPossible,
+                    type: Number,
+                    numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+                    isNaN_Forbidden: true,
+                    isUndefinedForbidden: true,
+                    isNullForbidden: true
+                  }
+                }).PRODUCT_ID;
+
+                return response.submitWithSuccess({
+                  HTML_Content: `<h1>Product with ID: ${ targetProductID }</h1>`
+                });
+
+              }
+            },
+
+            // ...
+
+          ]
+        });
+
+    p.Article-Paragraph.
+      Now, it we will try to submit the request with #[+ImportantEntity--YDID URI] including #[+Keyword--YDID non-numeric]
+        #[+Term--YDID path parameter], we will get the following error:
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/02-RoutingAndControllers/Images/" +
+          "Tutorials-RoutingAndControllers-NonNumericRoutePathParameterErrorLog",
+      imageAlternateText:
+          "In the console, the error titled as \"Invalid Route Path Parameters\" is displaying with red character." +
+          "In the description it has been said that numeric value expected while actually got a string.",
+      autoAspectRatioByYDA: true
+    })
+
+    p.Article-Paragraph.
+      We also can try to submit the #[+Term--YDID request] with the #[+ImportantEntity--YDID URI] including the
+        #[+Term--YDID fractional number] or #[+Term--YDID negative number] at #[+Term__Contrast--YDID path parameter]
+        position.
+      Such request also will not pass the validation, but this time in the error message it will be told that the
+        value of target #[+Term--YDID path parameter] is not&nbsp;belong to expected #[+Term--YDID number set]:
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/02-RoutingAndControllers/Images/" +
+          "Tutorials-RoutingAndControllers-WrongNumberSetAsRoutePathParameterErrorLog",
+      imageAlternateText:
+          "In the console, the error titled as \"Invalid Route Path Parameters\" is displaying with red character." +
+          "In the description it has been said that the numeric value is not belong to expected number set.",
+      autoAspectRatioByYDA: true
+    })
+
+
+    //- ━━━ Controllers ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.routingInYDB.$children.controllers.$heading,
+      HTML_ID: localizedSectioning.routingInYDB.$children.controllers.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      As far as #[+Term--YDID routes] number become larger, naturally there is as need to group them somehow.
+      If you are striving to avoid the #[+Term--YDID classes] at any cost, you can extract you #[+Term--YDID routes]
+        to files and import them to the #[+Term--YDID entry point].
+      In our example, we have two #[+Term--YDID routes] of four are related with products which are the first candidate
+        to extract them.
+
+    +CodeViewer--YDF
+
+      +CodeViewer-Listing--YDF({
+        fileLabel: "Routes/ProductRoutes.ts",
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript
+      }): :code_listing--yda
+        import {
+          Request,
+          Response,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
+        import {
+          convertPotentialStringToNumberIfPossible,
+          RawObjectDataProcessor
+        } from "@yamato-daiwa/es-extensions";
+
+
+        export default [
+
+          {
+            HTTP_Method: HTTP_Methods.get,
+            pathTemplate: "/products",
+            async handler(_request: Request, response: Response): Promise<void> {
+              return response.submitWithSuccess({
+                HTML_Content: "<h1>Products</h1>"
+              });
+            }
+          },
+
+          {
+            HTTP_Method: HTTP_Methods.get,
+            pathTemplate: "products/:PRODUCT_ID",
+            async handler(request: Request, response: Response): Promise<void> {
+
+              const targetProductID: number = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: number; }>({
+                PRODUCT_ID: {
+                  preValidationModifications: convertPotentialStringToNumberIfPossible,
+                  type: Number,
+                  numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+                  isNaN_Forbidden: true,
+                  isUndefinedForbidden: true,
+                  isNullForbidden: true
+                }
+              }).PRODUCT_ID;
+
+              return response.submitWithSuccess({
+                HTML_Content: `<h1>Product with ID: ${ targetProductID }</h1>`
+              });
+
+            }
+          }
+
+        ];
+
+      +CodeViewer-Listing--YDF({
+        fileLabel: "EntryPoint.ts",
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript
+      }): :code_listing--yda
+        import productRoutes from "./Routes/ProductRoutes";
+        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
+        import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+
+
+        /* Running the test:
+         *  ts-node Step4/EntryPoint-Step4.ts
+         * */
+        Server.initializeAndStart({
+          IP_Address: "127.0.0.1",
+          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          routing: [
+
+             {
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/",
+              async handler(_request: Request, response: Response): Promise<void> {
+                return response.submitWithSuccess({
+                  HTML_Content: "<h1>Top Page</h1>"
+                });
+              }
+            },
+
+            ...productRoutes,
+
+            {
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/checkout",
+              async handler(_request: Request, response: Response): Promise<void> {
+                return response.submitWithSuccess({
+                  HTML_Content: "<h1>Checkout</h1>"
+                });
+              }
+            }
+
+          ]
+        });
+
+    p.Article-Paragraph.
+      However, although many novice programmers are experiencing difficulties with deep understanding of
+        #[+Term--YDID Object-Oriented Programming], it is the powerful tooling with a large number of the use cases
+        and important maintainability measure.
+      In this class the #[+Term--YDID classes] will group the #[+Term--YDID requests] by some criteria.
+      Such use case, if more strictly, the #[+Term--YDID design pattern] is being called a #[+Term--YDID "controller"].
+
+    +CodeViewer--YDF
+
+      +CodeViewer-TabPanel--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      })
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda
+          import { Request, Response, Controller } from "@yamato-daiwa/backend";
+          import {
+            HTTP_Methods,
+            convertPotentialStringToIntegerIfPossible,
+            RawObjectDataProcessor
+          } from "@yamato-daiwa/es-extensions";
+
+
+          export default class ProductController extends Controller {
+
+            @Controller.RouteHandler({
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "products"
+            })
+            public async generateProductsPage(_request: Request, response: Response): Promise<void> {
+        +CodeViewer-Explanation--YDF.
+          The #[+Term--YDID parameter] of #[+ImportantEntity--YDID @Controller.RouteHandler]
+            #[+Term--YDID decorator function] is #[+Keyword--YDID almost] even with #[+Term--YDID elements]
+            or #[+ImportantEntity__Code--YDID routing] #[+Term--YDID array] which we passed during the
+            #[+ImportantEntity__Code--YDID Server.initializeAndStart({ ... })] initialization —
+            the #[+Keyphrase--YDID only] difference is there is&nbsp;#[+Keyword--YDID no]&nbsp;
+            #[+ImportantEntity__Code--YDID handler] property because the #[+Keyword--YDID decorated]
+            #[+Term--YDID class method] itself is the handler.
+          One more advantage of #[+Term--YDID controller classes] is it is clear what will be done when submit the
+            #[+Term--YDID request] to target #[+Term--YDID route] if
+            #[+Keyphrase--YDID #[+Term--YDID methods] naming has good quality].
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda
+              return response.submitWithSuccess({
+                HTML_Content: "<h1>Products list</h1>"
+              });
+            }
+
+            @Controller.RouteHandler({
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "products/:PRODUCT_ID"
+            })
+            public async generateProductProfilePage(request: Request, response: Response): Promise<void> {
+
+              const targetProductID: number = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: number; }>({
+                PRODUCT_ID: {
+                  preValidationModifications: convertPotentialStringToIntegerIfPossible,
+                  type: Number,
+                  numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+                  isNaN_Forbidden: true,
+                  isUndefinedForbidden: true,
+                  isNullForbidden: true
+                }
+              }).PRODUCT_ID;
+
+              return response.submitWithSuccess({
+                HTML_Content: `<h1>Product with ID: ${ targetProductID }</h1>`
+              });
+
+            }
+
+          }
+
+      +CodeViewer-TabPanel--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "EntryPoint.ts"
+      })
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda
+          import ProductController from "./Controllers/ProductController";
+          import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
+          import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+
+
+          Server.initializeAndStart({
+            IP_Address: "127.0.0.1",
+            HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+            routing: [
+
+              {
+                HTTP_Method: HTTP_Methods.get,
+                pathTemplate: "/",
+                async handler(_request: Request, response: Response): Promise<void> {
+                  return response.submitWithSuccess({
+                    HTML_Content: "<h1>Top Page</h1>"
+                  });
+                }
+              },
+
+              ProductController,
+        +CodeViewer-Explanation--YDF.
+          To include the #[+Term--YDID routes] handled by #[+Term--YDID controller] it is #[+Keyword--YDID required]
+            to pass the #[+Term--YDID controller class] as the #[+Term--YDID element] of
+            #[+ImportantEntity__Code--YDID routing] #[+Term--YDID array].
+          #[+Keyphrase--YDID If there are&nbsp;no the duplicates among #[+Term--YDID routes]], you can create the
+            #[+Term--YDID routes] by #[+Keyword--YDID both] #[+Term--YDID controllers] and #[+Term--YDID functions].
+          We also note that you do&nbsp;#[+Keyword--YDID not] need to create the #[+Term--YDID instance] of
+            #[+Term--YDID controller class] because the framework takes care about this routine.
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda
+              {
+                HTTP_Method: HTTP_Methods.get,
+                pathTemplate: "/checkout",
+                async handler(_request: Request, response: Response): Promise<void> {
+                  return response.submitWithSuccess({
+                    HTML_Content: "<h1>Checkout</h1>"
+                  });
+                }
+              }
+
+            ]
+          });

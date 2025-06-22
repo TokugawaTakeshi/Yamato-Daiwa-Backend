@@ -1,5 +1,5 @@
 /* ─── Entities ───────────────────────────────────────────────────────────────────────────────────────────────────── */
-import Product from "../../../BusinessRules/Entities/Product/Product";
+import Product from "../../BusinessRules/Entities/Product/Product";
 
 /* ─── Services ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 import { StringTypeID_Generator } from "@yamato-daiwa/es-extensions";

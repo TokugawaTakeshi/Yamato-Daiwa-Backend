@@ -1,6 +1,9 @@
-import { Request, Response } from "@yamato-daiwa/backend";
 import {
-  HTTP_Methods,
+  Request,
+  Response,
+  HTTP_Methods
+} from "@yamato-daiwa/backend";
+import {
   convertPotentialStringToNumberIfPossible,
   RawObjectDataProcessor
 } from "@yamato-daiwa/es-extensions";
@@ -27,7 +30,8 @@ export default [
         PRODUCT_ID: {
           preValidationModifications: convertPotentialStringToNumberIfPossible,
           type: Number,
-          numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber,
+          numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+          isNaN_Forbidden: true,
           isUndefinedForbidden: true,
           isNullForbidden: true
         }

@@ -1,4 +1,4 @@
-import type ProductCategory from "../Entities/ProductCategory";
+import type ProductCategory from "../Entities/Product/ProductCategory";
 
 
 interface ProductCategoryGateway {

@@ -14,14 +14,14 @@ import {
   isNotNull,
   isNotUndefined,
   Logger,
-  type ParsedJSON
+  type ParsedJSON_Object
 } from "@yamato-daiwa/es-extensions";
 
 
 abstract class SessionManagerMiddleware<
-  SessionData extends ParsedJSON,
+  SessionData extends ParsedJSON_Object,
   PossiblyCustomRequest extends Request = Request
-> extends ClassTypeMiddleware< PossiblyCustomRequest> {
+> extends ClassTypeMiddleware<PossiblyCustomRequest> {
 
   /* ━━━ Protected Fields ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   protected readonly secretString: string;
@@ -83,7 +83,7 @@ abstract class SessionManagerMiddleware<
 
       } catch (error: unknown) {
 
-        Logger.throwErrorAndLog({
+        Logger.throwErrorWithFormattedMessage({
           errorInstance: new DataRetrievingFailedError({ mentionToData: "SessionData" }),
           title: DataRetrievingFailedError.localization.defaultTitle,
           occurrenceLocation: "{InheritorOf}sessionManager.handleRequest(request, response, serverConfig)",

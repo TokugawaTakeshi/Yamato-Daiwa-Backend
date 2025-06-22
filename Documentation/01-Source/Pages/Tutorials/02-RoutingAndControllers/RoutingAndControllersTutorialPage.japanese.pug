@@ -11,6 +11,11 @@ block append Metadata
 
   -
 
+    const {
+      $heading: topHeading,
+      $sectioning: localizedSectioning
+    } = routing.japanese.tutorials.$children.routingAndControllers;
+
     RegularWebPageTemplate__YDF.configure({
       metadata: {
         title: buildHTML_PageTitle("RoutingAndControllers"),
@@ -31,8 +36,6 @@ block append Metadata
       russian: routing.russian.tutorials.$children.routingAndControllers.$URI
     });
 
-    const localizedSectioning = routing.japanese.tutorials.$children.HTTPS.$sectioning;
-
 
 block append HeadScripts
 
@@ -45,4 +48,4 @@ block append SpecificContent
 
   article
 
-    h1 ルーチング・コントローラー
+    h1 ルーティング・コントローラー

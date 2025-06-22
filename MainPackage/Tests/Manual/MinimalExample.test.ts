@@ -3,7 +3,7 @@ import type { Request, Response } from "../../Source";
 import { Server } from "../../Source";
 
 
-/* [ Execution ] cd  nodemon Tests/MinimalExample.test.ts */
+/* [ Execution ] tsx Tests/Manual/MinimalExample.test.ts */
 Server.initializeAndStart({
   IP_Address: "127.0.0.1",
   HTTP: { port: 1337 },

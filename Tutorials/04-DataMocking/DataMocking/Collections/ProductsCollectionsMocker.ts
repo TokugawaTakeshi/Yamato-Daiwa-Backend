@@ -1,22 +1,34 @@
-import type Product from "../../BusinessRules/Entities/Product";
-import type ProductCategory from "../../BusinessRules/Entities/ProductCategory";
+/* ─── Entities ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+import type Product from "../../BusinessRules/Entities/Product/Product";
+import type ProductCategory from "../../BusinessRules/Entities/Product/ProductCategory";
+
+/* ─── Data ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 import ProductMocker from "../Entities/ProductMocker";
-import type { DataMocking } from "@yamato-daiwa/es-extensions";
+
+/* ─── Services ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+import type ProductsIDsGeneratingService from "../../Services/IDsGenerators/ProductsIDsGeneratingService";
+
+/* ─── Utils ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+import { DataMocking } from "@yamato-daiwa/es-extensions";
 
 
-class ProductsCollectionsMocker {
+abstract class ProductsCollectionsMocker {
 
-  public static generate(
+  public static async generate(
     {
       mockingOrder,
-      dependencies
+      requirements: {
+        productsIDsGenerator,
+        categories
+      }
     }: Readonly<{
       mockingOrder: ProductsCollectionsMocker.MockingOrder;
-      dependencies: {
+      requirements: Readonly<{
+        productsIDsGenerator: ProductsIDsGeneratingService;
         categories: ReadonlyArray<ProductCategory>;
-      };
+      }>;
     }>
-  ): Array<Product> {
+  ): Promise<Array<Product>> {
 
     const accumulatingCollection: Array<Product> = [];
 
@@ -25,21 +37,26 @@ class ProductsCollectionsMocker {
       const itemsQuantity: number = "quantity" in subset ? subset.quantity : subset.withTitles.length;
 
       for (let itemNumber: number = 1; itemNumber <= itemsQuantity; itemNumber++) {
-        accumulatingCollection.push(ProductMocker.generate({
-          preDefinedFields: {
-            ..."withTitles" in subset ? { title: subset.withTitles[itemNumber - 1] } : null
-          },
-          dependencies: {
-            categories: dependencies.categories
-          },
-          options: {
-            optionalPropertiesDecisionStrategy: subset.optionalPropertiesDecisionStrategy,
-            ..."nameInfixForSearchingImitation" in subset ? {
-              nameInfixForSearchingImitation: subset.nameInfixForSearchingImitation
-            } : null
-          }
 
-        }));
+        accumulatingCollection.push(
+          /* eslint-disable-next-line no-await-in-loop -- 平行に生成すると、「accumulatingCollection」の順番が期待と違う事がある。 */
+          await ProductMocker.generate({
+            requirements: {
+              IDsGenerator: productsIDsGenerator,
+              categories
+            },
+            preDefinedFields: {
+              ..."withTitles" in subset ? { title: subset.withTitles[itemNumber - 1] } : null
+            },
+            options: {
+              optionalPropertiesDecisionStrategy: "optionalPropertiesDecisionStrategy" in subset ?
+                  subset.optionalPropertiesDecisionStrategy :
+                  DataMocking.OptionalPropertiesDecisionStrategies.mustGenerateWith50PercentageProbability,
+              ..."nameInfixForSearchingImitation" in subset ?
+                  { nameInfixForSearchingImitation: subset.nameInfixForSearchingImitation } : null
+            }
+          })
+        );
 
       }
 
@@ -54,22 +71,16 @@ class ProductsCollectionsMocker {
 
 namespace ProductsCollectionsMocker {
 
-  export type MockingOrder = Array<Subset>;
+  export type MockingOrder = ReadonlyArray<Subset>;
 
   export type Subset = Readonly<
     {
-      completelyRandom: true;
       optionalPropertiesDecisionStrategy: DataMocking.OptionalPropertiesDecisionStrategies;
+      nameInfixForSearchingImitation?: string;
       quantity: number;
     } |
     {
-      withTitles: Array<string>;
-      optionalPropertiesDecisionStrategy: DataMocking.OptionalPropertiesDecisionStrategies;
-    } |
-    {
-      nameInfixForSearchingImitation: string;
-      optionalPropertiesDecisionStrategy: DataMocking.OptionalPropertiesDecisionStrategies;
-      quantity: number;
+      withTitles: ReadonlyArray<string>;
     }
   >;
 

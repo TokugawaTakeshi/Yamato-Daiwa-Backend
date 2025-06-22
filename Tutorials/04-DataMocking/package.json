@@ -1,16 +1,17 @@
 {
   "name": "tutorials-data_mocking",
   "private": true,
-  "version": "0.0.0",
   "dependencies": {
-    "@faker-js/faker": "9.3.0",
+    "@faker-js/faker": "9.4.0",
     "@yamato-daiwa/backend": "../../MainPackage",
-    "@yamato-daiwa/es-extensions": "1.7.0",
-    "fundamental-constants": "0.7.0",
+    "@yamato-daiwa/es-extensions": "1.8.0",
+    "fundamental-constants": "0.8.0",
+    "nanoid": "5.1.5",
     "uuid": "11.0.5"
   },
   "devDependencies": {
-    "ts-node": "10.8.1",
-    "typescript": "5.5.4"
+    "@yamato-daiwa/style_guides": "0.5.0",
+    "ts-node": "10.9.2",
+    "typescript": "5.7.3"
   }
 }

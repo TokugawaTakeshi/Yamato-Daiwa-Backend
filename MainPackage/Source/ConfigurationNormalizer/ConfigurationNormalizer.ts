@@ -14,7 +14,7 @@ import FileSystem from "fs";
 import {
   Logger,
   InvalidConfigError,
-  isIPv4AddressLiesInRange,
+  isIPv4_AddressLiesInRange,
   splitString,
   isUndefined,
   removeAllSpecifiedCharacters,
@@ -33,7 +33,7 @@ class ConfigurationNormalizer {
   public static normalize(rawConfiguration: Server.RawConfiguration): Server.NormalizedConfiguration {
 
     if (isUndefined(rawConfiguration.HTTP) && isUndefined(rawConfiguration.HTTPS)) {
-      Logger.throwErrorAndLog({
+      Logger.throwErrorWithFormattedMessage({
         errorInstance: new InvalidConfigError({
           customMessage: ConfigurationNormalizer.localization.errorsMessages.neitherHTTP_NotHTTPS_SettingsHasBeenSpecified
         }),
@@ -243,7 +243,7 @@ class ConfigurationNormalizer {
 
   private static normalizeBasicDomains(rawConfig: Server.RawConfiguration): Array<string> {
 
-    const isSpecifiedIP_AddressTheLocalhost: boolean = isIPv4AddressLiesInRange({
+    const isSpecifiedIP_AddressTheLocalhost: boolean = isIPv4_AddressLiesInRange({
       comparedIP_Address: rawConfig.IP_Address,
       minimalIP_Address: "127.0.0.1",
       maximalIP_Address: "127.255.255.254"
@@ -282,7 +282,7 @@ class ConfigurationNormalizer {
   private static validatePort(specifiedPort: number): number {
 
     if (!isNaturalNumber(specifiedPort)) {
-      Logger.throwErrorAndLog({
+      Logger.throwErrorWithFormattedMessage({
         errorInstance: new InvalidConfigError({
           mentionToConfig: "Server.RawConfiguration",
           messageSpecificPart: ConfigurationNormalizer.localization.errorsMessages.invalidPortNumbersSet.
@@ -295,7 +295,7 @@ class ConfigurationNormalizer {
 
 
     if (specifiedPort < NETWORK_PORT_MINIMAL_VALUE || specifiedPort > NETWORK_PORT_MAXIMAL_VALUE) {
-      Logger.throwErrorAndLog({
+      Logger.throwErrorWithFormattedMessage({
         errorInstance: new InvalidConfigError({
           mentionToConfig: "Server.RawConfiguration",
           messageSpecificPart: ConfigurationNormalizer.localization.errorsMessages.portOutOfRange.generate({

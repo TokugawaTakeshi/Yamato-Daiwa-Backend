@@ -1,6 +1,10 @@
-import { Request, Response, Controller } from "@yamato-daiwa/backend";
 import {
-  HTTP_Methods,
+  Controller,
+  Request,
+  Response,
+  HTTP_Methods
+} from "@yamato-daiwa/backend";
+import {
   convertPotentialStringToIntegerIfPossible,
   RawObjectDataProcessor
 } from "@yamato-daiwa/es-extensions";
@@ -20,21 +24,20 @@ export default class ProductController extends Controller {
 
   @Controller.RouteHandler({
     HTTP_Method: HTTP_Methods.get,
-    pathTemplate: "products/:ID"
+    pathTemplate: "products/:PRODUCT_ID"
   })
   public async generateProductProfilePage(request: Request, response: Response): Promise<void> {
 
-    const targetProductID: number = request.validateAndProcessRoutePathParameters<{ ID: number; }>({
-      ID: {
+    const targetProductID: number = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: number; }>({
+      PRODUCT_ID: {
         preValidationModifications: convertPotentialStringToIntegerIfPossible,
         type: Number,
         numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+        isNaN_Forbidden: true,
         isUndefinedForbidden: true,
         isNullForbidden: true
       }
-    }).ID;
-
-    console.log(typeof targetProductID);
+    }).PRODUCT_ID;
 
     return response.submitWithSuccess({
       HTML_Content: `<h1>Product with ID: ${ targetProductID }</h1>`

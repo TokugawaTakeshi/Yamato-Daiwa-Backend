@@ -1,7 +1,7 @@
-import type { ParsedJSON } from "@yamato-daiwa/es-extensions";
+import type { ParsedJSON_Object } from "@yamato-daiwa/es-extensions";
 
 
-export default abstract class Session<SessionData extends ParsedJSON> {
+export default abstract class Session<SessionData extends ParsedJSON_Object> {
 
   protected data: SessionData;
   protected readonly validityPeriod__seconds: number;

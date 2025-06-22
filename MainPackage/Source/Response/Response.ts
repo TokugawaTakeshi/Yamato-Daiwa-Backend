@@ -1,4 +1,5 @@
 import type Server from "../Server/Server";
+import type Cookie from "../Cookie";
 
 import type HTTP from "http";
 import FileSystem from "fs";
@@ -7,7 +8,8 @@ import {
   Logger,
   UnexpectedEventError,
   SuccessfulResponsesHTTP_StatusCodes,
-  isNotUndefined
+  isNotUndefined,
+  isNonEmptyString
 } from "@yamato-daiwa/es-extensions";
 import type {
   ParsedJSON,
@@ -19,6 +21,8 @@ import { ResponseLocalizer } from "./ResponseLocalization";
 
 
 class Response {
+
+  public readonly cookies: Map<Cookie.Name, Cookie> = new Map();
 
   private readonly nativeResponse: HTTP.ServerResponse;
 
@@ -42,22 +46,29 @@ class Response {
 
     this.nativeResponse.statusCode = payload.statusCode ?? SuccessfulResponsesHTTP_StatusCodes.OK;
 
+    let responseBody: string | undefined;
+
     if ("HTML_Content" in payload) {
+      responseBody = payload.HTML_Content;
       this.nativeResponse.setHeader("Content-Type", "text/html");
-      this.nativeResponse.write(payload.HTML_Content);
     } else if ("JSON_Content" in payload) {
+      responseBody = JSON.stringify(payload.JSON_Content);
       this.nativeResponse.setHeader("Content-Type", "application/json");
-      this.nativeResponse.write(JSON.stringify(payload.JSON_Content));
     } else if ("plainTextContent" in payload) {
+      responseBody = payload.plainTextContent;
       this.nativeResponse.setHeader("Content-Type", "text/plain");
-      this.nativeResponse.write(payload.plainTextContent);
     } else if ("filePath" in payload) {
       return this.sendFileByStreamAPI(payload.filePath);
     }
 
-
     if (payload.noCache === true) {
       this.nativeResponse.setHeader("Cache-control", "no-cache");
+    }
+
+    this.onBeforeSubmit();
+
+    if (isNotUndefined(responseBody)) {
+      this.nativeResponse.write(responseBody);
     }
 
     return new Promise<void>((resolve: () => void): void => {
@@ -74,15 +85,27 @@ class Response {
       this.nativeResponse.statusMessage = payload.errorMessage;
     }
 
+
+    let responseBody: string | undefined;
+
+    /* [ Theory ]
+     * Do not use `nativeResponse.write()` here because this method starts to submitting the response body what makes
+     *   unable to set the HTTP headers while they must be able to change for now. */
     if (isNotUndefined(payload.HTML_Content)) {
+      responseBody = payload.HTML_Content;
       this.nativeResponse.setHeader("Content-Type", "text/html");
-      this.nativeResponse.write(payload.HTML_Content);
     } else if (isNotUndefined(payload.JSON_Content)) {
+      responseBody = JSON.stringify(payload.JSON_Content);
       this.nativeResponse.setHeader("Content-Type", "application/json");
-      this.nativeResponse.write(JSON.stringify(payload.JSON_Content));
     } else if (isNotUndefined(payload.plainTextContent)) {
+      responseBody = payload.plainTextContent;
       this.nativeResponse.setHeader("Content-Type", "text/plain");
-      this.nativeResponse.write(payload.plainTextContent);
+    }
+
+    this.onBeforeSubmit();
+
+    if (isNotUndefined(responseBody)) {
+      this.nativeResponse.write(responseBody);
     }
 
     return new Promise<void>((resolve: () => void): void => {
@@ -96,6 +119,31 @@ class Response {
     }
   }
 
+
+  private onBeforeSubmit(): void {
+
+    const currentSetCookieHTTP_HeaderRawValue: Array<string> | string | undefined =
+        this.nativeResponse.getHeaders()["set-cookie"];
+
+    let finalSetCookieHTTP_Header: Array<string>;
+
+    if (Array.isArray(currentSetCookieHTTP_HeaderRawValue)) {
+      finalSetCookieHTTP_Header = [ ...currentSetCookieHTTP_HeaderRawValue ];
+    } else if (isNonEmptyString(currentSetCookieHTTP_HeaderRawValue)) {
+      finalSetCookieHTTP_Header = [ currentSetCookieHTTP_HeaderRawValue ];
+    } else {
+      finalSetCookieHTTP_Header = [];
+    }
+
+    finalSetCookieHTTP_Header.push(
+      ...Array.from(this.cookies.values()).map(
+        (cookie: Cookie): string => cookie.serialize()
+      )
+    );
+
+    this.nativeResponse.setHeader("Set-Cookie", finalSetCookieHTTP_Header);
+
+  }
 
   private async sendFileByStreamAPI(targetFilePath: string): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: Error) => void): void => {
@@ -159,6 +207,7 @@ namespace Response {
         HTML_Content?: string;
         plainTextContent?: string;
       }>;
+
 }
 
 

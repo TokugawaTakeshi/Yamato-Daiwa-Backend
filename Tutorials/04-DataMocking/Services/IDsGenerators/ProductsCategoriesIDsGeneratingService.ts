@@ -1,5 +1,5 @@
 /* ─── Entities ───────────────────────────────────────────────────────────────────────────────────────────────────── */
-import ProductCategory from "../../../BusinessRules/Entities/Product/ProductCategory";
+import ProductCategory from "../../BusinessRules/Entities/Product/ProductCategory";
 
 /* ─── Services ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 import { StringTypeID_Generator } from "@yamato-daiwa/es-extensions";
@@ -8,7 +8,7 @@ import { StringTypeID_Generator } from "@yamato-daiwa/es-extensions";
 import { nanoid as generateNanoID } from "nanoid";
 
 
-export default abstract class ProductCategoriesIDsGeneratingService extends StringTypeID_Generator {
+export default abstract class ProductsCategoriesIDsGeneratingService extends StringTypeID_Generator {
 
   public constructor() {
     super({

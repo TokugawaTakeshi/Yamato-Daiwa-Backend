@@ -1,6 +1,11 @@
-import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
 import {
-  HTTP_Methods,
+  Server,
+  Request,
+  Response,
+  ProtocolDependentDefaultPorts,
+  HTTP_Methods
+} from "@yamato-daiwa/backend";
+import {
   convertPotentialStringToNumberIfPossible,
   RawObjectDataProcessor
 } from "@yamato-daiwa/es-extensions";
@@ -43,7 +48,8 @@ Server.initializeAndStart({
           PRODUCT_ID: {
             preValidationModifications: convertPotentialStringToNumberIfPossible,
             type: Number,
-            numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber,
+            numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+            isNaN_Forbidden: true,
             isUndefinedForbidden: true,
             isNullForbidden: true
           }

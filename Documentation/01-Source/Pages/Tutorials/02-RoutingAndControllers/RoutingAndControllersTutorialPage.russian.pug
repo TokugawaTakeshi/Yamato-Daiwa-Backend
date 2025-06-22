@@ -11,9 +11,14 @@ block append Metadata
 
   -
 
+    const {
+      $heading: topHeading,
+      $sectioning: localizedSectioning
+    } = routing.russian.tutorials.$children.routingAndControllers;
+
     RegularWebPageTemplate__YDF.configure({
       metadata: {
-        title: buildHTML_PageTitle("Маршрутизация и контроллеры"),
+        title: buildHTML_PageTitle(topHeading),
         description:
           "Node.js-фреймворк «Yamato Daiwa Backend» (сокращённо: «YDB») позволяет настроить маршрутизацию как " +
             "с помощью классов-контроллеров, так и без них."
@@ -33,8 +38,6 @@ block append Metadata
       japanese: routing.japanese.tutorials.$children.routingAndControllers.$URI,
     });
 
-    const localizedSectioning = routing.russian.tutorials.$children.routingAndControllers.$sectioning;
-
 
 block append HeadScripts
 
@@ -48,7 +51,7 @@ block append SpecificContent
   article
 
     //- ━━━ Маршрутизация и контроллеры ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    h1.Article-Heading1!= routing.russian.tutorials.$children.routingAndControllers.$heading
+    h1.Article-Heading1= topHeading
 
     //- ━━━ Теория ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     +Heading--YDF({
@@ -551,8 +554,13 @@ block append SpecificContent
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
-        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-        import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+        import {
+          Server,
+          Request,
+          Response,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
 
 
         Server.initializeAndStart({
@@ -575,8 +583,13 @@ block append SpecificContent
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
-        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-        import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+        import {
+          Server,
+          Request,
+          Response,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
 
 
         Server.initializeAndStart({
@@ -650,7 +663,8 @@ block append SpecificContent
 
     p.Article-Paragraph.
       Чтобы было, с чем сравнить, рассмотрим случай с фреймворком #[+SecondaryEntity--YDID Express.js].
-      Маршрут #[+SecondaryEntity__Code--YDID https://example.com/products/{ID}] там определяется следующим образом:
+      #[+Term--YDID Маршрут] #[+SecondaryEntity__Code--YDID https://example.com/products/{ID}] там определяется следующим
+        образом:
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
@@ -681,7 +695,7 @@ block append SpecificContent
 
       dt Низкий уровень типовой безопасности
       dd.
-        Приведение типа #[+ImportantEntity__Code--YDID { &lsqb;key: string&rsqb;: string; }] к
+        #[+Term--YDID Приведение типа] #[+ImportantEntity__Code--YDID { &lsqb;key: string&rsqb;: string; }] к
           #[+ImportantEntity__Code--YDID { ID: string; }] #[+Keyword--YDID ничем] не&nbsp;подкреплено.
         Несмотря на то, что у нас #[+Keyword--YDID шаблон] #[+Term--YDID пути] —
           #[+SecondaryEntity__Code--YDID "/products/:ID"], мы можем указать совершенно не&nbsp;имеющий к нему отношения
@@ -694,7 +708,7 @@ block append SpecificContent
           на указанный ранее #[+Term--YDID тип] #[+Keyword--YDID никак] #[+Keyword__Contrast--YDID нельзя] сослаться,
           чтобы проверить, соответствует ли #[+Term--YDID объект] #[+ImportantEntity__Code--YDID request.params] этому
           #[+Term--YDID типу].
-        Однако должно быть хоть что-то, чем подкреплено приведение
+        Однако должно быть хоть что-то, чем подкреплено #[+Term--YDID приведение]
          #[+ImportantEntity__Code--YDID { &lsqb;key: string&rsqb;: string; }] к
          #[+ImportantEntity__Code--YDID { ID: string; }], и #[+Keyphrase--YDID в первую очередь] это
          #[+Term--YDID валидация].
@@ -702,7 +716,7 @@ block append SpecificContent
           но есть сторонние библиотеки, например
           #[+Link--YDF({ unendorsedExternalURI: "https://express-validator.github.io/docs" }).Article-Link express-validator].
 
-      dt Неудобство в API
+      dt Неудобный API
       dd
         | У типа #[+ImportantEntity__Code--YDID Express.Request] целых #[+ImportantEntity--YDID 5]
         |   #[+Term--YDID параметров обобщения], причём если нам нужен, например, четвёртый (представленные в виде
@@ -713,14 +727,12 @@ block append SpecificContent
         +Link--YDF({
           unendorsedExternalURI: sharedExternalLinks.ESLint.plugins.typeScript.top
         }).Article-Link typescript-eslint
-        |
-        | может
+        |   может
         |
         +Link--YDF({
           unendorsedExternalURI: sharedExternalLinks.ESLint.plugins.typeScript.rules.noEmptyObjectType
         }).Article-Link выразить недовольство
-        |
-        | таким кодом.
+        |   таким кодом.
 
     p.Article-Paragraph.
       В #[+ImportantEntity--YDID YDB], #[+Keyword--YDID обе] проблемы имеют решение «из коробки».
@@ -752,8 +764,8 @@ block append SpecificContent
 
         dt Параметры маршрута
         dd.
-          Имеют отношение к #[+Term--YDID маршрутизации].
-          Данная концепция существует #[+Keyphrase--YDID вне любых языков программирования].
+          Имеют отношение к #[+Term--YDID маршрутизации] в целом, но #[+Keyword--YDID не]&nbsp; к конкретному
+            #[+Term--YDID языку программирования].
 
       p.Article-Paragraph.
         Эта терминология является #[+Keyword--YDID общей] и #[+Keyword__Contrast--YDID не]&nbsp;связана конкретно с
@@ -771,32 +783,34 @@ block append SpecificContent
 
       li.
         #[+Keyword--YDID Необходимо] указать #[+Term--YDID параметр обобщения] (ещё раз: #[+Term--YDID не]&nbsp;у
-          объекта #[+ImportantEntity__Code--YDID request], и при вызове #[+Term--YDID метода]
+          объекта #[+ImportantEntity__Code--YDID request], а при вызове #[+Term--YDID метода]
           #[+ImportantEntity__Code--YDID validateAndProcessRoutePathParameters]) — представленные в виде
           #[+Keyword--YDID единого] #[+Term--YDID объекта] #[+Term__Contrast--YDID параметры маршрута].
         У метода #[+ImportantEntity__Code--YDID validateAndProcessRoutePathParameters] такой
           #[+Term--YDID параметр обобщения] #[+Keyword--YDID только] #[+Keyword__Contrast--YDID один].
 
       li
-        | #[+Term--YDID Параметром] #[+Keyword--YDID метода] нужно передать правила валидации #[+Term--YDID объекта] в
-        |   формате
+        | Через #[+Term--YDID параметром] #[+Keyword--YDID метода] нужно передать правила валидации
+        |   #[+Term--YDID объекта] в формате
+        |
         +Link--YDF({
           endorsedExternalURI: sharedExternalLinks.YamatoDaiwaES_Extensions.RawObjectDataProcessor.PropertiesSpecification
         }) RawObjectDataProcessor
-        |
-        | из библиотеки
+        |   из библиотеки
         |
         +Link--YDF({
           endorsedExternalURI: sharedExternalLinks.YamatoDaiwaES_Extensions.top,
         }) @yamato-daiwa/es-extensions
         | .
         | В данном случае мы указываем, что #[+Term--YDID параметр маршрута] #[+SecondaryEntity__Code--YDID PRODUCT_ID]
-        |   является #[+Keyword--YDID обязательной] #[+Term--YDID строкой]:
+        |   является #[+Keyword--YDID обязательной] (в том смысле, что
+        |   #[+Keyword--YDID ни]&nbsp;#[+ImportantEntity__Code--YDID undefined],
+        |   #[+Keyword--YDID ни]&nbsp;#[+ImportantEntity__Code--YDID null] #[+Keyword--YDID не]&nbsp;допускаются)
+        |   #[+Term--YDID строкой]:
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
-        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-        import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+        import { Server, Request, Response, ProtocolDependentDefaultPorts, HTTP_Methods } from "@yamato-daiwa/backend";
 
         Server.initializeAndStart({
           IP_Address: "127.0.0.1",
@@ -808,10 +822,13 @@ block append SpecificContent
               pathTemplate: "products/:PRODUCT_ID",
               async handler(request: Request, response: Response): Promise<void> {
 
-                const targetProductID: string = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: string; }>({
+                const targetProductID: number = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: number; }>({
                   PRODUCT_ID: {
-                    type: String,
-                    required: true
+                    preValidationModifications: convertPotentialStringToIntegerIfPossible,
+                    type: Number,
+                    numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+                    isUndefinedForbidden: true,
+                    isNullForbidden: true
                   }
                 }).PRODUCT_ID;
 
@@ -831,19 +848,17 @@ block append SpecificContent
       type: QuestionAndAnswerBox__YDF.Types.criticism,
       question: "Кода стало больше. В Express.js было проще и чище."
     }).
-      Во-первых, у приведённых двух примеров разная функциональность: код примера с
-        #[+SecondaryEntity--YDID Express.js] не&nbsp;имеет валидации
-        #[+Term--YDID параметров маршрута].
+      Во-первых, приведённые выше пример #[+Keyword__Contrast--YDID не]&nbsp;эквиваленты: код примера с
+        #[+SecondaryEntity--YDID Express.js] #[+Keyword--YDID не]&nbsp;имеет валидации #[+Term--YDID параметров маршрута].
       Во-вторых, говоря это, Вы #[+Keyword--YDID сфокусированы] на том, чтобы побыстрее написать
         #[+Keyword--YDID начальный] код, но #[+Keyword--YDID не]&nbsp;на&nbsp;поддерживаемости кода на
-        и&nbsp;#[+Keyword--YDID не]&nbsp;на&nbsp;том, чтобы снизить вероятность ошибки.
+        и&nbsp;#[+Keyword--YDID не]&nbsp;на&nbsp;том, чтобы минимизировать вероятность логической ошибки.
       Малое количество кода #[+Keyword--YDID далеко] #[+Keyword__Contrast--YDID не]&nbsp;всегда обеспечивает
         поддерживаемость кода, а #[+Keyword--YDID иногда] и вовсе #[+Keyword--YDID конфликтует] с ней.
       #[+Keyphrase--YDID Само по себе] большое количество кода — это #[+Keyword--YDID не]&nbsp;хорошо
         #[+Keyword__Contrast--YDID и] #[+Keyword--YDID не]&nbsp;плохо; тут важно, #[+Keyphrase--YDID обосновано ли]
         это количество кода чем-либо, или же действительно можно упростить код без потерь в поддерживаемости.
       #[+Keyphrase--YDID В нашем случае] такое обоснование #[+Keyword--YDID имеется].
-
 
     p.Article-Paragraph.
       Поскольку указание правил валидации при вызове #[+Term--YDID метода]
@@ -870,7 +885,7 @@ block append SpecificContent
         #[+SecondaryEntity__Code--YDID https://example.com/products/1] является #[+Term--YDID числом].
       Однако #[+Keyword--YDID большинство] фреймворков (причем не&nbsp;только
         #[+ImportantEntity--YDID Node.js]-фреймворков) #[+Keyphrase--YDID по умолчанию] извлекают
-        #[+Term--YDID параметры маршрута] в виде #[+Keyword--YDID строк] (что #[+Keyword__Contrast--YDID естественно]
+        #[+Term--YDID параметры пути маршрута] в виде #[+Keyword--YDID строк] (что #[+Keyword__Contrast--YDID естественно]
         ввиду того, что #[+ImportantEntity--YDID URI] является #[+Keyword--YDID строкой], а пытаться преобразовать
         #[+Keyword--YDID каждый] #[+Term--YDID параметр маршрута] у #[+Keyword--YDID всех] #[+ImportantEntity--YDID URI]
         — это хоть и небольшая, но #[+Keyword--YDID бесполезная] трата вычислительных ресурсов).
@@ -880,11 +895,11 @@ block append SpecificContent
 
     p.Article-Paragraph.
       Тем не&nbsp;менее, иногда нам действительно нужно, чтобы #[+Keyword--YDID конкретные]
-        #[+Term--YDID параметры маршрута] были #[+Term--YDID числами].
+        #[+Term--YDID параметры пути маршрута] были #[+Term--YDID числами].
       В частности, при хранении сущностей в базах данных зачастую используются числовые #[+Term--YDID ключи], более того,
-        #[+Keyword--YDID положительные] и #[+Keyword--YDID целочисленные] (хотя при формировании
+        обычно это #[+Keyword--YDID неотрицательные] #[+Keyword__Contrast--YDID целочисленные] числа (хотя при формировании
         #[+Term--YDID SQL-запроса] всё снова превратится в #[+Term--YDID строку], учитывать числовой #[+Term--YDID тип]
-        #[+Term__Contrast--YDID ключей] всё равно в некоторых случаях нужно, да и потом, не&nbsp;все
+        #[+Term__Contrast--YDID параметров путей маршрутов] всё равно в некоторых случаях нужно, да и потом, не&nbsp;все
         #[+Term--YDID системы управления базами данных] используют #[+ImportantEntity--YDID SQL]).
       Другими словами, такие #[+ImportantEntity--YDID URI] как
         #[+SecondaryEntity__Code--YDID http://127.0.0.1/products/1.2] или
@@ -894,8 +909,8 @@ block append SpecificContent
     p.Article-Paragraph.
       Хотя в таких фреймворках, как #[+SecondaryEntity--YDID Express.js] при определении
         #[+Term--YDID параметра маршрута] можно указать #[+Term--YDID регулярное выражение], пропускающее только
-        #[+Term--YDID цифры], без сторонних библиотек преобразовывать #[+Term--YDID параметр] к числовому
-        #[+Term--YDID типу] данных всё равно придётся:
+        #[+Term--YDID цифры], без сторонних библиотек преобразовывать этот #[+Term--YDID параметр] к числовому
+        #[+Term--YDID типу данных] всё равно придётся:
 
     +CodeViewer--YDF
       +CodeViewer-TabPanel--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript })
@@ -936,14 +951,14 @@ block append SpecificContent
     ul.Article-UnorderedList
 
       li.
-        Чтобы выполнить преобразование с #[+Keyword--YDID числовому] #[+Term--YDID типу] (ещё раз повторимся, что
-          #[+Keyword--YDID изначально] #[+Keyword__Contrast--YDID все] #[+Term--YDID параметры маршрута] имеют
+        Чтобы выполнить преобразование к #[+Keyword--YDID числовому] #[+Term--YDID типу] (ещё раз повторимся, что
+          #[+Keyword--YDID изначально] #[+Keyword__Contrast--YDID все] #[+Term--YDID параметры пути маршрута] имеют
           #[+Keyword--YDID строковый] #[+Term--YDID тип] и их преобразование в числа осуществляется
           #[+Keyphrase--YDID по запросу]), нужно воспользоваться функциональностью, которая в #[+Term--YDID API]
           #[+ImportantEntity--YDID RawObjectDataProcessor] называется #[+Term--YDID «предвалидационные преобразования»]
           — по сути, #[+Term--YDID функция] #[+Keyword--YDID либо] #[+Term--YDID массив] #[+Term__Contrast--YDID функций],
           которые принимают на вход #[+Term--YDID параметр] #[+Term--YDID типа] #[+ImportantEntity__Code--YDID unknown]
-          и возвращают его либо в изменённом, либо в неизменном виде в зависимости от целей, с которой данная
+          и возвращают его значение либо в изменённом, либо в неизменном виде в зависимости от целей, с которой данная
           функциональностью используется.
         В нашем случае #[+Keyword--YDID строчное] значение нужно преобразовать в #[+Keyword--YDID числовое]
           #[+Keyphrase--YDID только если оно содержит валидное число].
@@ -952,23 +967,26 @@ block append SpecificContent
         Можно также воспользоваться #[+Term--YDID функцией]
           #[+ImportantEntity__Code--YDID convertPotentialStringToIntegerIfPossible],
           но тогда если #[+Term--YDID строка] будет содержать #[+Keyword--YDID не]&nbsp;#[+Keyword--YDID целое]
-          #[+Term--YDID число], а, например, дробное, то она #[+Keyword--YDID не]&nbsp;будет преобразована в число,
-          и тогда сообщение об ошибке валидации может запутать.
+          #[+Term--YDID число], а, например, дробное, то она #[+Keyword--YDID не]&nbsp;будет преобразована в
+          #[+Term--YDID число], и тогда сообщение об ошибке валидации может запутать.
 
       li.
-        Теперь, когда параметр маршрута преобразован в число (если это было возможно) #[+Keyword--YDID перед] валидацией,
-          ожидаемый #[+Term--YDID тип] #[+ImportantEntity__Code--YDID type: String] #[+Keyword--YDID необходимо]
+        Теперь, когда #[+Term--YDID параметр маршрута] преобразован в #[+Term--YDID число] (если это было возможно)
+          #[+Keyword--YDID перед] валидацией, указание #[+Keyword--YDID ожидаемого] #[+Term--YDID типа]
+          #[+ImportantEntity__Code--YDID type: String] #[+Keyword--YDID необходимо]
           #[+Keyword--YDID заменить] на #[+Keyword__Contrast--YDID type: Number].
 
       li.
         Согласно #[+Term--YDID API] #[+ImportantEntity__Code--YDID RawObjectDataProcessor], если ожидаемым
-          #[+Term--YDID типом] является число, то нужно указать #[+Term--YDID множество чисел] через
-          #[+Term--YDID свойство] #[+ImportantEntity__Code--YDID numbersSet].
+          #[+Term--YDID типом] является #[+Term--YDID число], то #[+Keyword--YDID надо] указать
+          #[+Term--YDID множество чисел] через #[+Term--YDID свойство] #[+ImportantEntity__Code--YDID numbersSet],
+          а также запрет #[+ImportantEntity__Code--YDID NaN].
         Если Вас интересуют #[+Keyword--YDID только] #[+Keyword__Contrast--YDID положительные] #[+Keyword--YDID целые]
           #[+Term--YDID числа] (включая #[+ImportantEntity--YDID 0]), то укажите
-          #[+ImportantEntity__Code--YDID RawObjectDataProcessor.NumbersSets.nonNegativeInteger], а если же
+          #[+ImportantEntity__Code--YDID RawObjectDataProcessor.NumbersSets.naturalNumberOrZero], а если же
           #[+ImportantEntity--YDID 0] Вы не&nbsp;разрешаете, значит значение будет #[+Keyword--YDID натуральным]
-          #[+Term--YDID числом] — #[+ImportantEntity__Code--YDID RawObjectDataProcessor.NumbersSets.naturalNumber]:
+          #[+Term--YDID числом] — #[+ImportantEntity__Code--YDID RawObjectDataProcessor.NumbersSets.naturalNumber].
+         #[+ImportantEntity--YDID NaN] разрешать #[+Keyword--YDID незачем].
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
@@ -994,8 +1012,10 @@ block append SpecificContent
                   PRODUCT_ID: {
                     preValidationModifications: convertPotentialStringToNumberIfPossible,
                     type: Number,
-                    numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber,
-                    required: true
+                    numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+                    isNaN_Forbidden: true,
+                    isUndefinedForbidden: true,
+                    isNullForbidden: true
                   }
                 }).PRODUCT_ID;
 
@@ -1012,9 +1032,35 @@ block append SpecificContent
         });
 
     p.Article-Paragraph.
-      Теперь, если мы попытаемся отправить запрос на URI, содержащий нечисловой параметр пути, по получим следующую ошибку:
+      Теперь, если мы попытаемся отправить запрос c #[+ImportantEntity--YDID URI], содержащий
+        #[+Keyword--YDID нечисловой] #[+Term--YDID параметр пути], то получим следующую ошибку:
 
-    //- TODO Image
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/02-RoutingAndControllers/Images/" +
+          "Tutorials-RoutingAndControllers-NonNumericRoutePathParameterErrorLog",
+      imageAlternateText:
+          "В консоли красным цветом отображается сообщение о невалидных параметрах пути маршрута (озаглавлено" +
+            "«Invalid Route Path Parameters» — «Невалидные пути параметра маршрута»). " +
+          "В описании указано, что ожидалось числовое значение, но в действительности это оказалась строка.",
+      autoAspectRatioByYDA: true
+    })
+
+    p.Article-Paragraph.
+      Можно также попробовать отправить #[+Term--YDID запрос] c #[+ImportantEntity--YDID URI], содержащий
+        #[+Term--YDID параметр пути], представляющий собой #[+Term--YDID отрицательное] либо #[+Term--YDID дробное число] —
+        от также не&nbsp;пройдёт нашу валидацию, только на сей раз в сообщении об ошибке будет сказано о том, что
+        #[+Term--YDID параметр пути] не&nbsp;принадлежит ожидаемому множеству чисел:
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/02-RoutingAndControllers/Images/" +
+          "Tutorials-RoutingAndControllers-WrongNumberSetAsRoutePathParameterErrorLog",
+      imageAlternateText:
+          "В консоли красным цветом отображается сообщение о невалидных параметрах пути маршрута (озаглавлено" +
+            "«Invalid Route Path Parameters» — «Невалидные пути параметра маршрута»). " +
+          "В описании указано, что вопреки ожиданиям, числовое значение не принадлежит множеству чисел " +
+            "\"натуральные числа и 0\".",
+      autoAspectRatioByYDA: true
+    })
 
 
     //- ━━━ Контроллеры ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1025,7 +1071,7 @@ block append SpecificContent
     }).Article-Heading3
 
     p.Article-Paragraph.
-      По мере увеличения количества #[+Term--YDID маршрутов] естественный образом появится потребность как-то их
+      По мере увеличения количества #[+Term--YDID маршрутов] естественным образом появится потребность как-то их
         сгруппировать.
       Если Вы по какой-то причине стремитесь избежать #[+Term--YDID классов] любой ценой, то можно разнести
         #[+Term--YDID маршруты] по файлам и импортировать их в #[+Term--YDID точку входа].
@@ -1037,9 +1083,12 @@ block append SpecificContent
         fileLabel: "Routes/ProductRoutes.ts",
         codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript
       }): :code_listing--yda
-        import { Request, Response } from "@yamato-daiwa/backend";
         import {
-          HTTP_Methods,
+          Request,
+          Response,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
+        import {
           convertPotentialStringToNumberIfPossible,
           RawObjectDataProcessor
         } from "@yamato-daiwa/es-extensions";
@@ -1066,8 +1115,10 @@ block append SpecificContent
                 PRODUCT_ID: {
                   preValidationModifications: convertPotentialStringToNumberIfPossible,
                   type: Number,
-                  numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber,
-                  required: true
+                  numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+                  isNaN_Forbidden: true,
+                  isUndefinedForbidden: true,
+                  isNullForbidden: true
                 }
               }).PRODUCT_ID;
 
@@ -1079,6 +1130,7 @@ block append SpecificContent
           }
 
         ];
+
 
       +CodeViewer-Listing--YDF({
         fileLabel: "EntryPoint.ts",
@@ -1125,31 +1177,11 @@ block append SpecificContent
 
     p.Article-Paragraph.
       Но, несмотря на то, что глубокое понимание #[+Term--YDID объектно-ориентированного программирования] даётся
-        начинающим программистам тяжело, это — инструмент с чрезвычайно широким диапазоном применения и важнейшее
-        средство обеспечения поддерживамости кода:
-
-    //- TODO Редактировать
-    +Blockquote--YDF({
-      authorPhotoURI: "@AssociatedWithPages/革命/論理的記憶/Images/QuotesAuthors/JohnBArden",
-      authorPhotoAlternatingText: "John B. Arden博士、心理学者、15冊の本の原作者",
-      publicationPhotoURI: "https://ir.ozone.ru/s3/multimedia-a/wc1000/6645056914.jpg",
-      publicationPhotoAlternatingText: "Алан Шаллоуей, Джеймс Р. Тротт — Шаблоны проектирования. " +
-        "Новый подход к объектно-ориентированному анализу и проектированию"
-    })
-
-      p
-
-      +InformationSourceReference--YDF.Blockquote--YDF-ReferenceToSource
-        | Алан Шаллоуей, Джеймс Р. Тротт
-        |
-        +Link--YDF({
-          unendorsedExternalURI: "https://www.ozon.ru/product/shablony-proektirovaniya-novyy-podhod-k-obektno-" +
-              "orientirovannomu-analizu-i-proektirovaniyu-trott-1358130914/"
-        }) Шаблоны проектирования. Новый подход к объектно-ориентированному анализу и проектированию
-
-
-    p.Article-Paragraph.
-      Здесь в ход идут #[+Term--YDID классы], которые называются #[+Term--YDID контроллерами]:
+        начинающим программистам тяжело, это — мощнейший инструмент с чрезвычайно большим количеством вариантов
+        использования и важнейшее средство обеспечения поддерживамости кода.
+      В данном случае #[+Term--YDID классы] будут выполнить роль группировки #[+Term--YDID запросов] по какому-либо
+        признаку — такой вариант использования, а точнее #[+Term--YDID шаблон проектирования] назваться
+        #[+Term--YDID «контроллер»]:
 
     +CodeViewer--YDF
 
@@ -1180,11 +1212,11 @@ block append SpecificContent
             #[+Term--YDID элементы массива] #[+ImportantEntity__Code--YDID routing],
             #[+Keyphrase--YDID которые мы передавали ранее] при инициализации
             #[+ImportantEntity__Code--YDID Server.initializeAndStart({ ... })], только
-            #[+Keyphrase--YDID в случае #[+Term--YDID контроллеров]] #[+Keyword--YDID вместо] #[+Term--YDID свойства]
-            #[+ImportantEntity__Code--YDID handler] — #[+Term--YDID метод класса], к которому #[+Term--YDID декоратор]
-            добавлен.
+            #[+Keyphrase--YDID в случае #[+Term--YDID контроллеров]] #[+Term--YDID свойства]
+            #[+ImportantEntity__Code--YDID handler] #[+Keyword--YDID нет], потому что #[+Term--YDID обработчиком запроса]
+            будет сам #[+Term--YDID декорируемый] #[+Term--YDID метод класса].
           Ещё одно достоинство #[+Term--YDID классов-контроллеров] состоит в том, что
-            #[+Keyphrase--YDID при качественном именовании #[+Term--YDID методов]] становится тут же понятно, что будет
+            #[+Keyphrase--YDID при качественном именовании #[+Term--YDID методов]] становится же понятно, что будет
             сделано при отправке #[+Term--YDID запроса] на конкретный #[+Term--YDID маршрут].
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda
@@ -1195,20 +1227,20 @@ block append SpecificContent
 
             @Controller.RouteHandler({
               HTTP_Method: HTTP_Methods.get,
-              pathTemplate: "products/:ID"
+              pathTemplate: "products/:PRODUCT_ID"
             })
             public async generateProductProfilePage(request: Request, response: Response): Promise<void> {
 
-              const targetProductID: number = request.validateAndProcessRoutePathParameters<{ ID: number; }>({
-                ID: {
+              const targetProductID: number = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: number; }>({
+                PRODUCT_ID: {
                   preValidationModifications: convertPotentialStringToIntegerIfPossible,
                   type: Number,
-                  required: true,
-                  numbersSet: RawObjectDataProcessor.NumbersSets.nonNegativeInteger
+                  numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+                  isNaN_Forbidden: true,
+                  isUndefinedForbidden: true,
+                  isNullForbidden: true
                 }
-              }).ID;
-
-              console.log(typeof targetProductID);
+              }).PRODUCT_ID;
 
               return response.submitWithSuccess({
                 HTML_Content: `<h1>Product with ID: ${ targetProductID }</h1>`
@@ -1217,6 +1249,8 @@ block append SpecificContent
             }
 
           }
+
+
 
       +CodeViewer-TabPanel--YDF({
         codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,

@@ -5,7 +5,6 @@ $projectBuilding:
     $publicDirectoriesRelativePaths:
 
       $localDevelopment: 02-LocalDevelopmentBuild
-      $production: 03-ProductionBuild
 
 
   # ━━━ Markup Processing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -13,7 +12,7 @@ $projectBuilding:
 
     $common:
       $buildingModeDependent:
-        $localDevelopment: { $mustUseResolveResourceReferencesToRelativePaths: true }
+        $localDevelopment: { $mustResolveResourcesPointersToRelativePaths: true }
 
     $entryPointsGroups:
 

@@ -1,5 +1,5 @@
-import type Product from "../Entities/Product";
-import type ProductCategory from "../Entities/ProductCategory";
+import type Product from "../Entities/Product/Product";
+import type ProductCategory from "../Entities/Product/ProductCategory";
 
 
 interface ProductGateway {
@@ -27,6 +27,7 @@ namespace ProductGateway {
       paginationPageNumber: number;
       itemsCountPerPaginationPage: number;
       searchingByFullOrPartialTitle?: string;
+      categoryID?: ProductCategory.ID;
     }>;
 
     export type ResponseData = Readonly<{
@@ -48,8 +49,8 @@ namespace ProductGateway {
       Partial<
         Pick<
           Product,
-          "title" |
-          "price__dollars__includingTax"
+              "title" |
+              "price__yens__includingTax"
         >
       > &
       {
@@ -57,7 +58,7 @@ namespace ProductGateway {
         categoryID: ProductCategory.ID;
         quantityRemainInStock?: number | null;
       }
-    >
+    >;
   }
 
 }

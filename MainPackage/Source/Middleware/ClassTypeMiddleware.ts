@@ -7,7 +7,7 @@ import type Middleware from "./Middleware";
 export default abstract class ClassTypeMiddleware<PossiblyCustomRequest extends Request = Request> {
 
   public abstract handleRequest(
-    request: PossiblyCustomRequest, response: Response, serverConfig: Server.NormalizedConfiguration
+    request: PossiblyCustomRequest, response: Response, serverConfiguration: Server.NormalizedConfiguration
   ): Promise<Middleware.CompletionSignals>;
 
 }

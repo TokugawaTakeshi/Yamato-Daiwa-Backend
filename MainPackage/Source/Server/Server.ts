@@ -460,7 +460,7 @@ class Server {
 
     /* [ Theory ] The route matching should be executed before static files searching because the static files searching
      *     requires more computing resources because of operation with files.
-     * If user wants the public file, not route, in most cases the route matching will end with `null` result quickly
+     * If a user wants the public file, not a route, in most cases the route matching will end with `null` result quickly
      *     and minimal performance impact.  */
     const routeMatch: Router.RouteMatch | null = Router.getRouteMatch({
       HTTP_Method,

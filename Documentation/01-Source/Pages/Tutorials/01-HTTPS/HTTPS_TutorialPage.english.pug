@@ -11,9 +11,14 @@ block append Metadata
 
   -
 
+    const {
+      $heading: topHeading,
+      $sectioning: localizedSectioning
+    } = routing.english.tutorials.$children.HTTPS;
+
     RegularWebPageTemplate__YDF.configure({
       metadata: {
-        title: buildHTML_PageTitle("HTTPS Usage"),
+        title: buildHTML_PageTitle(topHeading),
         description:
             "Node.js framework \"Yamato Daiwa Backend\" (abbreviation: \"YDB\") has the HTTPS protocol support out of " +
               "box herewith with eloquent syntax."
@@ -32,8 +37,6 @@ block append Metadata
       japanese: routing.japanese.tutorials.$children.HTTPS.$URI,
       russian: routing.russian.tutorials.$children.HTTPS.$URI
     });
-
-    const localizedSectioning = routing.english.tutorials.$children.HTTPS.$sectioning;
 
 
 block append HeadScripts
@@ -241,8 +244,13 @@ block append SpecificContent
       +CodeViewer-TabPanel--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript })
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda
-          import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-          import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+          import {
+            Server,
+            Request,
+            Response,
+            ProtocolDependentDefaultPorts,
+            HTTP_Methods
+          } from "@yamato-daiwa/backend";
           import Path from "path";
 
 

@@ -7,9 +7,9 @@ import type Middleware from "./Middleware";
 type FunctionTypeMiddleware<
   PossiblyCustomRequest extends Request = Request
 > = (
-  required: PossiblyCustomRequest,
+  request: PossiblyCustomRequest,
   response: Response,
-  serverConfig: Server.NormalizedConfiguration
+  serverConfiguration: Server.NormalizedConfiguration
 ) =>
     Promise<Middleware.CompletionSignals>;
 
