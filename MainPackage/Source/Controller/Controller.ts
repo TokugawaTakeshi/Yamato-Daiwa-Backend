@@ -18,7 +18,7 @@ export default abstract class Controller {
     return (controllerPrototype: SpecificController, methodName: string): void => {
 
       if (!Object.prototype.isPrototypeOf.call(Controller.prototype, controllerPrototype)) {
-        Logger.throwErrorAndLog({
+        Logger.throwErrorWithFormattedMessage({
           errorInstance: new ImproperUsageError(ControllerLocalizer.localization.errors.invalidTargetForRouteHandlerDecorator),
           occurrenceLocation: "Controller.RouteHandler",
           title: ImproperUsageError.localization.defaultTitle

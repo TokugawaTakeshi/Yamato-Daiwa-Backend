@@ -1,0 +1,1303 @@
+extends ../../../../node_modules/@yamato-daiwa/programming_documentation/Layouts/TwoColumns/TwoColumnsLayout.pug
+
+
+block append Requirements
+
+  include ../../../SharedAssets/Markup/SharedAssets.russian.pug
+  include ../../../SharedComponents/SharedComponents.russian.pug
+
+
+block append Metadata
+
+  -
+
+    const {
+      $heading: topHeading,
+      $sectioning: localizedSectioning
+    } = routing.russian.tutorials.$children.routingAndControllers;
+
+    RegularWebPageTemplate__YDF.configure({
+      metadata: {
+        title: buildHTML_PageTitle(topHeading),
+        description:
+          "Node.js-фреймворк «Yamato Daiwa Backend» (сокращённо: «YDB») позволяет настроить маршрутизацию как " +
+            "с помощью классов-контроллеров, так и без них."
+      },
+      stylesSheetsURIs: [
+        "$CommonStyles",
+        "$LayoutsStyles/TwoColumns/TwoColumnsLayout.css",
+        "$PreMadesStyles",
+        "@CustomizedExternalComponents"
+      ]
+    });
+
+    RoutingEmulator.setCurrentRoute("tutorials.routingAndControllers");
+
+    LanguageDropDownList__YDF_DK.setLinks({
+      english: routing.english.tutorials.$children.routingAndControllers.$URI,
+      japanese: routing.japanese.tutorials.$children.routingAndControllers.$URI,
+    });
+
+
+block append HeadScripts
+
+  if __IS_PRODUCTION_BUILDING_MODE__
+
+    +GoogleAnalyticsScript
+
+
+block append SpecificContent
+
+  article
+
+    //- ━━━ Маршрутизация и контроллеры ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    h1.Article-Heading1= topHeading
+
+    //- ━━━ Теория ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    +Heading--YDF({
+      level: 2,
+      text: localizedSectioning.theory.$heading,
+      HTML_ID: localizedSectioning.theory.$anchor
+    }).Article-Heading2
+
+    //- ─── URL, URN, URI ──────────────────────────────────────────────────────────────────────────────────────────────
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.URL_URN_URI.$heading,
+      HTML_ID: localizedSectioning.theory.$children.URL_URN_URI.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      Разница между терминами #[+ImportantEntity--YDID URL] (#[+Term--YDID Unified Resource Locator]),
+        #[+ImportantEntity--YDID URN (Unified Resource Name)] и #[+ImportantEntity--YDID URI (Unified Resource Identifier)],
+        а также их разделение на составляющие #[+Keyphrase--YDID может различаться в зависимости от источника информации].
+      Хотя анатомия #[+ImportantEntity--YDID URL], #[+ImportantEntity--YDID URN] и #[+ImportantEntity--YDID URI] является
+        #[+Keyphrase--YDID не&nbsp;зависящим от фреймворка] фундаментальным знанием, #[+Keyword--YDID необходимо]
+        условиться, какая анатомия актуальна конкретно для #[+ImportantEntity--YDID YDB].
+
+    p.Article-Paragraph.
+      Прежде всего, мы не&nbsp;будем обсуждать разницу между #[+Term--YDID URL] и #[+Term--YDID URN],
+        поскольку сейчас важно то, что #[+Term--YDID URI] является #[+Keyword--YDID завершённой] сущностью, включающей
+        в себя #[+Term--YDID URL] и #[+Term--YDID URN] (#[+Keyphrase--YDID в зависимости от источника информации],
+        #[+Term--YDID URL] и #[+Term--YDID URL] могут пересекаться #[+Keyword--YDID или] #[+Keyword__Contrast--YDID нет]).
+
+    p.Article-Paragraph.
+      Хотя помимо интернета, концепция #[+Term--YDID URI] может относиться и к файлам на локальном компьютере,
+        сейчас сконцентрируемся на особенностях #[+Term--YDID URI] в веб-разработке.
+
+
+    //- ─── Анатомия URI ───────────────────────────────────────────────────────────────────────────────────────────────
+    +Heading--YDF({
+      level: 4,
+      text: localizedSectioning.theory.$children.URL_URN_URI.$children.URI_Anatomy.$heading,
+      HTML_ID: localizedSectioning.theory.$children.URL_URN_URI.$children.URI_Anatomy.$anchor
+    }).Article-Heading4
+
+    p.Article-Paragraph.
+      Рассмотрим значимые составляющие #[+Term--YDID URI].
+      Сейчас нас больше интересует то, как мы будем использовать эти составляющие, нежели их канонические определения,
+        поэтому представленный ниже глоссарий содержит описания, а #[+Keyword--YDID не]&nbsp;определения.
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/02-RoutingAndControllers/Images/URI_Decomposition.svg",
+      imageAlternateText: "Декомпозиция URI: протокол, домен, порт, сокет, путь и так далее."
+    })
+
+    dl.Article-DescriptionList
+
+      dt Протокол (Protocol)
+      dd Нас сейчас интересуют протоколы #[+Term--YDID HTTP] и #[+Term--YDID HTTPS].
+
+      dt IP-адрес (IP address)
+      dd.
+        В случае локальной разработки чаще всего это #[+Keyword--YDID локальный] #[+Term--YDID IP-адрес]
+          (#[+Keyword--YDID обычно] #[+ImportantEntity--YDID 127.0.0.1], он же #[+Term--YDID localhost]).
+        При деплое сайта или приложения на сервер это будет #[+Term--YDID IP-адрес], выданный поставщиком услуг по
+          сдаче серверов в аренду.
+        Мы можем арендовать #[+Term--YDID доменное имя] и привязать его к этому #[+Term--YDID IP-адресу], тогда
+          #[+Keyword--YDID вместо] #[+Term--YDID IP-адреса] будет это #[+Term--YDID доменное имя].
+
+      dt Домен (Domain)
+      dt Домен (Domain name)
+      dd.
+        Наличие #[+Term--YDID доменного имени] востребовано в основном на этапе публикации сайта или приложения.
+        Помимо технологического аспекта, #[+Term--YDID доменное имя] является частью брендинга.
+        Тем не&nbsp;менее, разрабатывая сайт или приложение, необходимо принять меры, чтобы переход с одного домена на
+          другой был наиболее простым (в идеале — без внесения изменений в исходный код).
+
+      dt Порт (Port)
+      dd.
+        Благодаря тому что #[+Term--YDID портов] существует много, на одном сервере можно запускать несколько сайтов или
+          приложений.
+        Часть портов используется программным обеспечением для разных целей, но сейчас нас интересуют один, максимум
+          2 порта (когда у нас поддерживаются и #[+ImportantEntity--YDID HTTP], и #[+ImportantEntity--YDID HTTPS])
+          для обслуживания #[+Term--YDID HTTP-запросов].
+
+      dt Сокет (Socket)
+      dd.
+        #[+Keyword--YDID Совокупность] #[+Term--YDID домена] и #[+Term--YDID порта].
+        Если #[+Term--YDID порт] имеет номер по умолчанию (для конкретного #[+Term--YDID протокола], который
+          #[+Keyword--YDID не]&nbsp;является частью #[+Term--YDID сокета]), то #[+Term--YDID порт] его можно опустить.
+        Например, #[+SecondaryEntity__Code--YDID https://example.com:443] — то же самое, что и
+          #[+SecondaryEntity__Code--YDID https://example.com:443],
+          #[+Keyphrase--YDID покуда #[+Term--YDID протоколом] является #[+SecondaryEntity__Code--YDID HTTPS]].
+
+      dt Источник (Origin)
+      dd #[+Keyword--YDID Совокупность] #[+Term--YDID протокола], #[+Term--YDID домена] и #[+Term--YDID порта].
+
+      dt Путь (Path)
+      dd.
+        Именно от эта часть #[+Keyword--YDID наиболее] важна для #[+Term--YDID маршрутизации], так как
+          #[+Keyword--YDID обычно] в зависимости от неё выдаются те или иные данные (чаще всего в формате
+          #[+ImportantEntity--YDID HTML] или #[+ImportantEntity--YDID JSON], если говорить о разработке сайтов
+          и приложений).
+        Звеньев, разделённых косой черной, может быть несколько, однако слишком большое их количество делает
+          #[+Term--YDID маршрутизацию] запутанной.
+
+      dt Параметры поиска (Query parameters)
+      dd.
+        Обычно используются для поиска и фильтрации в конкретного набора данных, выдаваемого в зависимости от
+          #[+Term--YDID пути].
+        Однако это лишь общепринятая практика, а как именно будут влиять те или иные #[+Term--YDID параметры поиска] на
+          выдаваемые данные — зависит от реализации.
+
+      dt Хэш (Hash)
+      dd.
+        Эта часть обычно #[+Keyword--YDID не]&nbsp;обрабатывается при приёме запроса сервером и имеет значение лишь для
+          клиентской части.
+
+    p.Article-Paragraph.
+      Согласно #[+Keyphrase--YDID одному из] толкований #[+ImportantEntity--YDID URL] и #[+ImportantEntity--YDID URN],
+        #[+ImportantEntity--YDID URL] — это то же самое, что и #[+Term--YDID источник], а #[+ImportantEntity--YDID URN]
+        — это часть, начинающая с #[+Term--YDID пути], и, таким образом, соединив #[+ImportantEntity--YDID URL] и
+        #[+ImportantEntity--YDID URN], мы получим #[+ImportantEntity--YDID URI].
+      Однако как во многих программных интерфейсах, так и в повседневной жизни #[+Term--YDID термин]
+        #[+ImportantEntity--YDID URL] зачастую употребляется как синоним #[+ImportantEntity--YDID URI] либо как его
+        часть, не&nbsp;приведённой выше интерпретации.
+      Например, если взять стандартную функциональность #[+ImportantEntity--YDID Node.js], то свойство
+        #[+ImportantEntity__Code--YDID url] объекта #[+ImportantEntity__Code--YDID request] модуля
+        #[+ImportantEntity__Code--YDID http] включает в себя #[+Term--YDID путь] и #[+Term--YDID параметры запроса],
+        (пример значения из официальной документации: #[+SecondaryEntity__Code--YDID "/status?name=ryan"]), а на
+        основе примера #[+SecondaryEntity__Code--YDID new URL(`https://${process.env.HOST ?? 'localhost'}${request.url}`);]
+        и вовсе нельзя дать ответ, что же такое #[+ImportantEntity--YDID URL].
+
+
+    //- ─── Работа с сущностями ────────────────────────────────────────────────────────────────────────────────────────
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.workingWithEntities.$heading,
+      HTML_ID: localizedSectioning.theory.$children.workingWithEntities.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      Для того, чтобы полноценно рассмотреть #[+Term--YDID маршрутизацию], необходимо понять, для чего она обычно
+        используется.
+      Если рассматривать среднестатистическое серверное приложение, то цель #[+Term--YDID маршрутизации] — обеспечить
+        возможность #[+Keyphrase--YDID работы с данными].
+      Но «работа с данными» — слишком абстрактно, и если понизить абстрактность, то это будет «работа с объектами»
+        или «работа с сущностями».
+      Опять же, и «объект», и «сущность» являются многозначными терминами, потому очень легко запутаться,
+        но #[+Keyphrase--YDID на уровне концепции] это — #[+Keyword--YDID набор] информации, соответствующий какому-либо
+        реальному предмету или человеку, например пользователю, товару или статье в блоге.
+      Они могут быть представлены в виде строки в таблице базы данных, #[+Term--YDID ассоциативного массива],
+        #[+Term__Contrast--YDID объекта]
+        #[+Keyphrase--YDID в смысле #[+Term--YDID объектно-ориентированного программирования]] и так далее.
+
+    p.Article-Paragraph.
+      Одна из основных задач, для которой используются #[+Term--YDID фреймворки] для
+        #[+Term__Contrast--YDID бэкенд-разработки] — обеспечение возможности удобной манипуляции данными,
+        а если данные с течением времени не&nbsp;меняются, то зачастую можно обойтись без серверного программирования.
+      Основными типами манипуляций с сущностями являются:
+
+    ul.Article-UnorderedList
+      li Взятие выборки сущностей, удовлетворяющих определённым условиям (фильтрация)
+      li Поиск конкретной сущности, которая в чём-либо уникальна
+      li Создание новых сущностей
+      li Изменение существующих сущностей
+      li Удаление сущностей
+
+    +AdmonitionBlock--YDF({
+      SVG_Icon: true,
+      geometricVariation: AdmonitionBlock__YDF.GeometricVariations.stickyNoteLike,
+      decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.notice
+    }).
+      Концепция работы с сущностями #[+Keyword--YDID не]&nbsp;зародилась в IT и имела место быть во все времена.
+      Например, мы можем принести новое яблоко на склад продуктов (создание объекта) или наоборот, взять его;
+        найти все испортившиеся яблоки (взятие выборки), чтобы выбросить их (удаление).
+      Однако, при реализации сайтов и приложений работа с сущностями стала явной, а в повседневной жизни мы её часто
+        не&nbsp;осознаём.
+
+
+    //- ─── HTTP-методы ────────────────────────────────────────────────────────────────────────────────────────────────
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.HTTP_Methods.$heading,
+      HTML_ID: localizedSectioning.theory.$children.HTTP_Methods.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      Итак, ответ сервера зависит от того, по какому #[+ImportantEntity--YDID URI] был направлен
+        #[+Term--YDID HTTP-запрос], но если мы говорим о разработке серверной части конкретного сайта или приложения,
+        то #[+Term--YDID источник] у нас будет #[+Keyword--YDID постоянным], а #[+Term--YDID ответ] будет зависеть
+        #[+Keyphrase--YDID в основном] от
+        #[+Term--YDID пути] и #[+Term--YDID параметров запроса].
+      Однако есть ещё один фактор, влияющий на ответ сервера, но который #[+Keyword--YDID не]&nbsp;является частью
+        #[+ImportantEntity--YDID URI] — это #[+Term--YDID HTTP-метод].
+      По сути, #[+DefinableTerm--YDID HTTP-методы] — это #[+Keyword--YDID типы] или #[+Keyword--YDID категории]
+        #[+Term--YDID HTTP-запросов], многие из которых #[+Keyword--YDID не]&nbsp;эквивалентны и имеют свои особенности,
+        однако важной их ролью является #[+Keyphrase--YDID логическая группировка] #[+Term--YDID маршрутов].
+
+    p.Article-Paragraph.
+      Перед тем, как перечислить наиболее популярные #[+Term--YDID HTTP-методы], обратим внимание на несколько моментов,
+        которые часто упускают.
+
+    +AdmonitionBlock--YDF({
+      title: "Важные сведения об HTTP-методах",
+      SVG_Icon: true,
+      geometricVariation: AdmonitionBlock__YDF.GeometricVariations.stickyNoteLike,
+      decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.guidance
+    })
+      ul.Article-UnorderedList
+
+        li.
+          Названия #[+Term--YDID HTTP-методов] являются #[+Keyword--YDID условными], а конкретный эффект
+            #[+Keyword--YDID полностью] зависит от реализации.
+          Например, #[+Term--YDID HTTP-метод] #[+ImportantEntity__Code--YDID DELETE] («удалить») можно реализовать так,
+            что он ничего не&nbsp;будет удалять, а наоборот, что-то создаст.
+          Другое дело, что запутывать маршрутизацию не&nbsp;следует, потому реализация должна соответствовать названию
+            #[+Term--YDID метода].
+
+        li.
+          Маршрутизация будет логичнее и понятнее, если использовать #[+Keyword--YDID несколько] #[+Term--YDID методов],
+            хотя бы #[+ImportantEntity--YDID 3-4].
+          Тем не&nbsp;менее, это лишь #[+Keyword--YDID рекомендация], но #[+Keyword__Contrast--YDID не]&nbsp;техническое
+            требование.
+          До сих пор зачастую обходятся лишь двумя #[+Term--YDID методами] — #[+ImportantEntity--YDID GET] и
+            #[+ImportantEntity--YDID POST], а некоторые начинающие программисты даже не&nbsp;знают, что бывают и другие
+            #[+Term--YDID HTTP методы].
+
+    p.Article-Paragraph.
+      Итак, #[+Keyword--YDID наиболее] #[+Keyword__Contrast--YDID популярными] #[+Term--YDID HTTP-методами] являются:
+
+    dl.Article-DescriptionList
+
+      dt GET
+      dd.
+        Задуман как метод для #[+Keyword--YDID получения] сущности или коллекции таковых.
+        Кстати, когда мы открываем страницу браузера, то происходит отправка именно #[+Term--YDID GET-запроса],
+          а другие типы #[+Term--YDID HTTP-запросов] без использования средств для разработчика или плагинов отправить
+          с помощью популярных браузеров #[+Keyword--YDID нельзя].
+
+      dt PUT
+      dd.
+        Задуман как метод для #[+Keyword--YDID создания] сущности #[+Keyword--YDID или]
+          #[+Keyword__Contrast--YDID полного] #[+Keyword--YDID изменения] сущности, но #[+Keyphrase--YDID на практике]
+          сущность меняется на #[+ImportantEntity--YDID 100%] #[+Keyword--YDID крайне] #[+Keyword__Contrast--YDID редко],
+          хотя бы потому что обычно у сущностей есть уникальный идентификатор, не&nbsp;подлежащий изменению за время
+          существования сущности.
+
+      dt PATCH
+      dd.
+        Задуман как метод для #[+Keyword--YDID частичного] #[+Keyword__Contrast--YDID изменения] сущности.
+
+      dt POST
+      dd.
+        По сути, #[+Keyword--YDID обобщающий] метод по отношению в #[+ImportantEntity--YDID PUT] и
+          #[+ImportantEntity--YDID PATCH], часто использующийся вместо них.
+
+      dt DELETE
+      dd.
+        Задуман как метод для #[+Keyword--YDID удаления] сущности.
+
+    p.Article-Paragraph.
+      Итак, #[+Term--YDID HTTP-запросы] #[+Keyword--YDID с одним и тем же] #[+ImportantEntity--YDID URI] могут давать
+        #[+Keyword--YDID разный] эффект в зависимости от #[+Term--YDID HTTP-метода], например:
+
+    dl.Article-DescriptionList
+
+      dt [GET] https://example.com/api/users/1
+      dd Получение данных о пользователе с идентификатором #[+SecondaryEntity--YDID 1]
+
+      dt [PATCH] https://example.com/api/users/1
+      dd Частичное изменение данных о пользователе с идентификатором #[+SecondaryEntity--YDID 1]
+
+      dt [DELETE] https://example.com/api/users/1
+      dd Удаление данных о пользователе с идентификатором #[+SecondaryEntity--YDID 1]
+
+
+    //- ─── Определение маршрутизации и связанных терминов ─────────────────────────────────────────────────────────────
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.routingDefinition.$heading,
+      HTML_ID: localizedSectioning.theory.$children.routingDefinition.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      Теперь, когда мы договорились об анатомии #[+ImportantEntity--YDID URI], можно ввести понятие
+        #[+Term--YDID маршрутизации] (#[+Term--YDID роутинга]).
+      Сразу обратим внимание, что:
+
+    +AdmonitionBlock--YDF({
+      decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.warning,
+      geometricVariation: AdmonitionBlock__YDF.GeometricVariations.stickyNoteLike,
+      SVG_Icon: true
+    }).
+      Сейчас речь пойдёт о #[+Term--YDID маршрутизации] #[+Keyphrase--YDID на серверной] стороне.
+      С развитием так называемых #[+Term--YDID одностраничных приложений] (#[+ImportantEntity--YDID SPA])
+        #[+Term--YDID маршрутизация] стала реализовываться и на клиентской стороне, и хотя она имеет много общего с
+        #[+Term--YDID маршрутизацией] на серверной стороне, #[+Keyphrase--YDID есть и существенные отличия].
+
+    dl.Article-DescriptionList
+
+      dt Маршрутизация (роутинг) на серверной стороне
+      dd.
+        Генерация определённых #[+Term--YDID ответов] на #[+Term__Contrast--YDID HTTP-запросы] в зависимости от
+          конкретных #[+Term--YDID URI] (в основном от #[+Term--YDID пути] и #[+Term--YDID параметров поиска]) либо их
+          шаблонов, а также от #[+Term__Contrast--YDID HTTP-методов], #[+Keyword--YDID не]&nbsp;являющихся частью
+          #[+Term--YDID URI].
+
+      dt Маршрут
+      dd.
+        #[+Keyword--YDID Комбинация] #[+Term--YDID HTTP-метода] и #[+Term--YDID URI] либо либо его шаблона.
+
+      dt API серверного приложения
+      dd #[+Keyword--YDID Реализованный] набор #[+Term--YDID маршрутов]
+
+    p.Article-Paragraph.
+      Начиная с простейшего примера, рассмотрим #[+Term--YDID маршрутизацию] маленького корпоративного сайта.
+      Большинство #[+Term--YDID маршрутов] будут иметь тип #[+Term--YDID GET], а ответ будет содержать
+        #[+Term--YDID HTML-код] конкретной страницы.
+      Единственное исключение — #[+Term--YDID POST-запрос] для отправки формы запроса связи.
+      В общем случае он может ничего возвращать, а лишь просигнализировать, что запрос успешно обработан.
+
+    dl.Article-DescriptionList
+
+      dt [GET] https://example.com/
+      dd Главная страница
+
+      dt [GET] https://example.com/about
+      dd Страница «О компании»
+
+      dt [GET] https://example.com/services
+      dd Страница «Услуги»
+
+      dt [GET] https://example.com/access
+      dd Страница «Адрес и схема проезда»
+
+      dt [GET] https://example.com/contact
+      dd Страница «контакты» с формой запроса обратной связи
+
+      dt [POST] https://example.com/contact
+      dd Отправка формы запроса обратной связи
+
+    p.Article-Paragraph
+      | Если бы не&nbsp;отправка формы обратной связи, то данный сайт можно было бы реализовать вообще без серверного
+      |   программирования, а только в виде набора #[+Term--YDID HTML-файлов].
+      | Правда для того, чтобы #[+ImportantEntity--YDID URI] не&nbsp;были ссылками на #[+Term--YDID HTML-файлы]
+      |   (например, #[+SecondaryEntity__Code--YDID «https://example.com/about.html»]), а соответствовали приведённым
+      |   выше маршрутам, потребуется донастроить веб-сервер (
+      +Link--YDF({
+        unendorsedExternalURI: "https://nginx.org/en/docs/http/ngx_http_core_module.html#location"
+      }) пример для nginx
+      | ), но это проще, чем заниматься веб-программированием.
+      | Кроме того, если нужна форма запроса связи без серверного программирования, то можно воспользоваться сторонними
+      |   сервисами (
+      +Link--YDF({
+        endorsedExternalURI:
+            "https://aws.amazon.com/jp/blogs/architecture/" +
+              "create-dynamic-contact-forms-for-s3-static-websites-using-aws-lambda-amazon-api-gateway-and-amazon-ses/"
+      }) пример для AWS
+      | ).
+
+    p.Article-Paragraph.
+      В более же сложном случае у нас будут динамические звенья в #[+Term--YDID путях].
+      На примере интернет-магазина, #[+Term--YDID маршрутизация] может быть подобна следующей (некоторые
+        статические #[+Term--YDID маршруты], которые нам уже неинтересны, опущены):
+
+    dl.Article-DescriptionList
+
+      dt [GET] https://example.com/
+      dd Главная страница
+
+      dt [GET] https://example.com/products
+      dd Страница «Список товаров»
+
+      dt [GET] https://example.com/products/{productID}
+      dd Страница товара, где #[+SecondaryEntity__Code--YDID {productID}] — идентификатор товара
+
+      dt [POST] https://example.com/products/{productID}/cart
+      dd Добавление товара в корзину
+
+      dt [DELETE] https://example.com/products/{productID}/cart
+      dd Удаление продукта из корзины
+
+      dt [GET] https://example.com/checkout
+      dd Страница оформления заказа (так как заказ ещё не&nbsp;оформлен, то идентификатора заказа ещё нет)
+
+      dt [POST] https://example.com/checkout
+      dd Отправка данных нового заказа (так как заказ ещё не&nbsp;оформлен, то идентификатора заказа ещё нет)
+
+      dt [GET] https://example.com/vendors/{vendorID}
+      dd Страница поставщика товаров, где #[+SecondaryEntity__Code--YDID {vendorID}] — идентификатор поставщика
+
+      dt [POST] https://example.com/vendors
+      dd Добавление нового поставщика товаров (только для администраторов)
+
+      dt [DELETE] https://example.com/vendors/{vendorID}
+      dd Удаление поставщика товаров (только для администраторов)
+
+    +QuestionAndAnswerBox--YDF({
+      type: QuestionAndAnswerBox__YDF.Types.question,
+      question: "А что, маршрутизация будет одна на всех пользователей? " +
+          "Как, например, сервер поймёт, в корзину какого пользователя надо добавлять продукт?"
+    })
+
+      p.Article-Paragraph.
+        Да, одна на всех.
+        Могут быть маршруты, доступные только для конкретной группы пользователей, но маршрут для конкретного
+          пользователя — нечто экзотическое.
+
+      p.Article-Paragraph.
+        А идентификация пользователя — это отдельная и очень большая тема — #[+Term--YDID аутентификация] и
+          #[+Term--YDID авторизация].
+        Существуют много подходов в реализации #[+Term--YDID аутентификации] и #[+Term--YDID авторизации],
+          но если нужен пример, то данные, идентифицирующие пользователя, могут передаваться через
+          #[+Term--YDID HTTP-заголовки].
+
+
+    //- ─── Примитивная реализация маршрутизации ───────────────────────────────────────────────────────────────────────
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.routingPrimitiveImplementation.$heading,
+      HTML_ID: localizedSectioning.theory.$children.routingPrimitiveImplementation.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID Node.js], как впрочем и многие другие языки программирования,
+        #[+Keyword--YDID не]&nbsp;имеет встроенной функциональности для определения #[+Term--YDID маршрутизации] и
+        подбора #[+Term--YDID маршрута], соответствующего отправленному #[+Term--YDID HTTP-запросу], а потому
+        #[+Term--YDID маршрутизация] — это чуть ли не&nbsp;главная функциональность, которую должен иметь фреймворк
+        для разработки серверной части сайтов и приложений.
+      Но если Вам интересно, какую работу за Вас делает фреймворк, то в общих чертах для реализации
+      #[+Term--YDID маршрутизации] необходимо сделать следующее:
+
+    ol.Article-OrderedList
+
+      li.
+        Предложить программный интерфейс и соглашения для определения #[+Term--YDID маршрутов]
+
+      li.
+        При обработке #[+Term--YDID HTTP-запроса], проанализировать его и подобрать #[+Keyword--YDID походящий]
+          #[+Term--YDID маршрут]
+
+      li.
+        Если #[+Term--YDID маршрут] содержит динамическую часть (например, идентификатор чего-либо), то
+          #[+Keyword--YDID необходимо] сохранить соответствующие значения так, чтобы к ним был доступ у пользователей
+          фреймворка.
+
+    p.Article-Paragraph
+      | Вот пример реализации #[+Term--YDID маршрутизации] на чистом #[+ImportantEntity__Code--YDID Node.js] (основа на
+      |
+      +Link--YDF({ unendorsedExternalURI: "https://usefulangle.com/post/89/nodejs-routing" }).Article-Link этой статье
+      | ):
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import HTTP from "http";
+
+
+        HTTP.createServer((request: HTTP.IncomingMessage): void => {
+
+          const HTTP_Method: string | undefined = request.method;
+          const currentURL: URL = new URL(request.url ?? "", `http://${ request.headers.host }`);
+          const pathName: string = currentURL.pathname;
+          const searchingParameters: URLSearchParams = currentURL.searchParams;
+
+          if (HTTP_Method === "GET" && pathName === "/posts" && !searchingParameters.has("id")) {
+            // GET request to /posts
+          } else if (HTTP_Method === "GET" && pathName === "/posts" && searchingParameters.has("id")) {
+            // GET request to /posts?id=123
+          } else if (HTTP_Method === "POST" && pathName === "/posts") {
+            // POST request to /posts
+          }
+
+        });
+
+    p.Article-Paragraph.
+      Заметим, что в отличие от предыдущего примера, где идентификатор товара содержался с #[+Term--YDID пути]
+        (например, #[+SecondaryEntity__Code--YDID https://example.com/products/1]), здесь идентификатор
+        публикации (по-английски «post», что не&nbsp;следует #[+Term--YDID POST-запросами])
+        передаётся через #[+Term--YDID параметры поиска].
+      Реализация с идентификатором публикации, передаваемой через #[+Term--YDID путь], будет несколько сложнее, особенно
+        она должна работать и для других маршрутов.
+
+
+    //- ━━━ Маршрутизация в YDB ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    +Heading--YDF({
+      level: 2,
+      text: localizedSectioning.routingInYDB.$heading,
+      HTML_ID: localizedSectioning.routingInYDB.$anchor
+    }).Article-Heading2
+
+    //- ─── Функциональный API ─────────────────────────────────────────────────────────────────────────────────────────
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.routingInYDB.$children.functionalAPI.$heading,
+      HTML_ID: localizedSectioning.routingInYDB.$children.functionalAPI.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      В предыдущих уроках мы определяли #[+Keyword--YDID единственный] #[+Term--YDID маршрут], чтобы получить хоть
+        какую-нибудь обратную связь несмотря на максимальную простоту примеров.
+      Этот #[+Term--YDID маршрут] имел #[+Term--YDID HTTP-метод] #[+ImportantEntity--YDID GET] и #[+Term--YDID путь]
+        #[+ImportantEntity__Code--YDID /]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import {
+          Server,
+          Request,
+          Response,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
+
+
+        Server.initializeAndStart({
+          IP_Address: "127.0.0.1",
+          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          routing: [
+            {
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/",
+              async handler(request: Request, response: Response): Promise<void> {
+                return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });      }
+            }
+          ]
+        });
+
+    p.Article-Paragraph.
+      #[+Term--YDID Свойство] #[+ImportantEntity__Code--YDID routing] является #[+Keyword--YDID массивом],
+        и чтобы определить другие #[+Term--YDID маршруты], нужно #[+Keyphrase--YDID аналогичным образом] добавить
+        соответствующие #[+Term--YDID элементы]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import {
+          Server,
+          Request,
+          Response,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
+
+
+        Server.initializeAndStart({
+          IP_Address: "127.0.0.1",
+          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          routing: [
+
+            {
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/",
+              async handler(_request: Request, response: Response): Promise<void> {
+                return response.submitWithSuccess({
+                  HTML_Content: "<h1>Top Page</h1>"
+                });
+              }
+            },
+
+            {
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/products",
+              async handler(_request: Request, response: Response): Promise<void> {
+                return response.submitWithSuccess({
+                  HTML_Content: "<h1>Products</h1>"
+                });
+              }
+            },
+
+            {
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/checkout",
+              async handler(_request: Request, response: Response): Promise<void> {
+                return response.submitWithSuccess({
+                  HTML_Content: "<h1>Checkout</h1>"
+                });
+              }
+            }
+
+          ]
+        });
+
+    p.Article-Paragraph.
+      Как видно, #[+Keyword--YDID каждый] #[+Term--YDID элемент массива] #[+ImportantEntity__Code--YDID routing]
+        в примере выше представляет собой #[+Term--YDID объект] с #[+Keyword--YDID тремя]
+        #[+Keyword__Contrast--YDID обязательными] #[+Term--YDID свойствами] —
+        #[+ImportantEntity__Code--YDID HTTP_Method], #[+ImportantEntity__Code--YDID pathTemplate] и
+        #[+ImportantEntity__Code--YDID handler].
+      Но почему второе из них называется #[+ImportantEntity__Code--YDID pathTemplate] — «шаблон пути», а не&nbsp;просто
+        «path» — «путь»?
+      Потому что в общем случае #[+Term--YDID путь] может содержать #[+Term--YDID параметры], но поскольку их значения
+        #[+Keyword--YDID заранее] #[+Keyword__Contrast--YDID неизвестны], то их необходимо указывать
+        #[+Keyphrase--YDID согласно установленным правилам].
+
+
+    //- ─── Определение маршрутов с параметрами пути ───────────────────────────────────────────────────────────────────
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.routingInYDB.$children.pathParameters.$heading,
+      HTML_ID: localizedSectioning.routingInYDB.$children.pathParameters.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      Обнаруживать значения #[+Term--YDID параметров путей] в #[+ImportantEntity--YDID URI] (например, идентификатор
+        товара #[+SecondaryEntity__Code--YDID 1] в #[+SecondaryEntity__Code--YDID https://example.com/products/1]) может
+        любой популярный фреймворк для серверной разработки.
+      Однако сделать это с #[+Term--YDID типовой безопасностью] могут #[+Keyword--YDID немногие].
+      Справедливости ради следует отметить, что в случае #[+ImportantEntity--YDID TypeScript] сделать это со
+        стопроцентной #[+Term--YDID типовой безопасностью] едва ли возможно — ниже подробнее рассмотрим, почему.
+      Тем не&nbsp;менее, можно #[+Keyword--YDID не]&nbsp;только обойтись без использования #[+Keyword--YDID ущербного]
+        #[+Term--YDID типа] #[+ImportantEntity__Code--YDID any], но и подкрепить #[+Term--YDID приведение] более
+        общих #[+Term--YDID типов] к конкретным #[+Term--YDID валидацией].
+
+    p.Article-Paragraph.
+      Чтобы было, с чем сравнить, рассмотрим случай с фреймворком #[+SecondaryEntity--YDID Express.js].
+      #[+Term--YDID Маршрут] #[+SecondaryEntity__Code--YDID https://example.com/products/{ID}] там определяется следующим
+        образом:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import type { Express as ExpressApplication } from "express";
+        import type Express from "express";
+        import createExpressApplication from "express";
+
+
+        const expressApplication: ExpressApplication = createExpressApplication();
+
+        expressApplication.get(
+          "/products/:ID",
+          (request: Express.Request<{ ID: string; }>, response: Express.Response): void => {
+            response.send(`<h1>Product with ID: ${ request.params.ID }</h1>`);
+          }
+        );
+
+        expressApplication.listen(80, "127.0.0.1");
+
+    p.Article-Paragraph.
+      Как видно, #[+Term--YDID тип] #[+SecondaryEntity__Code--YDID Express.Request] является #[+Term--YDID дженериком],
+        #[+Keyword--YDID первый] #[+Term--YDID параметр] которого — #[+Term--YDID объект], в котором хранятся
+        извлечённые значения #[+Term--YDID параметров маршрута] и который #[+Keyword--YDID должен] удовлетворять
+        #[+Term--YDID привязке] #[+ImportantEntity__Code--YDID { &lsqb;key: string&rsqb;: string; }].
+      Какие здесь проблемы?
+
+    dl.Article-DescriptionList
+
+      dt Низкий уровень типовой безопасности
+      dd.
+        #[+Term--YDID Приведение типа] #[+ImportantEntity__Code--YDID { &lsqb;key: string&rsqb;: string; }] к
+          #[+ImportantEntity__Code--YDID { ID: string; }] #[+Keyword--YDID ничем] не&nbsp;подкреплено.
+        Несмотря на то, что у нас #[+Keyword--YDID шаблон] #[+Term--YDID пути] —
+          #[+SecondaryEntity__Code--YDID "/products/:ID"], мы можем указать совершенно не&nbsp;имеющий к нему отношения
+          #[+Term--YDID тип] (например, #[+SecondaryEntity__Code--YDID { foo: string; bar: string; }]) и
+          #[+ImportantEntity--YDID TypeScript] #[+Keyword--YDID ничего] #[+Keyword__Contrast--YDID не]&nbsp;заметит.
+        #[+Keyword--YDID Фундаментально] это проблему решить #[+Keyword--YDID нельзя], потому что указание
+          #[+Term--YDID типа] #[+Keyphrase--YDID прекращает своё существование] при #[+Term--YDID транспайлинге]
+          из #[+ImportantEntity--YDID TypeScript] в #[+ImportantEntity--YDID JavaScript],
+          соответственно при выполнении #[+Term--YDID JavaScript-кода] #[+Term__Contrast--YDID Node.js-сервером]
+          на указанный ранее #[+Term--YDID тип] #[+Keyword--YDID никак] #[+Keyword__Contrast--YDID нельзя] сослаться,
+          чтобы проверить, соответствует ли #[+Term--YDID объект] #[+ImportantEntity__Code--YDID request.params] этому
+          #[+Term--YDID типу].
+        Однако должно быть хоть что-то, чем подкреплено #[+Term--YDID приведение]
+         #[+ImportantEntity__Code--YDID { &lsqb;key: string&rsqb;: string; }] к
+         #[+ImportantEntity__Code--YDID { ID: string; }], и #[+Keyphrase--YDID в первую очередь] это
+         #[+Term--YDID валидация].
+        Сам #[+SecondaryEntity--YDID Express.js] такой функциональности #[+Keyword--YDID не]&nbsp;предлагает,
+          но есть сторонние библиотеки, например
+          #[+Link--YDF({ unendorsedExternalURI: "https://express-validator.github.io/docs" }).Article-Link express-validator].
+
+      dt Неудобный API
+      dd
+        | У типа #[+ImportantEntity__Code--YDID Express.Request] целых #[+ImportantEntity--YDID 5]
+        |   #[+Term--YDID параметров обобщения], причём если нам нужен, например, четвёртый (представленные в виде
+        |   #[+Term--YDID объекта] #[+Term__Contrast--YDID параметры поиска]), то придётся указать и предыдущие три,
+        |   даже если они для нас не&nbsp;актуальны, потому получится что-то вроде
+        |   #[+SecondaryEntity__Code--YDID Express.Request&lt;{}, {}, {}, { pageNumber: number; }&gt;].
+        |
+        +Link--YDF({
+          unendorsedExternalURI: sharedExternalLinks.ESLint.plugins.typeScript.top
+        }).Article-Link typescript-eslint
+        |   может
+        |
+        +Link--YDF({
+          unendorsedExternalURI: sharedExternalLinks.ESLint.plugins.typeScript.rules.noEmptyObjectType
+        }).Article-Link выразить недовольство
+        |   таким кодом.
+
+    p.Article-Paragraph.
+      В #[+ImportantEntity--YDID YDB], #[+Keyword--YDID обе] проблемы имеют решение «из коробки».
+
+    +AdmonitionBlock--YDF({
+      title: "Осторожнее с терминологий",
+      SVG_Icon: true,
+      geometricVariation: AdmonitionBlock__YDF.GeometricVariations.stickyNoteLike,
+      decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.warning
+    })
+
+      p.Article-Paragraph.
+        Термин #[+Term--YDID «параметр»] довольно широкий, и далее пойдёт речь о #[+Keyword--YDID трёх]
+          #[+Term--YDID параметрах] #[+Keyphrase--YDID в разных смыслах].
+
+      dl.Article-DescriptionList
+
+        dt Параметры функции/метода
+        dd.
+          Именно этот тип #[+Term--YDID параметров] представляется в первую очередь (в программировании), когда
+            произносится слово #[+Term--YDID «параметр»].
+          Однако, этот термин используется #[+Keyword--YDID не]&nbsp;только по отношению к #[+Term--YDID функциям] и
+            #[+Term--YDID методам].
+
+        dt Параметры обобщения
+        dd.
+          Имеют отношение к языкам программирования со #[+Term--YDID статической типизаций], коим
+            #[+ImportantEntity--YDID TypeScript] хоть и с натяжкой, но является.
+
+        dt Параметры маршрута
+        dd.
+          Имеют отношение к #[+Term--YDID маршрутизации] в целом, но #[+Keyword--YDID не]&nbsp; к конкретному
+            #[+Term--YDID языку программирования].
+
+      p.Article-Paragraph.
+        Эта терминология является #[+Keyword--YDID общей] и #[+Keyword__Contrast--YDID не]&nbsp;связана конкретно с
+          фреймворком #[+ImportantEntity--YDID YDB], однако программисты с малым опытом могут запутаться.
+
+    p.Article-Paragraph.
+      Сам #[+Term--YDID объект] #[+ImportantEntity__Code--YDID request] (естественно, у него #[+Keyword--YDID другой]
+        #[+Term--YDID тип], #[+Keyword--YDID не]&nbsp; #[+ImportantEntity__Code--YDID Express.Request] из фреймворка
+        #[+SecondaryEntity--YDID Express.js]) #[+Term--YDID параметров обобщения] #[+Keyword--YDID не]&nbsp;имеет.
+      Для того, чтобы обратиться к #[+Term--YDID параметрам маршрута], нужно вызывать #[+Term--YDID метод]
+        #[+ImportantEntity__Code--YDID validateAndProcessRoutePathParameters] у #[+Term--YDID объекта]
+        #[+ImportantEntity__Code--YDID request], при этом:
+
+    ul.Article-UnorderedList
+
+      li.
+        #[+Keyword--YDID Необходимо] указать #[+Term--YDID параметр обобщения] (ещё раз: #[+Term--YDID не]&nbsp;у
+          объекта #[+ImportantEntity__Code--YDID request], а при вызове #[+Term--YDID метода]
+          #[+ImportantEntity__Code--YDID validateAndProcessRoutePathParameters]) — представленные в виде
+          #[+Keyword--YDID единого] #[+Term--YDID объекта] #[+Term__Contrast--YDID параметры маршрута].
+        У метода #[+ImportantEntity__Code--YDID validateAndProcessRoutePathParameters] такой
+          #[+Term--YDID параметр обобщения] #[+Keyword--YDID только] #[+Keyword__Contrast--YDID один].
+
+      li
+        | Через #[+Term--YDID параметром] #[+Keyword--YDID метода] нужно передать правила валидации
+        |   #[+Term--YDID объекта] в формате
+        |
+        +Link--YDF({
+          endorsedExternalURI: sharedExternalLinks.YamatoDaiwaES_Extensions.RawObjectDataProcessor.PropertiesSpecification
+        }) RawObjectDataProcessor
+        |   из библиотеки
+        |
+        +Link--YDF({
+          endorsedExternalURI: sharedExternalLinks.YamatoDaiwaES_Extensions.top,
+        }) @yamato-daiwa/es-extensions
+        | .
+        | В данном случае мы указываем, что #[+Term--YDID параметр маршрута] #[+SecondaryEntity__Code--YDID PRODUCT_ID]
+        |   является #[+Keyword--YDID обязательной] (в том смысле, что
+        |   #[+Keyword--YDID ни]&nbsp;#[+ImportantEntity__Code--YDID undefined],
+        |   #[+Keyword--YDID ни]&nbsp;#[+ImportantEntity__Code--YDID null] #[+Keyword--YDID не]&nbsp;допускаются)
+        |   #[+Term--YDID строкой]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import { Server, Request, Response, ProtocolDependentDefaultPorts, HTTP_Methods } from "@yamato-daiwa/backend";
+
+        Server.initializeAndStart({
+          IP_Address: "127.0.0.1",
+          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          routing: [
+
+            {
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "products/:PRODUCT_ID",
+              async handler(request: Request, response: Response): Promise<void> {
+
+                const targetProductID: number = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: number; }>({
+                  PRODUCT_ID: {
+                    preValidationModifications: convertPotentialStringToIntegerIfPossible,
+                    type: Number,
+                    numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+                    isUndefinedForbidden: true,
+                    isNullForbidden: true
+                  }
+                }).PRODUCT_ID;
+
+                return response.submitWithSuccess({
+                  HTML_Content: `<h1>Product with ID: ${ targetProductID }</h1>`
+                });
+
+              }
+            },
+
+            // ...
+
+          ]
+        });
+
+    +QuestionAndAnswerBox--YDF({
+      type: QuestionAndAnswerBox__YDF.Types.criticism,
+      question: "Кода стало больше. В Express.js было проще и чище."
+    }).
+      Во-первых, приведённые выше пример #[+Keyword__Contrast--YDID не]&nbsp;эквиваленты: код примера с
+        #[+SecondaryEntity--YDID Express.js] #[+Keyword--YDID не]&nbsp;имеет валидации #[+Term--YDID параметров маршрута].
+      Во-вторых, говоря это, Вы #[+Keyword--YDID сфокусированы] на том, чтобы побыстрее написать
+        #[+Keyword--YDID начальный] код, но #[+Keyword--YDID не]&nbsp;на&nbsp;поддерживаемости кода на
+        и&nbsp;#[+Keyword--YDID не]&nbsp;на&nbsp;том, чтобы минимизировать вероятность логической ошибки.
+      Малое количество кода #[+Keyword--YDID далеко] #[+Keyword__Contrast--YDID не]&nbsp;всегда обеспечивает
+        поддерживаемость кода, а #[+Keyword--YDID иногда] и вовсе #[+Keyword--YDID конфликтует] с ней.
+      #[+Keyphrase--YDID Само по себе] большое количество кода — это #[+Keyword--YDID не]&nbsp;хорошо
+        #[+Keyword__Contrast--YDID и] #[+Keyword--YDID не]&nbsp;плохо; тут важно, #[+Keyphrase--YDID обосновано ли]
+        это количество кода чем-либо, или же действительно можно упростить код без потерь в поддерживаемости.
+      #[+Keyphrase--YDID В нашем случае] такое обоснование #[+Keyword--YDID имеется].
+
+    p.Article-Paragraph.
+      Поскольку указание правил валидации при вызове #[+Term--YDID метода]
+        #[+ImportantEntity__Code--YDID validateAndProcessRoutePathParameters]
+        является #[+Keyword--YDID обязательным], то этот #[+Term--YDID метод] #[+Keyword--YDID принуждает]
+        программиста подкрепить валидацией приведение к #[+Term--YDID типу], указанному через
+        #[+Term--YDID параметр обобщения].
+      Разумеется, ввиду рассмотренных выше ограничений #[+ImportantEntity--YDID TypeScript] указанные правила валидации
+        могут и не&nbsp;соответствовать #[+Term--YDID типу], указанного через #[+Term--YDID параметр обобщения], однако
+        это лучше, чем просто приведение #[+Term--YDID типов], и, как показывает практика, даже при таких ограничениях
+        вероятность ошибки #[+Keyword--YDID значительно] #[+Keyword__Contrast--YDID меньше].
+      В конце урока мы ещё более улучшим код, тем самым ещё снизим вероятность ошибки.
+
+
+    //- ─── Числовые параметры пути ────────────────────────────────────────────────────────────────────────────────────
+    +Heading--YDF({
+      level: 4,
+      text: localizedSectioning.routingInYDB.$children.pathParameters.$children.numeric.$heading,
+      HTML_ID: localizedSectioning.routingInYDB.$children.pathParameters.$children.numeric.$anchor
+    }).Article-Heading4
+
+    p.Article-Paragraph.
+      #[+Keyphrase--YDID На первый взгляд] очевидно, что #[+SecondaryEntity__Code--YDID 1] в
+        #[+SecondaryEntity__Code--YDID https://example.com/products/1] является #[+Term--YDID числом].
+      Однако #[+Keyword--YDID большинство] фреймворков (причем не&nbsp;только
+        #[+ImportantEntity--YDID Node.js]-фреймворков) #[+Keyphrase--YDID по умолчанию] извлекают
+        #[+Term--YDID параметры пути маршрута] в виде #[+Keyword--YDID строк] (что #[+Keyword__Contrast--YDID естественно]
+        ввиду того, что #[+ImportantEntity--YDID URI] является #[+Keyword--YDID строкой], а пытаться преобразовать
+        #[+Keyword--YDID каждый] #[+Term--YDID параметр маршрута] у #[+Keyword--YDID всех] #[+ImportantEntity--YDID URI]
+        — это хоть и небольшая, но #[+Keyword--YDID бесполезная] трата вычислительных ресурсов).
+      Таким образом, ранее мы могли при отправке запроса по #[+Term--YDID маршруту]
+        #[+SecondaryEntity__Code--YDID /products/:PRODUCT_ID] указать не&nbsp;#[+SecondaryEntity__Code--YDID 1],
+        а #[+Keyword--YDID произвольную] #[+Keyword__Contrast--YDID комбинацию] букв и цифр.
+
+    p.Article-Paragraph.
+      Тем не&nbsp;менее, иногда нам действительно нужно, чтобы #[+Keyword--YDID конкретные]
+        #[+Term--YDID параметры пути маршрута] были #[+Term--YDID числами].
+      В частности, при хранении сущностей в базах данных зачастую используются числовые #[+Term--YDID ключи], более того,
+        обычно это #[+Keyword--YDID неотрицательные] #[+Keyword__Contrast--YDID целочисленные] числа (хотя при формировании
+        #[+Term--YDID SQL-запроса] всё снова превратится в #[+Term--YDID строку], учитывать числовой #[+Term--YDID тип]
+        #[+Term__Contrast--YDID параметров путей маршрутов] всё равно в некоторых случаях нужно, да и потом, не&nbsp;все
+        #[+Term--YDID системы управления базами данных] используют #[+ImportantEntity--YDID SQL]).
+      Другими словами, такие #[+ImportantEntity--YDID URI] как
+        #[+SecondaryEntity__Code--YDID http://127.0.0.1/products/1.2] или
+        #[+SecondaryEntity__Code--YDID http://127.0.0.1/products/-3] будут рассматриваться нами как
+        #[+Keyword--YDID невалидные] несмотря на то, что содержат числа.
+
+    p.Article-Paragraph.
+      Хотя в таких фреймворках, как #[+SecondaryEntity--YDID Express.js] при определении
+        #[+Term--YDID параметра маршрута] можно указать #[+Term--YDID регулярное выражение], пропускающее только
+        #[+Term--YDID цифры], без сторонних библиотек преобразовывать этот #[+Term--YDID параметр] к числовому
+        #[+Term--YDID типу данных] всё равно придётся:
+
+    +CodeViewer--YDF
+      +CodeViewer-TabPanel--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript })
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda
+          import type { Express as ExpressApplication } from "express";
+          import type Express from "express";
+          import createExpressApplication from "express";
+
+
+          const expressApplication: ExpressApplication = createExpressApplication();
+
+          expressApplication.get(
+            "/products/:ID(\\d+)",
+            (request: Express.Request<{ ID: string; }>, response: Express.Response): void => {
+              console.log(typeof request.params.ID);
+        +CodeViewer-Explanation--YDF.
+          В консоль будет выведено #[+SecondaryEntity__Code--YDID string] несмотря на то, что идентификатор
+            гарантированно состоит из цифр, иначе этот #[+Term--YDID обработчик маршрута]&nbsp;не&nbsp;будет
+            вызван.
+          Прежде чем что-сделать с ним #[+Keyphrase--YDID как с числом], придётся привести его к числовому
+            #[+Term--YDID типу] — с помощью #[+ImportantEntity__Code--YDID Number()] или же
+            #[+ImportantEntity__Code--YDID parseInt], если нам нужен #[+Keyword--YDID целочисленный] #[+Term--YDID тип].
+        +CodeViewer-PartialListing--YDF: :code_listing--yda
+              response.send(`<h1>Product with ID: ${ request.params.ID }</h1>`);
+            }
+          );
+
+          expressApplication.listen(80, "127.0.0.1");
+
+    p.Article-Paragraph.
+      В случае с #[+ImportantEntity--YDID YDB], как видно из прямого перевода имени #[+Term--YDID метода]
+        #[+ImportantEntity__Code--YDID validateAndProcessRoutePathParameters] («валидировать и обработать параметры пути
+        маршрута»), данный метод не&nbsp;только валидирует #[+Term--YDID параметры пути маршрута], но и может их
+        обработать, в частности, преобразовать к числовому #[+Term--YDID типу].
+      Это очень просто, но необходимо подробно прокомментировать данную операцию.
+
+    ul.Article-UnorderedList
+
+      li.
+        Чтобы выполнить преобразование к #[+Keyword--YDID числовому] #[+Term--YDID типу] (ещё раз повторимся, что
+          #[+Keyword--YDID изначально] #[+Keyword__Contrast--YDID все] #[+Term--YDID параметры пути маршрута] имеют
+          #[+Keyword--YDID строковый] #[+Term--YDID тип] и их преобразование в числа осуществляется
+          #[+Keyphrase--YDID по запросу]), нужно воспользоваться функциональностью, которая в #[+Term--YDID API]
+          #[+ImportantEntity--YDID RawObjectDataProcessor] называется #[+Term--YDID «предвалидационные преобразования»]
+          — по сути, #[+Term--YDID функция] #[+Keyword--YDID либо] #[+Term--YDID массив] #[+Term__Contrast--YDID функций],
+          которые принимают на вход #[+Term--YDID параметр] #[+Term--YDID типа] #[+ImportantEntity__Code--YDID unknown]
+          и возвращают его значение либо в изменённом, либо в неизменном виде в зависимости от целей, с которой данная
+          функциональностью используется.
+        В нашем случае #[+Keyword--YDID строчное] значение нужно преобразовать в #[+Keyword--YDID числовое]
+          #[+Keyphrase--YDID только если оно содержит валидное число].
+        Для таких случаев есть #[+Keyword--YDID готовая] #[+Term--YDID функция]
+          #[+ImportantEntity__Code--YDID convertPotentialStringToNumberIfPossible].
+        Можно также воспользоваться #[+Term--YDID функцией]
+          #[+ImportantEntity__Code--YDID convertPotentialStringToIntegerIfPossible],
+          но тогда если #[+Term--YDID строка] будет содержать #[+Keyword--YDID не]&nbsp;#[+Keyword--YDID целое]
+          #[+Term--YDID число], а, например, дробное, то она #[+Keyword--YDID не]&nbsp;будет преобразована в
+          #[+Term--YDID число], и тогда сообщение об ошибке валидации может запутать.
+
+      li.
+        Теперь, когда #[+Term--YDID параметр маршрута] преобразован в #[+Term--YDID число] (если это было возможно)
+          #[+Keyword--YDID перед] валидацией, указание #[+Keyword--YDID ожидаемого] #[+Term--YDID типа]
+          #[+ImportantEntity__Code--YDID type: String] #[+Keyword--YDID необходимо]
+          #[+Keyword--YDID заменить] на #[+Keyword__Contrast--YDID type: Number].
+
+      li.
+        Согласно #[+Term--YDID API] #[+ImportantEntity__Code--YDID RawObjectDataProcessor], если ожидаемым
+          #[+Term--YDID типом] является #[+Term--YDID число], то #[+Keyword--YDID надо] указать
+          #[+Term--YDID множество чисел] через #[+Term--YDID свойство] #[+ImportantEntity__Code--YDID numbersSet],
+          а также запрет #[+ImportantEntity__Code--YDID NaN].
+        Если Вас интересуют #[+Keyword--YDID только] #[+Keyword__Contrast--YDID положительные] #[+Keyword--YDID целые]
+          #[+Term--YDID числа] (включая #[+ImportantEntity--YDID 0]), то укажите
+          #[+ImportantEntity__Code--YDID RawObjectDataProcessor.NumbersSets.naturalNumberOrZero], а если же
+          #[+ImportantEntity--YDID 0] Вы не&nbsp;разрешаете, значит значение будет #[+Keyword--YDID натуральным]
+          #[+Term--YDID числом] — #[+ImportantEntity__Code--YDID RawObjectDataProcessor.NumbersSets.naturalNumber].
+         #[+ImportantEntity--YDID NaN] разрешать #[+Keyword--YDID незачем].
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
+        import {
+          HTTP_Methods,
+          convertPotentialStringToNumberIfPossible,
+          RawObjectDataProcessor
+        } from "@yamato-daiwa/es-extensions";
+
+
+        Server.initializeAndStart({
+          IP_Address: "127.0.0.1",
+          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          routing: [
+
+            {
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "products/:PRODUCT_ID",
+              async handler(request: Request, response: Response): Promise<void> {
+
+                const targetProductID: number = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: number; }>({
+                  PRODUCT_ID: {
+                    preValidationModifications: convertPotentialStringToNumberIfPossible,
+                    type: Number,
+                    numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+                    isNaN_Forbidden: true,
+                    isUndefinedForbidden: true,
+                    isNullForbidden: true
+                  }
+                }).PRODUCT_ID;
+
+                return response.submitWithSuccess({
+                  HTML_Content: `<h1>Product with ID: ${ targetProductID }</h1>`
+                });
+
+              }
+            },
+
+            // ...
+
+          ]
+        });
+
+    p.Article-Paragraph.
+      Теперь, если мы попытаемся отправить запрос c #[+ImportantEntity--YDID URI], содержащий
+        #[+Keyword--YDID нечисловой] #[+Term--YDID параметр пути], то получим следующую ошибку:
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/02-RoutingAndControllers/Images/" +
+          "Tutorials-RoutingAndControllers-NonNumericRoutePathParameterErrorLog",
+      imageAlternateText:
+          "В консоли красным цветом отображается сообщение о невалидных параметрах пути маршрута (озаглавлено" +
+            "«Invalid Route Path Parameters» — «Невалидные пути параметра маршрута»). " +
+          "В описании указано, что ожидалось числовое значение, но в действительности это оказалась строка.",
+      autoAspectRatioByYDA: true
+    })
+
+    p.Article-Paragraph.
+      Можно также попробовать отправить #[+Term--YDID запрос] c #[+ImportantEntity--YDID URI], содержащий
+        #[+Term--YDID параметр пути], представляющий собой #[+Term--YDID отрицательное] либо #[+Term--YDID дробное число] —
+        от также не&nbsp;пройдёт нашу валидацию, только на сей раз в сообщении об ошибке будет сказано о том, что
+        #[+Term--YDID параметр пути] не&nbsp;принадлежит ожидаемому множеству чисел:
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/02-RoutingAndControllers/Images/" +
+          "Tutorials-RoutingAndControllers-WrongNumberSetAsRoutePathParameterErrorLog",
+      imageAlternateText:
+          "В консоли красным цветом отображается сообщение о невалидных параметрах пути маршрута (озаглавлено" +
+            "«Invalid Route Path Parameters» — «Невалидные пути параметра маршрута»). " +
+          "В описании указано, что вопреки ожиданиям, числовое значение не принадлежит множеству чисел " +
+            "\"натуральные числа и 0\".",
+      autoAspectRatioByYDA: true
+    })
+
+
+    //- ━━━ Контроллеры ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.routingInYDB.$children.controllers.$heading,
+      HTML_ID: localizedSectioning.routingInYDB.$children.controllers.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      По мере увеличения количества #[+Term--YDID маршрутов] естественным образом появится потребность как-то их
+        сгруппировать.
+      Если Вы по какой-то причине стремитесь избежать #[+Term--YDID классов] любой ценой, то можно разнести
+        #[+Term--YDID маршруты] по файлам и импортировать их в #[+Term--YDID точку входа].
+      Например, у нас два #[+Term--YDID маршрута] из уже определённых четырёх связаны с товарами — их мы и вынесем:
+
+    +CodeViewer--YDF
+
+      +CodeViewer-Listing--YDF({
+        fileLabel: "Routes/ProductRoutes.ts",
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript
+      }): :code_listing--yda
+        import {
+          Request,
+          Response,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
+        import {
+          convertPotentialStringToNumberIfPossible,
+          RawObjectDataProcessor
+        } from "@yamato-daiwa/es-extensions";
+
+
+        export default [
+
+          {
+            HTTP_Method: HTTP_Methods.get,
+            pathTemplate: "/products",
+            async handler(_request: Request, response: Response): Promise<void> {
+              return response.submitWithSuccess({
+                HTML_Content: "<h1>Products</h1>"
+              });
+            }
+          },
+
+          {
+            HTTP_Method: HTTP_Methods.get,
+            pathTemplate: "products/:PRODUCT_ID",
+            async handler(request: Request, response: Response): Promise<void> {
+
+              const targetProductID: number = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: number; }>({
+                PRODUCT_ID: {
+                  preValidationModifications: convertPotentialStringToNumberIfPossible,
+                  type: Number,
+                  numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+                  isNaN_Forbidden: true,
+                  isUndefinedForbidden: true,
+                  isNullForbidden: true
+                }
+              }).PRODUCT_ID;
+
+              return response.submitWithSuccess({
+                HTML_Content: `<h1>Product with ID: ${ targetProductID }</h1>`
+              });
+
+            }
+          }
+
+        ];
+
+
+      +CodeViewer-Listing--YDF({
+        fileLabel: "EntryPoint.ts",
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript
+      }): :code_listing--yda
+        import productRoutes from "./Routes/ProductRoutes";
+        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
+        import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+
+
+        /* Running the test:
+         *  ts-node Step4/EntryPoint-Step4.ts
+         * */
+        Server.initializeAndStart({
+          IP_Address: "127.0.0.1",
+          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          routing: [
+
+             {
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/",
+              async handler(_request: Request, response: Response): Promise<void> {
+                return response.submitWithSuccess({
+                  HTML_Content: "<h1>Top Page</h1>"
+                });
+              }
+            },
+
+            ...productRoutes,
+
+            {
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/checkout",
+              async handler(_request: Request, response: Response): Promise<void> {
+                return response.submitWithSuccess({
+                  HTML_Content: "<h1>Checkout</h1>"
+                });
+              }
+            }
+
+          ]
+        });
+
+
+    p.Article-Paragraph.
+      Но, несмотря на то, что глубокое понимание #[+Term--YDID объектно-ориентированного программирования] даётся
+        начинающим программистам тяжело, это — мощнейший инструмент с чрезвычайно большим количеством вариантов
+        использования и важнейшее средство обеспечения поддерживамости кода.
+      В данном случае #[+Term--YDID классы] будут выполнить роль группировки #[+Term--YDID запросов] по какому-либо
+        признаку — такой вариант использования, а точнее #[+Term--YDID шаблон проектирования] назваться
+        #[+Term--YDID «контроллер»]:
+
+    +CodeViewer--YDF
+
+      +CodeViewer-TabPanel--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      })
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda
+          import { Request, Response, Controller } from "@yamato-daiwa/backend";
+          import {
+            HTTP_Methods,
+            convertPotentialStringToIntegerIfPossible,
+            RawObjectDataProcessor
+          } from "@yamato-daiwa/es-extensions";
+
+
+          export default class ProductController extends Controller {
+
+            @Controller.RouteHandler({
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "products"
+            })
+            public async generateProductsPage(_request: Request, response: Response): Promise<void> {
+        +CodeViewer-Explanation--YDF.
+          #[+Term--YDID Параметр] #[+Term__Contrast--YDID функции-декоратора]
+            #[+ImportantEntity--YDID @Controller.RouteHandler] #[+Keyword--YDID почти] такой же, как
+            #[+Term--YDID элементы массива] #[+ImportantEntity__Code--YDID routing],
+            #[+Keyphrase--YDID которые мы передавали ранее] при инициализации
+            #[+ImportantEntity__Code--YDID Server.initializeAndStart({ ... })], только
+            #[+Keyphrase--YDID в случае #[+Term--YDID контроллеров]] #[+Term--YDID свойства]
+            #[+ImportantEntity__Code--YDID handler] #[+Keyword--YDID нет], потому что #[+Term--YDID обработчиком запроса]
+            будет сам #[+Term--YDID декорируемый] #[+Term--YDID метод класса].
+          Ещё одно достоинство #[+Term--YDID классов-контроллеров] состоит в том, что
+            #[+Keyphrase--YDID при качественном именовании #[+Term--YDID методов]] становится же понятно, что будет
+            сделано при отправке #[+Term--YDID запроса] на конкретный #[+Term--YDID маршрут].
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda
+              return response.submitWithSuccess({
+                HTML_Content: "<h1>Products list</h1>"
+              });
+            }
+
+            @Controller.RouteHandler({
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "products/:PRODUCT_ID"
+            })
+            public async generateProductProfilePage(request: Request, response: Response): Promise<void> {
+
+              const targetProductID: number = request.validateAndProcessRoutePathParameters<{ PRODUCT_ID: number; }>({
+                PRODUCT_ID: {
+                  preValidationModifications: convertPotentialStringToIntegerIfPossible,
+                  type: Number,
+                  numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumberOrZero,
+                  isNaN_Forbidden: true,
+                  isUndefinedForbidden: true,
+                  isNullForbidden: true
+                }
+              }).PRODUCT_ID;
+
+              return response.submitWithSuccess({
+                HTML_Content: `<h1>Product with ID: ${ targetProductID }</h1>`
+              });
+
+            }
+
+          }
+
+
+
+      +CodeViewer-TabPanel--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "EntryPoint.ts"
+      })
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda
+          import ProductController from "./Controllers/ProductController";
+          import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
+          import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+
+
+          Server.initializeAndStart({
+            IP_Address: "127.0.0.1",
+            HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+            routing: [
+
+              {
+                HTTP_Method: HTTP_Methods.get,
+                pathTemplate: "/",
+                async handler(_request: Request, response: Response): Promise<void> {
+                  return response.submitWithSuccess({
+                    HTML_Content: "<h1>Top Page</h1>"
+                  });
+                }
+              },
+
+              ProductController,
+        +CodeViewer-Explanation--YDF.
+          Чтобы подключить в приложение #[+Term--YDID маршруты], обрабатываемые в #[+Term--YDID контроллере],
+            #[+Keyword__Contrast--YDID необходимо] передать #[+Term--YDID класс-контролер] в качестве
+            #[+Term--YDID элемента массива] #[+ImportantEntity__Code--YDID routing].
+          #[+Keyphrase--YDID Если повторяющихся #[+ImportantEntity--YDID маршрутов] нет], то можно создавать
+            #[+Term--YDID маршруты] как с помощью #[+Term--YDID контроллеров], так и с помощью #[+Term--YDID функций].
+          Заметим также, что создавать #[+Term--YDID экземпляр] #[+Term__Contrast--YDID класса-контроллера]
+            #[+Keyword--YDID не]&nbsp;нужно: фреймворк берёт эту рутину на себя.
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda
+              {
+                HTTP_Method: HTTP_Methods.get,
+                pathTemplate: "/checkout",
+                async handler(_request: Request, response: Response): Promise<void> {
+                  return response.submitWithSuccess({
+                    HTML_Content: "<h1>Checkout</h1>"
+                  });
+                }
+              }
+
+            ]
+          });

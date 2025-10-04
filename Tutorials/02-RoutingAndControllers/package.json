@@ -1,0 +1,13 @@
+{
+  "name": "tutorials-routing_and_controllers",
+  "private": true,
+  "version": "0.0.0",
+  "dependencies": {
+    "@yamato-daiwa/backend": "../../MainPackage",
+    "@yamato-daiwa/es-extensions": "1.8.0"
+  },
+  "devDependencies": {
+    "ts-node": "10.9.2",
+    "typescript": "5.8.3"
+  }
+}

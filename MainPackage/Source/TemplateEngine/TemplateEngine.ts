@@ -35,7 +35,7 @@ class TemplateEngine {
 
       case "": {
 
-        Logger.throwErrorAndLog({
+        Logger.throwErrorWithFormattedMessage({
           errorInstance: new UnsupportedScenarioError(
             `The path to template file '${ templateFilePath }' does not including the filename extension while ` +
             "automatic detecting of filename extension is not supported."
@@ -46,9 +46,9 @@ class TemplateEngine {
       }
 
       /* eslint-disable-next-line no-fallthrough --
-      * ESLint does not detect that 'throwErrorAndLog' returns 'never' type. */
+      * ESLint does not detect that 'throwErrorWithFormattedMessage' returns 'never' type. */
       default: {
-        Logger.throwErrorAndLog({
+        Logger.throwErrorWithFormattedMessage({
           errorInstance: new UnsupportedScenarioError(
             `The template file '${ templateFilePath }' has unsupported filename extension.`
           ),
@@ -57,14 +57,13 @@ class TemplateEngine {
         });
       }
     }
+
   }
+
 }
 
 
 namespace TemplateEngine {
-  /* eslint-disable-next-line id-denylist --
-  * 'templateData' is incorrect rather than just 'data' because 'template' and 'data' are two elements of template engine
-  * conception. */
   export type CachedRenderer<Data extends ParsedJSON_Object> = (data: Data) => string;
 }
 

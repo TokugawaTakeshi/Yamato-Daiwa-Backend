@@ -6,31 +6,19 @@ block append Requirements
   include ../../../SharedAssets/Markup/SharedAssets.english.pug
   include ../../../SharedComponents/SharedComponents.english.pug
 
-  -
-
-    const serverInitializationPropertiesSpecification = {
-      IP_Address: {
-        type: "string",
-        required: true
-      },
-      HTTP: {
-        type: "RawConfig.HTTP",
-        required: false
-      },
-      HTTPS: {
-        type: "RawConfig.HTTPS",
-        required: false
-      }
-    };
-
 
 block append Metadata
 
   -
 
+    const {
+      $heading: topHeading,
+      $sectioning: localizedSectioning
+    } = routing.english.API.$children.Server;
+
     RegularWebPageTemplate__YDF.configure({
       metadata: {
-        title: buildHTML_PageTitle("Server"),
+        title: buildHTML_PageTitle(topHeading),
         description:
             "Class \"Server\" of the Node.js framework \"Yamato Daiwa Backend\" (abbreviation: \"YDB\") provides the " +
               "functionality of initialization of the server application accepting the HTTP requests with HTTPS " +
@@ -44,14 +32,45 @@ block append Metadata
       ]
     });
 
-    RoutingEmulator.setCurrentRoute("localizedRouting.API.Server");
+    RoutingEmulator.setCurrentRoute("API.Server");
 
     LanguageDropDownList__YDF_DK.setLinks({
-      japanese: "./Server.japanese.html",
-      russian: "./Server.russian.html",
+      japanese: routing.japanese.API.$children.Server.$URI,
+      russian: routing.russian.API.$children.Server.$URI
     });
 
-    const pageTableOfContents = localizedRouting.API.$children.Server.$sectioning;
+    const serverInitializationPropertiesSpecification = {
+      IP_Address: {
+        type: String,
+        isUndefinedForbidden: true,
+        isNullForbidden: true
+      },
+      HTTP: {
+        type: {
+          name: "RawConfig.HTTP",
+          anchorOrURI: `#${ localizedSectioning.relatedTypes.$children.RawConfig.$children.HTTP.$anchor }`
+        },
+        isUndefinedForbidden: false,
+        isNullForbidden: true
+      },
+      HTTPS: {
+        type: "RawConfig.HTTPS",
+        type: {
+          name: "RawConfig.HTTPS",
+          anchorOrURI: `#${ localizedSectioning.relatedTypes.$children.RawConfig.$children.HTTPS.$anchor }`
+        },
+        isUndefinedForbidden: false,
+        isNullForbidden: true
+      },
+      routing: {
+        type: {
+          name: "RawConfig.RawRouting",
+          anchorOrURI: `#${ localizedSectioning.relatedTypes.$children.RawConfig.$children.routing.$anchor }`
+        },
+        isUndefinedForbidden: true,
+        isNullForbidden: true
+      }
+    };
 
 
 block append HeadScripts
@@ -70,7 +89,7 @@ block append SpecificContent
 
     +ThisPageHasNotBeenCheckedByNativeSpeakersYetWarning
 
-    +CompactTableOfContents--YDF_DK(pageTableOfContents, { mustApplyAnchorsInsteadOfURIs: true })
+    +CompactTableOfContents--YDF_DK(localizedSectioning, { mustApplyAnchorsInsteadOfURIs: true })
 
     p.Article-Paragraph.
       The main #[+Term--YDID class] of the framework providing the functionality for processing of the
@@ -80,8 +99,8 @@ block append SpecificContent
     //- ━━━ Public Static Methods ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     +Heading--YDF({
       level: 2,
-      text: pageTableOfContents.publicStaticMethods.$heading,
-      HTML_ID: pageTableOfContents.publicStaticMethods.$anchor
+      text: localizedSectioning.publicStaticMethods.$heading,
+      HTML_ID: localizedSectioning.publicStaticMethods.$anchor
     }).Article-Heading2
 
     //- ─── `initializeAndStart` ───────────────────────────────────────────────────────────────────────────────────────
@@ -97,7 +116,7 @@ block append SpecificContent
       ],
       returnedValue: "Server"
     })(
-      id=pageTableOfContents.publicStaticMethods.$children.initializeAndStart.$anchor
+      id=localizedSectioning.publicStaticMethods.$children.initializeAndStart.$anchor
     )
       +ObjectTypeAbstract--YDF_DK({
         typeName: "Server.RawConfiguration",
@@ -113,16 +132,21 @@ block append SpecificContent
       +CodeViewer-Listing--YDF({
         codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript
       }): :code_listing--yda
-        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-        import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
-
+        import {
+          Server,
+          Request,
+          Response,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
 
         Server.initializeAndStart({
           IP_Address: "127.0.0.1",
           HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
           routing: [
             {
-              route: { HTTP_Method: HTTP_Methods.get, pathTemplate: "/" },
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/",
               async handler(request: Request, response: Response): Promise<void> {
                 return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
               }
@@ -143,9 +167,7 @@ block append SpecificContent
         }
       ],
       returnedValue: "Server"
-    })(
-      id=pageTableOfContents.publicStaticMethods.$children.initialize.$anchor
-    )
+    })(id=localizedSectioning.publicStaticMethods.$children.initialize.$anchor)
       +ObjectTypeAbstract--YDF_DK({
         typeName: "Server.RawConfiguration",
         propertiesSpecification: serverInitializationPropertiesSpecification
@@ -161,16 +183,21 @@ block append SpecificContent
       +CodeViewer-Listing--YDF({
         codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript
       }): :code_listing--yda
-        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-        import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
-
+        import {
+          Server,
+          Request,
+          Response,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
 
         const serverApplication: Server = Server.initialize({
           IP_Address: "127.0.0.1",
           HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
           routing: [
             {
-              route: { HTTP_Method: HTTP_Methods.get, pathTemplate: "/" },
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/",
               async handler(request: Request, response: Response): Promise<void> {
                 return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
               }
@@ -186,8 +213,8 @@ block append SpecificContent
     //- ━━━ Public Instance Methods ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     +Heading--YDF({
       level: 2,
-      text: pageTableOfContents.publicInstanceMethods.$heading,
-      HTML_ID: pageTableOfContents.publicInstanceMethods.$anchor
+      text: localizedSectioning.publicInstanceMethods.$heading,
+      HTML_ID: localizedSectioning.publicInstanceMethods.$anchor
     }).Article-Heading2
 
     //- ─── `initializeAndStart` ───────────────────────────────────────────────────────────────────────────────────────
@@ -195,9 +222,7 @@ block append SpecificContent
       technicalName: "start",
       headingTag: "h3",
       returnedValue: "Server"
-    })(
-      id=pageTableOfContents.publicInstanceMethods.$children.start.$anchor
-    )
+    })(id=localizedSectioning.publicInstanceMethods.$children.start.$anchor)
 
     p.Article-Paragraph.
       Launches the the #[+Term--YDID instance] of the server application represented by the #[+Term--YDID instance] of
@@ -209,16 +234,21 @@ block append SpecificContent
       +CodeViewer-Listing--YDF({
         codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript
       }): :code_listing--yda
-        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-        import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
-
+        import {
+          Server,
+          Request,
+          Response,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
 
         const serverApplication: Server = Server.initialize({
           IP_Address: "127.0.0.1",
           HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
           routing: [
             {
-              route: { HTTP_Method: HTTP_Methods.get, pathTemplate: "/" },
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/",
               async handler(request: Request, response: Response): Promise<void> {
                 return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
               }
@@ -234,15 +264,15 @@ block append SpecificContent
     //- ━━━ Related Types ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     +Heading--YDF({
       level: 2,
-      text: pageTableOfContents.relatedTypes.$heading,
-      HTML_ID: pageTableOfContents.relatedTypes.$anchor
+      text: localizedSectioning.relatedTypes.$heading,
+      HTML_ID: localizedSectioning.relatedTypes.$anchor
     }).Article-Heading2
 
     //- ─── `Server.RawConfig` ─────────────────────────────────────────────────────────────────────────────────────────
     +Heading--YDF({
       level: 3,
-      innerHTML: pageTableOfContents.relatedTypes.$children.RawConfig.$heading,
-      HTML_ID: pageTableOfContents.relatedTypes.$children.RawConfig.$anchor
+      innerHTML: localizedSectioning.relatedTypes.$children.RawConfig.$heading,
+      HTML_ID: localizedSectioning.relatedTypes.$children.RawConfig.$anchor
     }).Article-Heading3
 
     +ObjectTypeAbstract--YDF_DK({
@@ -258,8 +288,8 @@ block append SpecificContent
     //- ─── `IP_Address` ───────────────────────────────────────────────────────────────────────────────────────────────
     +Heading--YDF({
       level: 4,
-      innerHTML: pageTableOfContents.relatedTypes.$children.RawConfig.$children.IP_Address.$heading,
-      HTML_ID: pageTableOfContents.relatedTypes.$children.RawConfig.$children.IP_Address.$anchor
+      innerHTML: localizedSectioning.relatedTypes.$children.RawConfig.$children.IP_Address.$heading,
+      HTML_ID: localizedSectioning.relatedTypes.$children.RawConfig.$children.IP_Address.$anchor
     }).Article-Heading4
 
     +PropertyMetadata--YDF_DK(serverInitializationPropertiesSpecification.IP_Address)
@@ -274,16 +304,21 @@ block append SpecificContent
       +CodeViewer-Listing--YDF({
         codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript
       }): :code_listing--yda
-        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-        import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
-
+        import {
+          Server,
+          Request,
+          Response,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
 
         Server.initializeAndStart({
           IP_Address: "127.0.0.1",
           HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
           routing: [
             {
-              route: { HTTP_Method: HTTP_Methods.get, pathTemplate: "/" },
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/",
               async handler(request: Request, response: Response): Promise<void> {
                 return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
               }
@@ -295,8 +330,8 @@ block append SpecificContent
     //- ─── `HTTP` ─────────────────────────────────────────────────────────────────────────────────────────────────────
     +Heading--YDF({
       level: 4,
-      innerHTML: pageTableOfContents.relatedTypes.$children.RawConfig.$children.HTTP.$heading,
-      HTML_ID: pageTableOfContents.relatedTypes.$children.RawConfig.$children.HTTP.$anchor
+      innerHTML: localizedSectioning.relatedTypes.$children.RawConfig.$children.HTTP.$heading,
+      HTML_ID: localizedSectioning.relatedTypes.$children.RawConfig.$children.HTTP.$anchor
     }).Article-Heading4
 
     +PropertyMetadata--YDF_DK(serverInitializationPropertiesSpecification.HTTP)
@@ -334,16 +369,21 @@ block append SpecificContent
       +CodeViewer-Listing--YDF({
         codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript
       }): :code_listing--yda
-        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-        import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
-
+        import {
+          Server,
+          Request,
+          Response,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
 
         Server.initializeAndStart({
           IP_Address: "127.0.0.1",
           HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
           routing: [
             {
-              route: { HTTP_Method: HTTP_Methods.get, pathTemplate: "/" },
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/",
               async handler(request: Request, response: Response): Promise<void> {
                 return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
               }
@@ -355,8 +395,8 @@ block append SpecificContent
     //- ─── `HTTPS` ────────────────────────────────────────────────────────────────────────────────────────────────────
     +Heading--YDF({
       level: 4,
-      innerHTML: pageTableOfContents.relatedTypes.$children.RawConfig.$children.HTTPS.$heading,
-      HTML_ID: pageTableOfContents.relatedTypes.$children.RawConfig.$children.HTTPS.$anchor
+      innerHTML: localizedSectioning.relatedTypes.$children.RawConfig.$children.HTTPS.$heading,
+      HTML_ID: localizedSectioning.relatedTypes.$children.RawConfig.$children.HTTPS.$anchor
     }).Article-Heading4
 
     +PropertyMetadata--YDF_DK(serverInitializationPropertiesSpecification.HTTPS)
@@ -412,10 +452,14 @@ block append SpecificContent
         fileLabel: "Reading of SSL certificate and key from files",
         codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript
       }): :code_listing--yda
-        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-        import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+        import {
+          Server,
+          Request,
+          Response,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
         import Path from "path";
-
 
         Server.initializeAndStart({
           IP_Address: "127.0.0.1",
@@ -426,7 +470,8 @@ block append SpecificContent
           },
           routing: [
             {
-              route: { HTTP_Method: HTTP_Methods.get, pathTemplate: "/" },
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/",
               async handler(_request: Request, response: Response): Promise<void> {
                 return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
               }
@@ -438,22 +483,26 @@ block append SpecificContent
         fileLabel: "SSL certificate and key as strings",
         codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript
       }): :code_listing--yda
-        import { Server, Request, Response, ProtocolDependentDefaultPorts } from "@yamato-daiwa/backend";
-        import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
-        import Path from "path";
-        import { secrets } from "docker-secret";
-
+        import {
+          Server,
+          Request,
+          Response,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
+        import { secrets as dockerSecrets } from "docker-secret";
 
         Server.initializeAndStart({
           IP_Address: "127.0.0.1",
           HTTPS: {
             port: ProtocolDependentDefaultPorts.HTTPS,
-            SSL_Key: secrets.SSL_KEY,
-            SSL_Certificate: secrets.SSL_CERTIFICATE
+            SSL_Key: dockerSecrets.SSL_KEY,
+            SSL_Certificate: dockerSecrets.SSL_CERTIFICATE
           },
           routing: [
             {
-              route: { HTTP_Method: HTTP_Methods.get, pathTemplate: "/" },
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/",
               async handler(_request: Request, response: Response): Promise<void> {
                 return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
               }
@@ -465,10 +514,125 @@ block append SpecificContent
       Certainly, the #[+Term--YDID SSH key] and #[+Term--YDID SSH certificate] must be prepared before launching the
         application.
 
-    //-
-      //- ─── `routing` ──────────────────────────────────────────────────────────────────────────────────────────────────
-      +Heading--YDF({
-        level: 4,
-        innerHTML: pageTableOfContents.relatedTypes.$children.RawConfig.$children.routing.$heading,
-        HTML_ID: pageTableOfContents.relatedTypes.$children.RawConfig.$children.routing.$anchor
-      }).Article-Heading4
+
+    //- ─── `routing` ──────────────────────────────────────────────────────────────────────────────────────────────────
+    +Heading--YDF({
+      level: 4,
+      innerHTML: localizedSectioning.relatedTypes.$children.RawConfig.$children.routing.$heading,
+      HTML_ID: localizedSectioning.relatedTypes.$children.RawConfig.$children.routing.$anchor
+    }).Article-Heading4
+
+    +PropertyMetadata--YDF_DK(serverInitializationPropertiesSpecification.routing)
+
+    p.Article-Paragraph.
+      #[+Term--YDID Indexed array], #[+Keyword--YDID each] #[+Term--YDID element] of which #[+Keyword--YDID must]
+        have #[+Keyphrase--YDID one of] the following #[+Keyword--YDID two] #[+Term--YDID types]:
+
+    ul.Article-UnorderedList
+
+      li.
+        #[+Keyword--YDID Any] #[+Term--YDID class], #[+Keyword--YDID inhering] the
+          #[+ImportantEntity__Code--YDID Controller] one, herewith
+          #[+Keyphrase--YDID #[+Term--YDID класс] itself, #[+Keyphrase--YDID not]&nbsp;its #[+Term--YDID instance]],
+          because the instantiating will be executed by #[+ImportantEntity--YDID YDB].
+
+      li The #[+Term--YDID object], where the #[+Term--YDID route] and its #[+Term--YDID handler] specified.
+
+    p.Article-Paragraph.
+      It is possible to specify the #[+Term--YDID elements] of #[+Keyword--YDID any] of these #[+Term--YDID types], but
+        as #[+Term--YDID routes] number become large it is #[+Keyword--YDID recommended] to organize most of
+        #[+Term--YDID routes] by #[+Term--YDID controller classes].
+
+    p.Article-Paragraph.
+      The following #[+Term--YDID routes] definition methods are #[+Keyword--YDID equivalent].
+      Although the example in the first tab with the #[+Term--YDID object-oriented] style seems to be more bulky that
+        the example in the first tab with the #[+Term--YDID functional] style, in practical applications such simple
+        request handlers are few while for the more complicated ones the #[+Term--YDID object-oriented programming]
+        capabilities are more demanded.
+
+    +CodeViewer--YDF
+
+      +CodeViewer-Listing--YDF({
+        fileLabel: "Object-Oriented Style",
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript
+      }): :code_listing--yda
+        import {
+          Server,
+          Request,
+          Response,
+          Controller,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
+
+
+        class TopPageController extends Controller {
+
+          @Controller.RouteHandler({
+            HTTP_Method: HTTP_Methods.get,
+            pathTemplate: "/"
+          })
+          public async renderTopPage(_request: Request, response: Response): Promise<void> {
+            return response.submitWithSuccess({ HTML_Content: "<h1>Top Page</h1>" });
+          }
+
+        }
+
+        class ProductController extends Controller {
+
+          @Controller.RouteHandler({
+            HTTP_Method: HTTP_Methods.get,
+            pathTemplate: "products"
+          })
+          public async generateProductsPage(_request: Request, response: Response): Promise<void> {
+            return response.submitWithSuccess({ HTML_Content: "<h1>Products list</h1>" });
+          }
+
+        }
+
+
+        Server.initializeAndStart({
+          IP_Address: "127.0.0.1",
+          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          routing: [
+            TopPageController,
+            ProductController
+          ]
+        });
+
+
+      +CodeViewer-Listing--YDF({
+        fileLabel: "Functional Style",
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript
+      }): :code_listing--yda
+        import {
+          Server,
+          Request,
+          Response,
+          ProtocolDependentDefaultPorts,
+          HTTP_Methods
+        } from "@yamato-daiwa/backend";
+
+        Server.initializeAndStart({
+          IP_Address: "127.0.0.1",
+          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          routing: [
+
+            {
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/",
+              async handler(_request: Request, response: Response): Promise<void> {
+                return response.submitWithSuccess({ HTML_Content: "<h1>Top Page</h1>" });
+              }
+            },
+
+            {
+              HTTP_Method: HTTP_Methods.get,
+              pathTemplate: "/products",
+              async handler(_request: Request, response: Response): Promise<void> {
+                return response.submitWithSuccess({ HTML_Content: "<h1>Products</h1>" });
+              }
+            }
+
+          ]
+        });

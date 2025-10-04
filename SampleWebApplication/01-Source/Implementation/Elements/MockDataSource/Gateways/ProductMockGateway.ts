@@ -38,7 +38,7 @@ export default class ProductMockGateway implements ProductGateway {
       requestParameters,
       getResponseData: (): ProductGateway.SelectionRetrieving.ResponseData => ({
         selectionItemsCount: selection.length,
-        totalItemsCount: this.mockDataSource.categories.length,
+        totalItemsCount: this.mockDataSource.products.length,
         itemsOfTargetPaginationPage: splitToPaginationCollection(selection, {
           itemsCountPerPaginationPage: requestParameters.itemsCountPerPaginationPage,
           pagesNumerationFrom: 1

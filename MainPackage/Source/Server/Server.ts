@@ -7,14 +7,13 @@ import Path from "path";
 import DomainNameSystem from "dns/promises";
 
 /* ─── Framework's Constituents ───────────────────────────────────────────────────────────────────────────────────── */
-import type Request from "../Request";
+import Request from "../Request/Request";
 import Response from "../Response/Response";
 import Router from "../Router";
-import Middleware from "../Middleware/Middleware";
 import type URI_QueryParametersDeserializer from "../URI_QueryParametersDeserializer";
-
-/* ─── Build-in Middlewares ───────────────────────────────────────────────────────────────────────────────────────── */
-import CORS_Middleware from "../Middleware/CORS_Middleware";
+import Middleware from "../Middleware/Middleware";
+import ClassTypeMiddleware from "../Middleware/ClassTypeMiddleware";
+import type FunctionTypeMiddleware from "../Middleware/FunctionTypeMiddleware";
 
 /* ─── Applied Utils ──────────────────────────────────────────────────────────────────────────────────────────────── */
 import ConfigurationNormalizer from "../ConfigurationNormalizer/ConfigurationNormalizer";
@@ -25,12 +24,10 @@ import getSubdomainConfig from "../Utils/getSubdomainConfig";
 import {
   HTTP_StatusCodes,
   HTTP_Methods,
-  RawObjectDataProcessor,
   Logger,
   UnsupportedScenarioError,
   UnexpectedEventError,
   InvalidConfigError,
-  ImproperUsageError,
   DataSubmittingFailedError,
   ServerErrorsHTTP_StatusCodes,
   isUndefined,
@@ -38,20 +35,19 @@ import {
   isNotNull,
   stringifyAndFormatArbitraryValue,
   isNull,
-  isNotUndefined,
   removeArrayElementsByPredicates,
-  removeSpecificCharacterFromCertainPosition,
-  type Log,
-  type ParsedJSON_Object
+  ClientErrorsHTTP_StatusCodes,
+  type Log
 } from "@yamato-daiwa/es-extensions";
 import {
   ConsoleApplicationLogger,
   isErrnoException
 } from "@yamato-daiwa/es-extensions-nodejs";
+import InvalidRoutePathParametersError from "../Errors/InvalidRoutePathParameters/InvalidRoutePathParametersError";
+import InvalidURI_QueryParametersError from "../Errors/InvalidURI_QueryParameters/InvalidURI_QueryParametersError";
 
 /* ─── Localization ───────────────────────────────────────────────────────────────────────────────────────────────── */
 import serverLocalization__english from "./ServerLocalization.english";
-import parseCookieHTTP_Header from "../Utils/parseCookieHTTP_Header";
 
 
 class Server {
@@ -66,7 +62,7 @@ class Server {
 
   /* ━━━ Instance Fields ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   private readonly configuration: Server.NormalizedConfiguration;
-  private readonly middlewares: Array<Middleware> = [ CORS_Middleware ];
+  private readonly middlewares: ReadonlyArray<FunctionTypeMiddleware | ClassTypeMiddleware>;
 
 
   /* ━━━ Public Static Methods ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -82,6 +78,7 @@ class Server {
   /* ━━━ Constructor ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   private constructor(configuration: Server.RawConfiguration) {
     this.configuration = ConfigurationNormalizer.normalize(configuration);
+    this.middlewares = configuration.middlewares ?? [];
   }
 
 
@@ -272,7 +269,7 @@ class Server {
         errorType: UnsupportedScenarioError.NAME,
         title: UnsupportedScenarioError.localization.defaultTitle,
         description: Server.localization.errors.unsupportedHTTP_Method.generateMessage({ HTTP_Method: rawRequest.method }),
-        occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)"
+        occurrenceLocation: "Server.requestMasterHandler(compoundParameter)"
       });
 
       rawResponse.writeHead(HTTP_StatusCodes.badRequest).end();
@@ -290,7 +287,7 @@ class Server {
         errorType: UnsupportedScenarioError.NAME,
         title: UnsupportedScenarioError.localization.defaultTitle,
         description: Server.localization.errors.requestURL_IsNotDefined,
-        occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)"
+        occurrenceLocation: "Server.requestMasterHandler(compoundParameter)"
       });
 
       rawResponse.writeHead(HTTP_StatusCodes.badRequest).end();
@@ -299,20 +296,20 @@ class Server {
     }
 
 
-    let URI_PathAndQuery: string;
+    let URI_PathAndQueryPart: string;
 
     try {
 
-      URI_PathAndQuery = decodeURIComponent(rawRequest.url);
+      URI_PathAndQueryPart = decodeURIComponent(rawRequest.url);
 
     } catch (error: unknown) {
 
       Logger.logError({
         errorType: "URI_DecodingError",
-        title: "URI decoding error",
+        title: "URI Decoding Error",
         description: Server.localization.errors.URI_PathAndQueryDecoding.
             generateMessage({ URI_PathAndQuery: rawRequest.url }),
-        occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)",
+        occurrenceLocation: "Server.requestMasterHandler(compoundParameter)",
         caughtError: error
       });
 
@@ -323,15 +320,15 @@ class Server {
 
 
     /* eslint-disable-next-line no-bitwise, no-implicit-coercion --
-     * Here is bitwise operation is required and conscious. */
-    if (~URI_PathAndQuery.indexOf("\0") !== 0) {
+     * Here is bitwise operation conscious because it is required to check the URI for null byte. */
+    if (~URI_PathAndQueryPart.indexOf("\0") !== 0) {
 
       Logger.logWarning({
         title: Server.localization.notifications.nullBytePoisoningAttackAttemptDetected.title,
         description: Server.localization.notifications.nullBytePoisoningAttackAttemptDetected.generateDescription({
           formattedHTTP_Headers: stringifyAndFormatArbitraryValue(rawRequest.headers)
         }),
-        occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)"
+        occurrenceLocation: "Server.requestMasterHandler(compoundParameter)"
       });
 
       rawResponse.writeHead(HTTP_StatusCodes.badRequest).end();
@@ -345,11 +342,15 @@ class Server {
 
     if (isUndefined(rawHostHTTP_Header)) {
 
-      /* [ Reference ] https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host */
+      /* [ Theory ]
+      * A `Host` header field must be sent in all HTTP/1.1 request messages.
+      * A 400 (Bad Request) status code may be sent to any HTTP/1.1 request message that lacks or contains more than
+      *   one Host header field.
+      * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host */
       Logger.logError({
         errorType: "RequiredHTTP_HeaderMissingError",
         ...Server.localization.errors.missingHostHTTP_Header,
-        occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)"
+        occurrenceLocation: "Server.requestMasterHandler(compoundParameter)"
       });
 
       rawResponse.writeHead(HTTP_StatusCodes.badRequest).end();
@@ -373,7 +374,7 @@ class Server {
         errorType: "HostHTTP_HeaderParsingFailedError",
         title: Server.localization.errors.hostHTTP_HeaderParsingFailed.title,
         description: Server.localization.errors.hostHTTP_HeaderParsingFailed.generateDescription({ rawHostHTTP_Header }),
-        occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)",
+        occurrenceLocation: "Server.requestMasterHandler(compoundParameter)",
         caughtError: error
       });
 
@@ -392,7 +393,7 @@ class Server {
           rightPortNumber: port,
           portNumberInHostHTTP_Header: parsedHostHTTP_Header.port
         }),
-        occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)",
+        occurrenceLocation: "Server.requestMasterHandler(compoundParameter)",
         additionalData: {
           rawHostHTTP_Header,
           parsedHostHeader: parsedHostHTTP_Header
@@ -401,6 +402,7 @@ class Server {
 
       rawResponse.writeHead(HTTP_StatusCodes.internalServerError).end();
       return;
+
     }
 
 
@@ -438,7 +440,7 @@ class Server {
           description: Server.localization.errors.unknownSubdomain.generateDescription({
             requestedSubdomain: parsedHostHTTP_Header.domain
           }),
-          occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)"
+          occurrenceLocation: "Server.requestMasterHandler(compoundParameter)"
         });
 
         rawResponse.writeHead(HTTP_StatusCodes.badRequest).end();
@@ -451,193 +453,54 @@ class Server {
 
     }
 
-    const normalizedURI: URL = new URL(
-      URI_PathAndQuery, `${ protocol.toLowerCase() }://${ targetDomain }:${ port }/`
+    const normalizedURI: Omit<URL, "hash"> = new URL(
+      URI_PathAndQueryPart, `${ protocol.toLowerCase() }://${ targetDomain }:${ port }/`
     );
 
 
-    /* [ Theory ] The route matching should be executed before static file searching because the static files searching requires
-     *     more computing resources. If user wants the public file, not route, in most cases the route resolution will end with
-     *     'null' result quickly and minimal performance loss.  */
+    /* [ Theory ] The route matching should be executed before static files searching because the static files searching
+     *     requires more computing resources because of operation with files.
+     * If a user wants the public file, not a route, in most cases the route matching will end with `null` result quickly
+     *     and minimal performance impact.  */
     const routeMatch: Router.RouteMatch | null = Router.getRouteMatch({
       HTTP_Method,
       URI_Path: normalizedURI.pathname,
       normalizedRouting: routingActualForTargetDomain
     });
 
-
-    let processedRoutePathParameters: Router.RoutePathParameters | undefined;
-
-    if (isNotNull(routeMatch) && isNotUndefined(routeMatch.routePathParameterProcessing)) {
-
-      const routePathParametersProcessingResult: RawObjectDataProcessor.ProcessingResult<Router.RoutePathParameters> =
-          RawObjectDataProcessor.process(
-            routeMatch.routePathParameters,
-            {
-              nameForLogging: Server.localization.errors.invalidRoutePathParameters.generateDataNameForDescription({
-                targetURI: normalizedURI.toString()
-              }),
-              subtype: RawObjectDataProcessor.ObjectSubtypes.fixedKeyAndValuePairsObject,
-              properties: routeMatch.routePathParameterProcessing
-            }
-          );
-
-      if (routePathParametersProcessingResult.rawDataIsInvalid) {
-
-        Logger.logError({
-          errorType: "InvalidRoutePathParametersError",
-          title: Server.localization.errors.invalidRoutePathParameters.title,
-          description: Server.localization.errors.invalidRoutePathParameters.generateDescription({
-            formattedPreIndentedValidationErrorsMessages: RawObjectDataProcessor.formatValidationErrorsList(
-              routePathParametersProcessingResult.validationErrorsMessages
-            )
-          }),
-          occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)"
-        });
-
-
-        rawResponse.writeHead(HTTP_StatusCodes.badRequest).end();
-        return;
-      }
-
-
-      processedRoutePathParameters = routePathParametersProcessingResult.processedData;
-    }
-
-
-    const queryParametersDeserializer: URI_QueryParametersDeserializer = routeMatch?.routeQueryParametersDeserializer ??
-        this.configuration.URI_QueryParametersMainDeserializer;
-
-    /* [ Theory ] Basically, the parameters deserializer must remove the leading question mark, however working with third-party
-    *     deserializer, it could not be guaranteed. */
-    const deserializedURI_QueryParameters: ParsedJSON_Object = queryParametersDeserializer(
-      removeSpecificCharacterFromCertainPosition({
-        targetString: normalizedURI.search,
-        targetCharacter: "?",
-        fromFirstPosition: true
-      })
-    );
-
-    let processedURI_QueryParameters: ParsedJSON_Object | undefined;
-
-    if (isNotNull(routeMatch) && isNotUndefined(routeMatch.routeQueryParametersProcessing)) {
-
-      const routeQueryParametersProcessingResult: RawObjectDataProcessor.ProcessingResult<Request.RoutePathParameters> =
-          RawObjectDataProcessor.process(
-            deserializedURI_QueryParameters,
-            {
-              nameForLogging: Server.localization.errors.invalidRouteQueryParameters.generateDataNameForDescription({
-                targetURI: normalizedURI.toString()
-              }),
-              subtype: RawObjectDataProcessor.ObjectSubtypes.fixedKeyAndValuePairsObject,
-              properties: routeMatch.routeQueryParametersProcessing
-            }
-          );
-
-      if (routeQueryParametersProcessingResult.rawDataIsInvalid) {
-
-        Logger.logError({
-          errorType: "InvalidURI_QueryParametersError",
-          title: Server.localization.errors.invalidRouteQueryParameters.title,
-          description: Server.localization.errors.invalidRouteQueryParameters.generateDescription({
-            formattedPreIndentedValidationErrorsMessages: RawObjectDataProcessor.formatValidationErrorsList(
-              routeQueryParametersProcessingResult.validationErrorsMessages
-            )
-          }),
-          occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)"
-        });
-
-        rawResponse.writeHead(HTTP_StatusCodes.badRequest).end();
-        return;
-      }
-
-
-      processedURI_QueryParameters = routeQueryParametersProcessingResult.processedData;
-    }
-
-
-    const normalizedRequest: Request = {
-
-      URI: normalizedURI,
+    const normalizedRequest: Request = new Request({
       HTTP_Method,
-
-      parsedCookies: isNotUndefined(rawRequest.headers.cookie) ?
-          parseCookieHTTP_Header(rawRequest.headers.cookie) : new Map<string, string>(),
-
-      routePathParameters: routeMatch?.routePathParameters ?? {},
-      ...isNotUndefined(processedRoutePathParameters) ? { $processedRoutePathParameters: processedRoutePathParameters } : null,
-      getProcessedRoutePathParameters<
-        ProcessedRootPathParameters extends Request.RoutePathProcessedParameters
-      >(): ProcessedRootPathParameters {
-
-        if (isUndefined(this.$processedRoutePathParameters)) {
-          Logger.throwErrorAndLog({
-            errorType: ImproperUsageError.NAME,
-            ...Server.localization.errors.unableToAccessToProcessedRoutePathParameters,
-            occurrenceLocation: "request.getProcessedRoutePathParameters()"
-          });
-        }
-
-
-        /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions --
-        * Is this case casting is inevitable because we can not know at advance the exact schema of root path parameters
-        * which will be defined by user. */
-        return processedRoutePathParameters as ProcessedRootPathParameters;
-
-      },
-
-      ...isNotUndefined(processedURI_QueryParameters) ? { $processedQueryParameters: processedURI_QueryParameters } : null,
-      getProcessedQueryParameters<ProcessedURI_QueryParameters extends ParsedJSON_Object>(): ProcessedURI_QueryParameters {
-
-        if (isUndefined(this.$processedQueryParameters)) {
-          Logger.throwErrorAndLog({
-            errorType: ImproperUsageError.NAME,
-            ...Server.localization.errors.unableToAccessToProcessedRouteQueryParameters,
-            occurrenceLocation: "request.getProcessedQueryParameters()"
-          });
-        }
-
-
-        /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions --
-         * Is this case casting is inevitable because we can not know at advance the exact schema of query path parameters
-         * which will be defined by user. */
-        return processedURI_QueryParameters as ProcessedURI_QueryParameters;
-
-      },
-
-      subdomainParameters: {
-        ...isNotNull(actualSubdomainConfig) ? actualSubdomainConfig.parameterizedHostNameLabels_Values : null
-      }
-
-    };
+      URI: normalizedURI,
+      cookieHTTP_Header: rawRequest.headers.cookie,
+      rawRoutePathParameters: routeMatch?.routePathParameters,
+      subdomainParameters: actualSubdomainConfig?.parameterizedHostNameLabels_Values,
+      routePathTemplate: routeMatch?.routePathTemplate
+    });
 
     const response: Response = new Response(rawResponse, this.configuration);
 
     for (const middleware of this.middlewares) {
 
-      let middlewareCompletionSignal: Middleware.CompletionSignal;
+      let middlewareCompletionSignal: Middleware.CompletionSignals;
 
       try {
 
         /* eslint-disable-next-line no-await-in-loop --
          * The middleware handlers must be executed sequentially. */
-        middlewareCompletionSignal = await middleware(normalizedRequest, response, this.configuration);
+        middlewareCompletionSignal = await (
+          middleware instanceof ClassTypeMiddleware ?
+              middleware.handleRequest(normalizedRequest, response, this.configuration) :
+              middleware(normalizedRequest, response, this.configuration)
+        );
 
       } catch (error: unknown) {
 
-        Logger.logError({
-          errorType: "MiddlewareExecutionError",
-          ...Server.localization.errors.middlewareExecutionFailed,
-          occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)",
-          caughtError: error
-        });
-
-        return response.submitWithError({ statusCode: ServerErrorsHTTP_StatusCodes.internalServerError });
+        return Server.handleErrorAndSubmitResponse(response, error);
 
       }
 
 
-      if (middlewareCompletionSignal === Middleware.CompletionSignal.finishRequestHandling) {
+      if (middlewareCompletionSignal === Middleware.CompletionSignals.finishRequestHandling) {
         return;
       }
 
@@ -652,17 +515,9 @@ class Server {
 
       } catch (error: unknown) {
 
-        Logger.logError({
-          errorType: "RouterHandlerExecutionError",
-          ...Server.localization.errors.routeHandlerExecutionFailed,
-          occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)",
-          caughtError: error
-        });
-
-        return response.submitWithError({ statusCode: ServerErrorsHTTP_StatusCodes.internalServerError });
+        return Server.handleErrorAndSubmitResponse(response, error);
 
       }
-
 
       return;
 
@@ -688,7 +543,7 @@ class Server {
               ),
               formattedHTTP_RequestHeaders: stringifyAndFormatArbitraryValue(rawRequest.headers)
             }),
-        occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)"
+        occurrenceLocation: "Server.requestMasterHandler(compoundParameter)"
       });
     }
 
@@ -719,7 +574,7 @@ class Server {
         description: Server.localization.errors.requestedResourceNotFound.generateDescription({
           potentialRawRelatedPathToPublicFile
         }),
-        occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)"
+        occurrenceLocation: "Server.requestMasterHandler(compoundParameter)"
       });
 
       rawResponse.writeHead(HTTP_StatusCodes.notFound).end();
@@ -746,7 +601,7 @@ class Server {
         errorType: UnexpectedEventError.NAME,
         title: UnexpectedEventError.localization.defaultTitle,
         description: Server.localization.errors.fileStatisticsRetrievingFailure,
-        occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)",
+        occurrenceLocation: "Server.requestMasterHandler(compoundParameter)",
         caughtError: error
       });
 
@@ -763,7 +618,7 @@ class Server {
         description: Server.localization.errors.directoryInsteadOfFileHasBeenRequested.generateDescription({
           targetPath: validAbsolutePathToPublicFile
         }),
-        occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)"
+        occurrenceLocation: "Server.requestMasterHandler(compoundParameter)"
       });
 
       rawResponse.writeHead(HTTP_StatusCodes.notFound).end();
@@ -783,7 +638,7 @@ class Server {
         description: Server.localization.errors.publicFileSubmittingFailed.generateDescription({
           targetPath: validAbsolutePathToPublicFile
         }),
-        occurrenceLocation: "Server.requestMasterHandler(rawRequest, rawResponse)",
+        occurrenceLocation: "Server.requestMasterHandler(compoundParameter)",
         caughtError: error
       });
 
@@ -867,6 +722,54 @@ class Server {
           });
 
     });
+
+  }
+
+  private static async handleErrorAndSubmitResponse(response: Response, error: unknown): Promise<void> {
+
+    if (error instanceof InvalidRoutePathParametersError) {
+
+      Logger.logError({
+        errorType: InvalidRoutePathParametersError.NAME,
+        title: InvalidRoutePathParametersError.localization.defaultTitle,
+        description: error.message,
+        occurrenceLocation: "Server.handleErrorAndSubmitResponse(response, error)"
+      });
+
+      return response.submitWithError({
+        statusCode: ClientErrorsHTTP_StatusCodes.badRequest,
+        plainTextContent: error.message
+      });
+
+    }
+
+
+    if (error instanceof InvalidURI_QueryParametersError) {
+
+      Logger.logError({
+        errorType: InvalidURI_QueryParametersError.NAME,
+        title: InvalidURI_QueryParametersError.localization.defaultTitle,
+        description: error.message,
+        occurrenceLocation: "Server.handleErrorAndSubmitResponse(response, error)"
+      });
+
+      return response.submitWithError({
+        statusCode: ClientErrorsHTTP_StatusCodes.badRequest,
+        plainTextContent: error.message
+      });
+
+    }
+
+
+    Logger.logError({
+      errorType: "RequestHandlerError",
+      ...Server.localization.errors.middlewareExecutionFailed,
+      occurrenceLocation: "Server.requestMasterHandler(compoundParameter)",
+      caughtError: error
+    });
+
+    return response.submitWithError({ statusCode: ServerErrorsHTTP_StatusCodes.internalServerError });
+
   }
 
 }
@@ -892,6 +795,7 @@ namespace Server {
     HTTP?: RawConfiguration.HTTP;
     HTTPS?: RawConfiguration.HTTPS;
     routing?: Router.RawRouting;
+    middlewares?: ReadonlyArray<FunctionTypeMiddleware | ClassTypeMiddleware>;
     publicDirectoriesAbsoluteOrRelativePaths?: ReadonlyArray<string>;
     security?: RawConfiguration.Security;
     subdomains?: RawConfiguration.Subdomains;
@@ -1085,32 +989,7 @@ namespace Server {
         ) => string;
       }>;
 
-      invalidRoutePathParameters: Readonly<{
-        title: string;
-        generateDataNameForDescription: (
-          templateVariables: Localization.Errors.InvalidRoutePathParameters.DataName.TemplateVariables
-        ) => string;
-        generateDescription: (
-          templateVariables: Localization.Errors.InvalidRoutePathParameters.Description.TemplateVariables
-        ) => string;
-      }>;
-
-      invalidRouteQueryParameters: Readonly<{
-        title: string;
-        generateDataNameForDescription: (
-          templateVariables: Localization.Errors.InvalidRouteQueryParameters.DataName.TemplateVariables
-        ) => string;
-        generateDescription: (
-          templateVariables: Localization.Errors.InvalidRouteQueryParameters.Description.TemplateVariables
-        ) => string;
-      }>;
-
-      unableToAccessToProcessedRoutePathParameters: Pick<Log, "title" | "description">;
-
-      unableToAccessToProcessedRouteQueryParameters: Pick<Log, "title" | "description">;
-
       middlewareExecutionFailed: Pick<Log, "title" | "description">;
-
       routeHandlerExecutionFailed: Pick<Log, "title" | "description">;
 
       requestedResourceNotFound: Readonly<{
@@ -1214,38 +1093,6 @@ namespace Server {
         export type TemplateVariables = Readonly<{
           requestedSubdomain: string;
         }>;
-      }
-
-      export namespace InvalidRoutePathParameters {
-
-        export namespace DataName {
-          export type TemplateVariables = Readonly<{
-            targetURI: string;
-          }>;
-        }
-
-        export namespace Description {
-          export type TemplateVariables = Readonly<{
-            formattedPreIndentedValidationErrorsMessages: string;
-          }>;
-        }
-
-      }
-
-      export namespace InvalidRouteQueryParameters {
-
-        export namespace DataName {
-          export type TemplateVariables = Readonly<{
-            targetURI: string;
-          }>;
-        }
-
-        export namespace Description {
-          export type TemplateVariables = Readonly<{
-            formattedPreIndentedValidationErrorsMessages: string;
-          }>;
-        }
-
       }
 
       export namespace RequestedResourceNotFound {
