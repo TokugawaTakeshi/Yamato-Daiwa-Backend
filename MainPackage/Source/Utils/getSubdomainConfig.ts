@@ -1,9 +1,5 @@
 import type Server from "../Server/Server";
-
-import {
-  isUndefined,
-  isNotUndefined
-} from "@yamato-daiwa/es-extensions";
+import { isUndefined, isNotUndefined } from "@yamato-daiwa/es-extensions";
 
 
 export default function getSubdomainConfig(
@@ -30,8 +26,6 @@ export default function getSubdomainConfig(
 
 
   for (const [ index, hostnameLabel ] of subdomainsOfMainDomain__fromTopmostLevel.entries()) {
-
-    // Console.log(`--- ${index} : ${hostnameLabel} ---------------------------------------------------------------------`);
 
     const isLastHostnameLabel: boolean = index + 1 === subdomainsOfMainDomain__fromTopmostLevel.length;
 

@@ -1,0 +1,1 @@
+GET http://localhost:80/products?ci[]=1&ci[]=2&pg[pn]=1&pg[ic]=20

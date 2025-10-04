@@ -1,0 +1,1 @@
+GET http://localhost:80/products?categoryID[]=1&categoryID[]=2&pagination[pageNumber]=1&pagination[itemsCountPerPage]=20

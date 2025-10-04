@@ -1,0 +1,17 @@
+GET http://127.0.0.1:1337/
+
+###
+
+GET http://127.0.0.1:1337/products
+
+###
+
+GET http://127.0.0.1:1337/api/products
+
+###
+
+GET http://127.0.0.1:1337/api/foo
+
+###
+
+GET http://127.0.0.1:1337/api/products/foo

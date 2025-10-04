@@ -1,0 +1,5 @@
+GET http://localhost:80/users?user.name=John&user.age=30&settings.theme=dark
+
+###
+
+GET http://localhost:80/settings?colors=red,blue,green&flags=active,verified

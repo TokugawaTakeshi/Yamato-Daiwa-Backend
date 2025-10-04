@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Functional Routing Testing" type="NodeJSConfigurationType" path-to-js-file="$PROJECT_DIR$/Tests/Manual/Routing/FunctionalRouting.test.ts" typescript-loader="bundled" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>

@@ -31,7 +31,7 @@ block append Metadata
       ]
     });
 
-    RoutingEmulator.setCurrentRoute("tutorials.routingAndControllers");
+    YDF.RoutingEmulator.setCurrentRoute("tutorials.routingAndControllers");
 
     LanguageDropDownList__YDF_DK.setLinks({
       english: routing.english.tutorials.$children.routingAndControllers.$URI,
@@ -53,14 +53,17 @@ block append SpecificContent
     //- ━━━ Маршрутизация и контроллеры ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     h1.Article-Heading1= topHeading
 
-    //- ━━━ Теория ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    +TutorialCodeIsNotOpimizedForProductionWarning
+
+
+    //- ┅┅┅ Теория ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅
     +Heading--YDF({
       level: 2,
       text: localizedSectioning.theory.$heading,
       HTML_ID: localizedSectioning.theory.$anchor
     }).Article-Heading2
 
-    //- ─── URL, URN, URI ──────────────────────────────────────────────────────────────────────────────────────────────
+    //- ╍╍╍ URL, URN, URI ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
     +Heading--YDF({
       level: 3,
       text: localizedSectioning.theory.$children.URL_URN_URI.$heading,
@@ -76,14 +79,15 @@ block append SpecificContent
         условиться, какая анатомия актуальна конкретно для #[+ImportantEntity--YDID YDB].
 
     p.Article-Paragraph.
-      Прежде всего, мы не&nbsp;будем обсуждать разницу между #[+Term--YDID URL] и #[+Term--YDID URN],
-        поскольку сейчас важно то, что #[+Term--YDID URI] является #[+Keyword--YDID завершённой] сущностью, включающей
-        в себя #[+Term--YDID URL] и #[+Term--YDID URN] (#[+Keyphrase--YDID в зависимости от источника информации],
-        #[+Term--YDID URL] и #[+Term--YDID URL] могут пересекаться #[+Keyword--YDID или] #[+Keyword__Contrast--YDID нет]).
+      Прежде всего, мы не&nbsp;будем обсуждать разницу между #[+ImportantEntity--YDID URL] и #[+ImportantEntity--YDID URN],
+        поскольку сейчас важно то, что #[+ImportantEntity--YDID URI] является #[+Keyword--YDID завершённой]
+        сущностью, #[+Keyphrase--YDID включающей в себя] #[+ImportantEntity--YDID URL] и
+        #[+ImportantEntity--YDID URN], а пересекаются эти две составляющие или нет — это уже
+         (#[+Keyphrase--YDID преподносится по-разному в зависимости от источника информации].
 
     p.Article-Paragraph.
-      Хотя помимо интернета, концепция #[+Term--YDID URI] может относиться и к файлам на локальном компьютере,
-        сейчас сконцентрируемся на особенностях #[+Term--YDID URI] в веб-разработке.
+      Хотя помимо интернета, концепция #[+ImportantEntity--YDID URI] может относиться и к файлам на локальном компьютере,
+        сейчас сконцентрируемся на особенностях #[+ImportantEntity--YDID URI] #[+Keyphrase--YDID в веб-разработке].
 
 
     //- ─── Анатомия URI ───────────────────────────────────────────────────────────────────────────────────────────────
@@ -94,9 +98,10 @@ block append SpecificContent
     }).Article-Heading4
 
     p.Article-Paragraph.
-      Рассмотрим значимые составляющие #[+Term--YDID URI].
+      Рассмотрим значимые составляющие #[+ImportantEntity--YDID URI].
       Сейчас нас больше интересует то, как мы будем использовать эти составляющие, нежели их канонические определения,
-        поэтому представленный ниже глоссарий содержит описания, а #[+Keyword--YDID не]&nbsp;определения.
+        поэтому представленный ниже глоссарий содержит #[+Keyword--YDID описания], а
+        #[+Keyword__Contrast--YDID не]&nbsp;определения.
 
     +SingleImageViewer--YDF({
       imageURI: "@AssociatedWithPages/Tutorials/02-RoutingAndControllers/Images/URI_Decomposition.svg",
@@ -111,9 +116,9 @@ block append SpecificContent
       dt IP-адрес (IP address)
       dd.
         В случае локальной разработки чаще всего это #[+Keyword--YDID локальный] #[+Term--YDID IP-адрес]
-          (#[+Keyword--YDID обычно] #[+ImportantEntity--YDID 127.0.0.1], он же #[+Term--YDID localhost]).
+          (#[+Keyword--YDID обычно] #[+ImportantEntity--YDID 127.0.0.1], он же #[+ImportantEntity__Code--YDID localhost]).
         При деплое сайта или приложения на сервер это будет #[+Term--YDID IP-адрес], выданный поставщиком услуг по
-          сдаче серверов в аренду.
+          сдаче серверов в аренду, однако с точки зрения сервера это будет уже его #[+ImportantEntity--YDID localhost].
         Мы можем арендовать #[+Term--YDID доменное имя] и привязать его к этому #[+Term--YDID IP-адресу], тогда
           #[+Keyword--YDID вместо] #[+Term--YDID IP-адреса] будет это #[+Term--YDID доменное имя].
 
@@ -121,43 +126,45 @@ block append SpecificContent
       dt Домен (Domain name)
       dd.
         Наличие #[+Term--YDID доменного имени] востребовано в основном на этапе публикации сайта или приложения.
-        Помимо технологического аспекта, #[+Term--YDID доменное имя] является частью брендинга.
+        Помимо технологического аспекта, #[+Term--YDID доменное имя] является #[+Keyword--YDID частью]
+          #[+Keyword__Contrast--YDID брендинга].
         Тем не&nbsp;менее, разрабатывая сайт или приложение, необходимо принять меры, чтобы переход с одного домена на
-          другой был наиболее простым (в идеале — без внесения изменений в исходный код).
+          другой был максимально простым (в идеале — без внесения изменений в исходный код).
 
       dt Порт (Port)
       dd.
-        Благодаря тому что #[+Term--YDID портов] существует много, на одном сервере можно запускать несколько сайтов или
-          приложений.
-        Часть портов используется программным обеспечением для разных целей, но сейчас нас интересуют один, максимум
-          2 порта (когда у нас поддерживаются и #[+ImportantEntity--YDID HTTP], и #[+ImportantEntity--YDID HTTPS])
-          для обслуживания #[+Term--YDID HTTP-запросов].
+        Благодаря тому, что #[+Term--YDID портов] существует много (а именно #[+ImportantEntity--YDID 65535]), на одном
+          сервере можно запускать несколько сайтов и/или приложений.
+        #[+Keyword--YDID Часть] #[+Term--YDID портов] используется программным обеспечением для разных целей, но сейчас
+          нас интересуют один, максимум #[+ImportantEntity--YDID 2] #[+Term--YDID порта] (когда у нас поддерживаются и
+          #[+ImportantEntity--YDID HTTP], и #[+ImportantEntity--YDID HTTPS]) для обслуживания #[+Term--YDID HTTP-запросов].
 
       dt Сокет (Socket)
       dd.
         #[+Keyword--YDID Совокупность] #[+Term--YDID домена] и #[+Term--YDID порта].
-        Если #[+Term--YDID порт] имеет номер по умолчанию (для конкретного #[+Term--YDID протокола], который
-          #[+Keyword--YDID не]&nbsp;является частью #[+Term--YDID сокета]), то #[+Term--YDID порт] его можно опустить.
+        Если #[+Term--YDID порт] имеет номер по умолчанию 　(#[+Keyphrase--YDID для конкретного #[+Term--YDID протокола]],
+          который　#[+Keyword--YDID не]&nbsp;является частью #[+Term--YDID сокета]), то #[+Term--YDID порт]
+          #[+Keyword--YDID можно] #[+Keyword__Contrast--YDID опустить].
         Например, #[+SecondaryEntity__Code--YDID https://example.com:443] — то же самое, что и
-          #[+SecondaryEntity__Code--YDID https://example.com:443],
+          #[+SecondaryEntity__Code--YDID https://example.com],
           #[+Keyphrase--YDID покуда #[+Term--YDID протоколом] является #[+SecondaryEntity__Code--YDID HTTPS]].
+
 
       dt Источник (Origin)
       dd #[+Keyword--YDID Совокупность] #[+Term--YDID протокола], #[+Term--YDID домена] и #[+Term--YDID порта].
 
       dt Путь (Path)
       dd.
-        Именно от эта часть #[+Keyword--YDID наиболее] важна для #[+Term--YDID маршрутизации], так как
-          #[+Keyword--YDID обычно] в зависимости от неё выдаются те или иные данные (чаще всего в формате
-          #[+ImportantEntity--YDID HTML] или #[+ImportantEntity--YDID JSON], если говорить о разработке сайтов
+        Именно от эта часть #[+Keyword--YDID наиболее] #[+Keyword__Contrast--YDID важна] для #[+Term--YDID маршрутизации],
+          так как #[+Keyword--YDID обычно] в зависимости от неё выдаются те или иные данные (чаще всего в формате
+          #[+ImportantEntity--YDID JSON] или #[+ImportantEntity--YDID HTML], если говорить о разработке сайтов
           и приложений).
         Звеньев, разделённых косой черной, может быть несколько, однако слишком большое их количество делает
           #[+Term--YDID маршрутизацию] запутанной.
 
       dt Параметры поиска (Query parameters)
       dd.
-        Обычно используются для поиска и фильтрации в конкретного набора данных, выдаваемого в зависимости от
-          #[+Term--YDID пути].
+        Обычно используются для поиска/фильтрации набора данных, выдаваемого в зависимости от #[+Term--YDID пути].
         Однако это лишь общепринятая практика, а как именно будут влиять те или иные #[+Term--YDID параметры поиска] на
           выдаваемые данные — зависит от реализации.
 
@@ -172,17 +179,16 @@ block append SpecificContent
         — это часть, начинающая с #[+Term--YDID пути], и, таким образом, соединив #[+ImportantEntity--YDID URL] и
         #[+ImportantEntity--YDID URN], мы получим #[+ImportantEntity--YDID URI].
       Однако как во многих программных интерфейсах, так и в повседневной жизни #[+Term--YDID термин]
-        #[+ImportantEntity--YDID URL] зачастую употребляется как синоним #[+ImportantEntity--YDID URI] либо как его
-        часть, не&nbsp;приведённой выше интерпретации.
+        #[+ImportantEntity--YDID URL] зачастую употребляется как синоним #[+ImportantEntity--YDID URI] либо как его　часть.
       Например, если взять стандартную функциональность #[+ImportantEntity--YDID Node.js], то свойство
         #[+ImportantEntity__Code--YDID url] объекта #[+ImportantEntity__Code--YDID request] модуля
-        #[+ImportantEntity__Code--YDID http] включает в себя #[+Term--YDID путь] и #[+Term--YDID параметры запроса],
-        (пример значения из официальной документации: #[+SecondaryEntity__Code--YDID "/status?name=ryan"]), а на
-        основе примера #[+SecondaryEntity__Code--YDID new URL(`https://${process.env.HOST ?? 'localhost'}${request.url}`);]
-        и вовсе нельзя дать ответ, что же такое #[+ImportantEntity--YDID URL].
+        #[+ImportantEntity__Code--YDID http] включает в себя #[+Term--YDID путь] и #[+Term--YDID параметры запроса]
+        (пример значения из официальной документации: #[+SecondaryEntity__Code--YDID "/status?name=ryan"]), а
+        пример #[+SecondaryEntity__Code--YDID new URL(`https://${process.env.HOST ?? 'localhost'}${request.url}`);]
+        и вовсе похож на рекурсию, потому только этому примеру нельзя сказать, что же такое #[+ImportantEntity--YDID URL].
 
 
-    //- ─── Работа с сущностями ────────────────────────────────────────────────────────────────────────────────────────
+    //- ╍╍╍ Работа с сущностями ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
     +Heading--YDF({
       level: 3,
       text: localizedSectioning.theory.$children.workingWithEntities.$heading,
@@ -199,7 +205,7 @@ block append SpecificContent
       Опять же, и «объект», и «сущность» являются многозначными терминами, потому очень легко запутаться,
         но #[+Keyphrase--YDID на уровне концепции] это — #[+Keyword--YDID набор] информации, соответствующий какому-либо
         реальному предмету или человеку, например пользователю, товару или статье в блоге.
-      Они могут быть представлены в виде строки в таблице базы данных, #[+Term--YDID ассоциативного массива],
+      Они могут быть представлены в виде строки таблицы базы данных, значения #[+Term--YDID ассоциативного массива],
         #[+Term__Contrast--YDID объекта]
         #[+Keyphrase--YDID в смысле #[+Term--YDID объектно-ориентированного программирования]] и так далее.
 
@@ -207,7 +213,7 @@ block append SpecificContent
       Одна из основных задач, для которой используются #[+Term--YDID фреймворки] для
         #[+Term__Contrast--YDID бэкенд-разработки] — обеспечение возможности удобной манипуляции данными,
         а если данные с течением времени не&nbsp;меняются, то зачастую можно обойтись без серверного программирования.
-      Основными типами манипуляций с сущностями являются:
+      Основными типами манипуляций над сущностями являются:
 
     ul.Article-UnorderedList
       li Взятие выборки сущностей, удовлетворяющих определённым условиям (фильтрация)
@@ -224,11 +230,11 @@ block append SpecificContent
       Концепция работы с сущностями #[+Keyword--YDID не]&nbsp;зародилась в IT и имела место быть во все времена.
       Например, мы можем принести новое яблоко на склад продуктов (создание объекта) или наоборот, взять его;
         найти все испортившиеся яблоки (взятие выборки), чтобы выбросить их (удаление).
-      Однако, при реализации сайтов и приложений работа с сущностями стала явной, а в повседневной жизни мы её часто
-        не&nbsp;осознаём.
+      Однако, как не парадоксально, именно в абстрактных информационных технологиях при реализации сайтов и приложений
+        работа с сущностями стала явной, а в повседневной жизни мы её часто не&nbsp;осознаём.
 
 
-    //- ─── HTTP-методы ────────────────────────────────────────────────────────────────────────────────────────────────
+    //- ╍╍╍ HTTP-методы ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
     +Heading--YDF({
       level: 3,
       text: localizedSectioning.theory.$children.HTTP_Methods.$heading,
@@ -244,12 +250,12 @@ block append SpecificContent
       Однако есть ещё один фактор, влияющий на ответ сервера, но который #[+Keyword--YDID не]&nbsp;является частью
         #[+ImportantEntity--YDID URI] — это #[+Term--YDID HTTP-метод].
       По сути, #[+DefinableTerm--YDID HTTP-методы] — это #[+Keyword--YDID типы] или #[+Keyword--YDID категории]
-        #[+Term--YDID HTTP-запросов], многие из которых #[+Keyword--YDID не]&nbsp;эквивалентны и имеют свои особенности,
-        однако важной их ролью является #[+Keyphrase--YDID логическая группировка] #[+Term--YDID маршрутов].
+        #[+Term--YDID HTTP-запросов], которые #[+Keyword--YDID не]&nbsp;эквивалентны и имеют свои особенности,
+        а важной их ролью является #[+Keyphrase--YDID логическая группировка] #[+Term--YDID маршрутов].
 
     p.Article-Paragraph.
-      Перед тем, как перечислить наиболее популярные #[+Term--YDID HTTP-методы], обратим внимание на несколько моментов,
-        которые часто упускают.
+      Перед тем, как перечислить наиболее популярные #[+Term--YDID HTTP-методы], следует обратить внимание на несколько
+        моментов, которые часто упускают.
 
     +AdmonitionBlock--YDF({
       title: "Важные сведения об HTTP-методах",
@@ -262,19 +268,19 @@ block append SpecificContent
         li.
           Названия #[+Term--YDID HTTP-методов] являются #[+Keyword--YDID условными], а конкретный эффект
             #[+Keyword--YDID полностью] зависит от реализации.
-          Например, #[+Term--YDID HTTP-метод] #[+ImportantEntity__Code--YDID DELETE] («удалить») можно реализовать так,
+          Например, #[+Term--YDID HTTP-метод] #[+SecondaryEntity--YDID DELETE] («удалить») можно реализовать так,
             что он ничего не&nbsp;будет удалять, а наоборот, что-то создаст.
           Другое дело, что запутывать маршрутизацию не&nbsp;следует, потому реализация должна соответствовать названию
-            #[+Term--YDID метода].
+            #[+Term--YDID HTTP-метода].
 
         li.
-          Маршрутизация будет логичнее и понятнее, если использовать #[+Keyword--YDID несколько] #[+Term--YDID методов],
-            хотя бы #[+ImportantEntity--YDID 3-4].
+          Маршрутизация будет логичнее и понятнее, если использовать #[+Keyword--YDID несколько]
+            #[+Term--YDID HTTP-методов], хотя бы #[+ImportantEntity--YDID 3-4].
           Тем не&nbsp;менее, это лишь #[+Keyword--YDID рекомендация], но #[+Keyword__Contrast--YDID не]&nbsp;техническое
             требование.
-          До сих пор зачастую обходятся лишь двумя #[+Term--YDID методами] — #[+ImportantEntity--YDID GET] и
-            #[+ImportantEntity--YDID POST], а некоторые начинающие программисты даже не&nbsp;знают, что бывают и другие
-            #[+Term--YDID HTTP методы].
+          До сих пор зачастую обходятся лишь двумя #[+Term--YDID методами] — #[+SecondaryEntity--YDID GET] и
+            #[+SecondaryEntity--YDID POST], а некоторые начинающие программисты даже не&nbsp;знают, что бывают и другие
+            #[+Term--YDID HTTP-методы].
 
     p.Article-Paragraph.
       Итак, #[+Keyword--YDID наиболее] #[+Keyword__Contrast--YDID популярными] #[+Term--YDID HTTP-методами] являются:
@@ -290,11 +296,11 @@ block append SpecificContent
 
       dt PUT
       dd.
-        Задуман как метод для #[+Keyword--YDID создания] сущности #[+Keyword--YDID или]
-          #[+Keyword__Contrast--YDID полного] #[+Keyword--YDID изменения] сущности, но #[+Keyphrase--YDID на практике]
-          сущность меняется на #[+ImportantEntity--YDID 100%] #[+Keyword--YDID крайне] #[+Keyword__Contrast--YDID редко],
-          хотя бы потому что обычно у сущностей есть уникальный идентификатор, не&nbsp;подлежащий изменению за время
-          существования сущности.
+        Задуман как метод для #[+Keyword--YDID создания] #[+Keyword--YDID или]　#[+Keyword__Contrast--YDID полного]
+          #[+Keyword--YDID изменения] сущности.
+        Однако #[+Keyphrase--YDID на практике]　сущность меняется на #[+ImportantEntity--YDID 100%]
+          #[+Keyword--YDID крайне] #[+Keyword__Contrast--YDID редко] хотя бы потому, что обычно у сущностей есть
+          уникальный идентификатор, не&nbsp;подлежащий изменению на протяжении существования сущности.
 
       dt PATCH
       dd.
@@ -310,7 +316,7 @@ block append SpecificContent
         Задуман как метод для #[+Keyword--YDID удаления] сущности.
 
     p.Article-Paragraph.
-      Итак, #[+Term--YDID HTTP-запросы] #[+Keyword--YDID с одним и тем же] #[+ImportantEntity--YDID URI] могут давать
+      Итак, #[+Term--YDID HTTP-запросы] #[+Keyphrase--YDID с одним и тем же] #[+ImportantEntity--YDID URI] могут давать
         #[+Keyword--YDID разный] эффект в зависимости от #[+Term--YDID HTTP-метода], например:
 
     dl.Article-DescriptionList
@@ -325,7 +331,7 @@ block append SpecificContent
       dd Удаление данных о пользователе с идентификатором #[+SecondaryEntity--YDID 1]
 
 
-    //- ─── Определение маршрутизации и связанных терминов ─────────────────────────────────────────────────────────────
+    //- ╍╍╍ Определение маршрутизации и связанных терминов ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
     +Heading--YDF({
       level: 3,
       text: localizedSectioning.theory.$children.routingDefinition.$heading,
@@ -345,20 +351,21 @@ block append SpecificContent
       Сейчас речь пойдёт о #[+Term--YDID маршрутизации] #[+Keyphrase--YDID на серверной] стороне.
       С развитием так называемых #[+Term--YDID одностраничных приложений] (#[+ImportantEntity--YDID SPA])
         #[+Term--YDID маршрутизация] стала реализовываться и на клиентской стороне, и хотя она имеет много общего с
-        #[+Term--YDID маршрутизацией] на серверной стороне, #[+Keyphrase--YDID есть и существенные отличия].
+        #[+Term--YDID маршрутизацией] на серверной стороне,
+        #[+Keyphrase--YDID есть и #[+Keyword--YDID существенные] отличия].
 
     dl.Article-DescriptionList
 
       dt Маршрутизация (роутинг) на серверной стороне
       dd.
         Генерация определённых #[+Term--YDID ответов] на #[+Term__Contrast--YDID HTTP-запросы] в зависимости от
-          конкретных #[+Term--YDID URI] (в основном от #[+Term--YDID пути] и #[+Term--YDID параметров поиска]) либо их
-          шаблонов, а также от #[+Term__Contrast--YDID HTTP-методов], #[+Keyword--YDID не]&nbsp;являющихся частью
-          #[+Term--YDID URI].
+          конкретных #[+ImportantEntity--YDID URI] (в основном от #[+Term--YDID пути] и
+          #[+Term--YDID параметров поиска]) либо их шаблонов, а также от #[+Term__Contrast--YDID HTTP-методов],
+          #[+Keyword--YDID не]&nbsp;являющихся частью #[+ImportantEntity--YDID URI].
 
       dt Маршрут
       dd.
-        #[+Keyword--YDID Комбинация] #[+Term--YDID HTTP-метода] и #[+Term--YDID URI] либо либо его шаблона.
+        #[+Keyword--YDID Комбинация] #[+Term--YDID HTTP-метода] и #[+ImportantEntity--YDID URI] либо либо его шаблона.
 
       dt API серверного приложения
       dd #[+Keyword--YDID Реализованный] набор #[+Term--YDID маршрутов]
@@ -412,7 +419,8 @@ block append SpecificContent
     p.Article-Paragraph.
       В более же сложном случае у нас будут динамические звенья в #[+Term--YDID путях].
       На примере интернет-магазина, #[+Term--YDID маршрутизация] может быть подобна следующей (некоторые
-        статические #[+Term--YDID маршруты], которые нам уже неинтересны, опущены):
+        статические #[+Term--YDID маршруты], которые часто имеются в интернет-магазинах, но сейчас нам уже
+        не&nbsp;интересны, опущены):
 
     dl.Article-DescriptionList
 
@@ -462,10 +470,10 @@ block append SpecificContent
           #[+Term--YDID авторизация].
         Существуют много подходов в реализации #[+Term--YDID аутентификации] и #[+Term--YDID авторизации],
           но если нужен пример, то данные, идентифицирующие пользователя, могут передаваться через
-          #[+Term--YDID HTTP-заголовки].
+          #[+Term--YDID HTTP-заголовки] (разумеется, предполагается механизм проверки этих данных на подлинность).
 
 
-    //- ─── Примитивная реализация маршрутизации ───────────────────────────────────────────────────────────────────────
+    //- ╍╍╍ Примитивная реализация маршрутизации ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
     +Heading--YDF({
       level: 3,
       text: localizedSectioning.theory.$children.routingPrimitiveImplementation.$heading,
@@ -528,18 +536,18 @@ block append SpecificContent
         (например, #[+SecondaryEntity__Code--YDID https://example.com/products/1]), здесь идентификатор
         публикации (по-английски «post», что не&nbsp;следует #[+Term--YDID POST-запросами])
         передаётся через #[+Term--YDID параметры поиска].
-      Реализация с идентификатором публикации, передаваемой через #[+Term--YDID путь], будет несколько сложнее, особенно
-        она должна работать и для других маршрутов.
+      Реализация с идентификатором публикации, передаваемой через #[+Term--YDID путь], будет несколько сложнее, и она
+        должна работать и для других маршрутов.
 
 
-    //- ━━━ Маршрутизация в YDB ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    //- ┅┅┅ Маршрутизация в YDB ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅
     +Heading--YDF({
       level: 2,
       text: localizedSectioning.routingInYDB.$heading,
       HTML_ID: localizedSectioning.routingInYDB.$anchor
     }).Article-Heading2
 
-    //- ─── Функциональный API ─────────────────────────────────────────────────────────────────────────────────────────
+    //- ╍╍╍ Функциональный API ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
     +Heading--YDF({
       level: 3,
       text: localizedSectioning.routingInYDB.$children.functionalAPI.$heading,
@@ -554,24 +562,18 @@ block append SpecificContent
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
-        import {
-          Server,
-          Request,
-          Response,
-          ProtocolDependentDefaultPorts,
-          HTTP_Methods
-        } from "@yamato-daiwa/backend";
+        import * as YDB from "@yamato-daiwa/backend";
 
-
-        Server.initializeAndStart({
+        YDB.Server.initializeAndStart({
           IP_Address: "127.0.0.1",
-          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          HTTP: { port: YDB.ProtocolDependentDefaultPorts.HTTP },
           routing: [
             {
-              HTTP_Method: HTTP_Methods.get,
+              HTTP_Method: YDB.HTTP_Methods.get,
               pathTemplate: "/",
-              async handler(request: Request, response: Response): Promise<void> {
-                return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });      }
+              async handler(request: YDB.Request, response: YDB.Response): Promise<void> {
+                return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
+              }
             }
           ]
         });
@@ -583,24 +585,17 @@ block append SpecificContent
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
-        import {
-          Server,
-          Request,
-          Response,
-          ProtocolDependentDefaultPorts,
-          HTTP_Methods
-        } from "@yamato-daiwa/backend";
+        import * as YDB from "@yamato-daiwa/backend";
 
-
-        Server.initializeAndStart({
+        YDB.Server.initializeAndStart({
           IP_Address: "127.0.0.1",
-          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          HTTP: { port: YDB.ProtocolDependentDefaultPorts.HTTP },
           routing: [
 
             {
-              HTTP_Method: HTTP_Methods.get,
+              HTTP_Method: YDB.HTTP_Methods.get,
               pathTemplate: "/",
-              async handler(_request: Request, response: Response): Promise<void> {
+              async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
                 return response.submitWithSuccess({
                   HTML_Content: "<h1>Top Page</h1>"
                 });
@@ -608,9 +603,9 @@ block append SpecificContent
             },
 
             {
-              HTTP_Method: HTTP_Methods.get,
+              HTTP_Method: YDB.HTTP_Methods.get,
               pathTemplate: "/products",
-              async handler(_request: Request, response: Response): Promise<void> {
+              async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
                 return response.submitWithSuccess({
                   HTML_Content: "<h1>Products</h1>"
                 });
@@ -618,9 +613,9 @@ block append SpecificContent
             },
 
             {
-              HTTP_Method: HTTP_Methods.get,
+              HTTP_Method: YDB.HTTP_Methods.get,
               pathTemplate: "/checkout",
-              async handler(_request: Request, response: Response): Promise<void> {
+              async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
                 return response.submitWithSuccess({
                   HTML_Content: "<h1>Checkout</h1>"
                 });
@@ -643,7 +638,7 @@ block append SpecificContent
         #[+Keyphrase--YDID согласно установленным правилам].
 
 
-    //- ─── Определение маршрутов с параметрами пути ───────────────────────────────────────────────────────────────────
+    //- ╍╍╍ Определение маршрутов с параметрами пути ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
     +Heading--YDF({
       level: 3,
       text: localizedSectioning.routingInYDB.$children.pathParameters.$heading,
@@ -656,7 +651,8 @@ block append SpecificContent
         любой популярный фреймворк для серверной разработки.
       Однако сделать это с #[+Term--YDID типовой безопасностью] могут #[+Keyword--YDID немногие].
       Справедливости ради следует отметить, что в случае #[+ImportantEntity--YDID TypeScript] сделать это со
-        стопроцентной #[+Term--YDID типовой безопасностью] едва ли возможно — ниже подробнее рассмотрим, почему.
+        стопроцентной #[+Term--YDID типовой безопасностью] едва ли возможно, и для тех, кто не&nbsp;знает причины,
+        ниже подробнее рассмотрим, почему именно.
       Тем не&nbsp;менее, можно #[+Keyword--YDID не]&nbsp;только обойтись без использования #[+Keyword--YDID ущербного]
         #[+Term--YDID типа] #[+ImportantEntity__Code--YDID any], но и подкрепить #[+Term--YDID приведение] более
         общих #[+Term--YDID типов] к конкретным #[+Term--YDID валидацией].
@@ -696,7 +692,8 @@ block append SpecificContent
       dt Низкий уровень типовой безопасности
       dd.
         #[+Term--YDID Приведение типа] #[+ImportantEntity__Code--YDID { &lsqb;key: string&rsqb;: string; }] к
-          #[+ImportantEntity__Code--YDID { ID: string; }] #[+Keyword--YDID ничем] не&nbsp;подкреплено.
+          #[+ImportantEntity__Code--YDID { ID: string; }] #[+Keyword--YDID ничем]
+          #[+Keyword__Contrast--YDID не]&nbsp;подкреплено.
         Несмотря на то, что у нас #[+Keyword--YDID шаблон] #[+Term--YDID пути] —
           #[+SecondaryEntity__Code--YDID "/products/:ID"], мы можем указать совершенно не&nbsp;имеющий к нему отношения
           #[+Term--YDID тип] (например, #[+SecondaryEntity__Code--YDID { foo: string; bar: string; }]) и
@@ -718,7 +715,7 @@ block append SpecificContent
 
       dt Неудобный API
       dd
-        | У типа #[+ImportantEntity__Code--YDID Express.Request] целых #[+ImportantEntity--YDID 5]
+        | У #[+Term--YDID типа] #[+SecondaryEntity__Code--YDID Express.Request] целых #[+ImportantEntity--YDID 5]
         |   #[+Term--YDID параметров обобщения], причём если нам нужен, например, четвёртый (представленные в виде
         |   #[+Term--YDID объекта] #[+Term__Contrast--YDID параметры поиска]), то придётся указать и предыдущие три,
         |   даже если они для нас не&nbsp;актуальны, потому получится что-то вроде

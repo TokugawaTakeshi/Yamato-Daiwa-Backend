@@ -1,0 +1,39 @@
+theory:
+
+  $heading: "Theory"
+
+  deserialization:
+
+    $heading: "Deserialization"
+
+  serialization:
+
+    $heading: "Serialization"
+
+  validation:
+
+    $heading: "Validation"
+
+queryParametersInYDB:
+
+  $heading: "Query Parameters in YDB"
+
+  booleanParameters:
+
+    $heading: "Boolean Parameters"
+
+  objectParameters:
+
+    $heading: "Object Parameters"
+
+  arrayedParameters:
+
+    $heading: "Arrayed Parameters"
+
+  renamingOfKeys:
+
+    $heading: "Renaming of Keys"
+
+  multipleDeserializingAlgorithms:
+
+    $heading: "Multiple Deserializing Algorithms"

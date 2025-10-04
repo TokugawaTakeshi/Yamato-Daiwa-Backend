@@ -1,0 +1,51 @@
+theory:
+
+  $heading: `theory.$heading`
+  $anchor: THEORY--SECTION
+
+  $children:
+
+    deserialization:
+
+      $heading: `theory.deserialization.$heading`
+      $anchor: THEORY-DESERIALIZATION--SECTION
+
+    serialization:
+
+      $heading: `theory.serialization.$heading`
+      $anchor: THEORY-SERIALIZATION--SECTION
+
+    validation:
+
+      $heading: `theory.validation.$heading`
+      $anchor: THEORY-VALIDATION--SECTION
+
+queryParametersInYDB:
+
+  $heading: `queryParametersInYDB.$heading`
+  $anchor: QUERY_PARAMETERS_IN_YDB--SECTION
+
+
+  $children:
+
+    booleanParameters:
+
+      $heading: `queryParametersInYDB.booleanParameters.$heading`
+      $anchor: QUERY_PARAMETERS_IN_YDB-BOOLEAN_PARAMETERS--SECTION
+
+    objectParameters:
+
+      $heading: `queryParametersInYDB.objectParameters.$heading`
+      $anchor: QUERY_PARAMETERS_IN_YDB-OBJECT_PARAMETERS--SECTION
+
+    arrayedParameters:
+      $heading: `queryParametersInYDB.arrayedParameters.$heading`
+      $anchor: QUERY_PARAMETERS_IN_YDB-ARRAYED_PARAMETERS--SECTION
+
+    renamingOfKeys:
+      $heading: `queryParametersInYDB.renamingOfKeys.$heading`
+      $anchor: QUERY_PARAMETERS_IN_YDB-RENAMING_OF_KEYS--SECTION
+
+    multipleDeserializingAlgorithms:
+      $heading: `queryParametersInYDB.multipleDeserializingAlgorithms.$heading`
+      $anchor: QUERY_PARAMETERS_IN_YDB-MULTIPLE_DESERIALIZING_ALGORITHMS--SECTION

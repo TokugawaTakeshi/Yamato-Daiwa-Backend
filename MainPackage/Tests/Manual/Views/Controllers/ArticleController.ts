@@ -1,25 +1,17 @@
 import type Article from "../BusinessRules/Enterprise/Article";
-import {
-  Controller,
-  TemplateEngine
-} from "../../../../Source";
-import type {
-  Request,
-  Response
-} from "../../../../Source";
-import { HTTP_Methods } from "@yamato-daiwa/es-extensions";
+import * as YDB from "../../../../Source";
 
 
-export default class ArticleController extends Controller {
+export default class ArticleController extends YDB.Controller {
 
-  private readonly renderProductsPage: TemplateEngine.CachedRenderer<ArticleController.ProductsListPage.TemplateParameters> =
-      TemplateEngine.cacheRenderer("Views/Sample.hbs");
+  private readonly renderProductsPage: YDB.TemplateEngine.CachedRenderer<ArticleController.ProductsListPage.TemplateParameters> =
+      YDB.TemplateEngine.cacheRenderer("Views/Sample.hbs");
 
-  @Controller.RouteHandler({
-    HTTP_Method: HTTP_Methods.get,
+  @YDB.Controller.RouteHandler({
+    HTTP_Method: YDB.HTTP_Methods.get,
     pathTemplate: "articles"
   })
-  public async generateProductsPage(_request: Request, response: Response): Promise<void> {
+  public async generateProductsPage(_request: YDB.Request, response: YDB.Response): Promise<void> {
     return response.submitWithSuccess({
       HTML_Content: this.renderProductsPage({
         topHeading: "Test",
@@ -31,6 +23,7 @@ export default class ArticleController extends Controller {
       })
     });
   }
+
 }
 
 

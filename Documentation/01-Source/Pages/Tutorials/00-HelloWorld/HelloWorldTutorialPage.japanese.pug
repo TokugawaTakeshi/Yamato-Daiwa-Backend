@@ -35,7 +35,7 @@ block append Metadata
       ]
     });
 
-    RoutingEmulator.setCurrentRoute("tutorials.helloWorld");
+    YDF.RoutingEmulator.setCurrentRoute("tutorials.helloWorld");
 
     LanguageDropDownList__YDF_DK.setLinks({
       english: routing.english.tutorials.$children.helloWorld.$URI,
@@ -55,14 +55,11 @@ block append SpecificContent
   article.Article.DocumentationPage-Article
 
     //- ━━━ 初手の例の「ハロー・ワールド」 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    h1.Article-Heading1= localizedRouting.tutorials.$children.helloWorld.$heading
+    h1.Article-Heading1= topHeading
 
-    +ThisPageHasNotBeenCheckedByNativeSpeakersYetWarning
+    +PageNotReadyApology--YDPD({ currentState: PageNotReadyApology__YDPD.States.notCheckedByNativeSpeakers })
 
-    +AdmonitionBlock--YDF({ decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.warning, SVG_Icon: true }).
-      当授業で提示されたプロジェクト構成・コードは教材への最適化として#[+Keyphrase--YDID 可能な限り]#[+Keyword--YDID 簡素化]されたので、
-        此れに#[+Keyphrase--YDID 真似し本物の営利的なウェブサイト・ウェブアプリケーションのコードを書いてはならない]。
-      此の授業で習った知識を実践に活用するには、授業の内容を理解した上でコードサンプルを貴方の課題・スタイルガイドに適応する事。
+    +TutorialCodeIsNotOpimizedForProductionWarning
 
 
     //- ━━━ 事前に必要な知識・熟練 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -147,16 +144,9 @@ block append SpecificContent
       })
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda
-          import {
-            Server,
-            Request,
-            Response,
-            ProtocolDependentDefaultPorts,
-            HTTP_Methods
-          } from "@yamato-daiwa/backend";
+          import * as YDB from "@yamato-daiwa/backend";
 
-
-          Server.initializeAndStart({
+          YDB.Server.initializeAndStart({
         +CodeViewer-Explanation--YDF
           | #[+SecondaryEntity__Code--YDID Server]#[+Term--YDID クラス]の#[+SecondaryEntity__Code--YDID initializeAndStart]
           |   #[+Term--YDID 静的メソッド]は
@@ -182,7 +172,7 @@ block append SpecificContent
           | の一番最初のものにしておこう。
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="2" indentationString="  ")
-          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          HTTP: { port: YDB.ProtocolDependentDefaultPorts.HTTP },
         +CodeViewer-Explanation--YDF.
           #[+ImportantEntity__Code--YDID ProtocolDependentDefaultPorts.HTTP]の値である#[+ImportantEntity--YDID 80]は
             #[+Term--YDID HTTPプロトコル]専用#[+Keyword--YDID 規定の]#[+Term--YDID ポート]番号だ。
@@ -194,7 +184,7 @@ block append SpecificContent
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="2" indentationString="  ")
           routing: [
             {
-              HTTP_Method: HTTP_Methods.get,
+              HTTP_Method: YDB.HTTP_Methods.get,
               pathTemplate: "/",
         +CodeViewer-Explanation--YDF.
           #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/]と言う#[+ImportantEntity--YDID URI]宛てに#[+Term--YDID GET型]
@@ -211,7 +201,7 @@ block append SpecificContent
             #[+Term--YDID リクエスト]を送信してみると、サーバが「見つからなかった」と言うエラーを含む#[+Term--YDID レスポンス]を返す。
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="4" indentationString="  ")
-          async handler(request: Request, response: Response): Promise<void> {
+          async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
         +CodeViewer-Explanation--YDF
 
           p.Article-Paragraph.

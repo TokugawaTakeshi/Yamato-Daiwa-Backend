@@ -1,21 +1,12 @@
-import {
-  Server,
-  Request,
-  Response,
-  ProtocolDependentDefaultPorts,
-  HTTP_Methods
-} from "@yamato-daiwa/backend";
+import * as YDB from "@yamato-daiwa/backend";
 // import Path from "path";
 
 
-/* Running the test:
- *  tsx EntryPoint.ts   OR   npm run start
- * */
-Server.initializeAndStart({
+YDB.Server.initializeAndStart({
   IP_Address: "127.0.0.1",
-  HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+  HTTP: { port: YDB.ProtocolDependentDefaultPorts.HTTP },
   HTTPS: {
-    port: ProtocolDependentDefaultPorts.HTTPS,
+    port: YDB.ProtocolDependentDefaultPorts.HTTPS,
     // SSL_CertificateFileRelativeOrAbsolutePath: Path.resolve(__dirname, "./SSL/SSL_Certificate.pem"),
     // SSL_KeyFileRelativeOrAbsolutePath: Path.resolve(__dirname, "./SSL/SSL_Key.pem"),
     SSL_CertificateFileRelativeOrAbsolutePath: "SSL/SSL_Certificate.pem",
@@ -23,9 +14,9 @@ Server.initializeAndStart({
   },
   routing: [
     {
-      HTTP_Method: HTTP_Methods.get,
+      HTTP_Method: YDB.HTTP_Methods.get,
       pathTemplate: "/",
-      async handler(request: Request, response: Response): Promise<void> {
+      async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
         return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
       }
     }

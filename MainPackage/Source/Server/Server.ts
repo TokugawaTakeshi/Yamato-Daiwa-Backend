@@ -1,4 +1,8 @@
-/* ─── Native Modules ─────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ━━━ < Imports ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ┅┅┅ Assets ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
+import serverLocalization__english from "./ServerLocalization.english";
+
+/* ┅┅┅ Native Modules ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
 import HTTP from "http";
 import HTTPS from "https";
 import type FileSystem from "fs";
@@ -6,21 +10,21 @@ import PromisfiedFileSystem from "fs/promises";
 import Path from "path";
 import DomainNameSystem from "dns/promises";
 
-/* ─── Framework's Constituents ───────────────────────────────────────────────────────────────────────────────────── */
-import Request from "../Request/Request";
-import Response from "../Response/Response";
+/* ┅┅┅ Framework Constituents ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
+import Request from "../Request";
+import Response from "../Response";
 import Router from "../Router";
 import type URI_QueryParametersDeserializer from "../URI_QueryParametersDeserializer";
 import Middleware from "../Middleware/Middleware";
 import ClassTypeMiddleware from "../Middleware/ClassTypeMiddleware";
 import type FunctionTypeMiddleware from "../Middleware/FunctionTypeMiddleware";
 
-/* ─── Applied Utils ──────────────────────────────────────────────────────────────────────────────────────────────── */
-import ConfigurationNormalizer from "../ConfigurationNormalizer/ConfigurationNormalizer";
+/* ┅┅┅ Applied Utils ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
+import ConfigurationNormalizer from "../ConfigurationNormalizer";
 import HostHTTP_HeaderParser from "../Utils/HostHTTP_HeaderParser";
 import getSubdomainConfig from "../Utils/getSubdomainConfig";
 
-/* ─── General Utils ──────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ┅┅┅ General Utils ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
 import {
   HTTP_StatusCodes,
   HTTP_Methods,
@@ -44,10 +48,10 @@ import {
   isErrnoException
 } from "@yamato-daiwa/es-extensions-nodejs";
 import InvalidRoutePathParametersError from "../Errors/InvalidRoutePathParameters/InvalidRoutePathParametersError";
+import URI_QueryParametersDeserializationFailedError from
+    "../Errors/URI_QueryParametersDeserializationFailed/URI_QueryParametersDeserializationFailedError";
 import InvalidURI_QueryParametersError from "../Errors/InvalidURI_QueryParameters/InvalidURI_QueryParametersError";
-
-/* ─── Localization ───────────────────────────────────────────────────────────────────────────────────────────────── */
-import serverLocalization__english from "./ServerLocalization.english";
+/* ━━━ Imports > ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 
 class Server {
@@ -471,10 +475,13 @@ class Server {
     const normalizedRequest: Request = new Request({
       HTTP_Method,
       URI: normalizedURI,
-      cookieHTTP_Header: rawRequest.headers.cookie,
+      URI_QueryParametersDeserializer:
+          routeMatch?.URI_QueryParametersDeserializer ??
+          this.configuration.URI_QueryParametersMainDeserializer,
       rawRoutePathParameters: routeMatch?.routePathParameters,
       subdomainParameters: actualSubdomainConfig?.parameterizedHostNameLabels_Values,
-      routePathTemplate: routeMatch?.routePathTemplate
+      routePathTemplate: routeMatch?.routePathTemplate,
+      rawRequest
     });
 
     const response: Response = new Response(rawResponse, this.configuration);
@@ -495,7 +502,7 @@ class Server {
 
       } catch (error: unknown) {
 
-        return Server.handleErrorAndSubmitResponse(response, error);
+        return this.handleErrorAndSubmitResponse(response, error);
 
       }
 
@@ -515,7 +522,7 @@ class Server {
 
       } catch (error: unknown) {
 
-        return Server.handleErrorAndSubmitResponse(response, error);
+        return this.handleErrorAndSubmitResponse(response, error);
 
       }
 
@@ -725,7 +732,7 @@ class Server {
 
   }
 
-  private static async handleErrorAndSubmitResponse(response: Response, error: unknown): Promise<void> {
+  private async handleErrorAndSubmitResponse(response: Response, error: unknown): Promise<void> {
 
     if (error instanceof InvalidRoutePathParametersError) {
 
@@ -738,7 +745,24 @@ class Server {
 
       return response.submitWithError({
         statusCode: ClientErrorsHTTP_StatusCodes.badRequest,
-        plainTextContent: error.message
+        ...this.configuration.security.detailedResponse ? { plainTextContent: error.message } : null
+      });
+
+    }
+
+
+    if (error instanceof URI_QueryParametersDeserializationFailedError) {
+
+      Logger.logError({
+        errorType: URI_QueryParametersDeserializationFailedError.NAME,
+        title: URI_QueryParametersDeserializationFailedError.localization.defaultTitle,
+        description: error.message,
+        occurrenceLocation: "Server.handleErrorAndSubmitResponse(response, error)"
+      });
+
+      return response.submitWithError({
+        statusCode: ClientErrorsHTTP_StatusCodes.badRequest,
+        ...this.configuration.security.detailedResponse ? { plainTextContent: error.message } : null
       });
 
     }
@@ -755,7 +779,7 @@ class Server {
 
       return response.submitWithError({
         statusCode: ClientErrorsHTTP_StatusCodes.badRequest,
-        plainTextContent: error.message
+        ...this.configuration.security.detailedResponse ? { plainTextContent: error.message } : null
       });
 
     }
@@ -779,6 +803,7 @@ namespace Server {
 
   export type Security = Readonly<{
     HTTP_Headers: Security.HTTP_Headers;
+    detailedResponse: boolean;
   }>;
 
   export namespace Security {
@@ -825,6 +850,7 @@ namespace Server {
     /* eslint-disable-next-line @typescript-eslint/no-shadow -- No problems if to access by fully qualified name. */
     export type Security = Readonly<{
       HTTP_Headers?: Security.HTTP_Headers;
+      detailedResponse?: boolean;
     }>;
 
     export namespace Security {
@@ -866,7 +892,7 @@ namespace Server {
 
   export namespace NormalizedConfiguration {
 
-    /* [ Theory ] According  RFC6454, the origin is scheme+host+port https://stackoverflow.com/a/37366696/4818123 */
+    /* [ Theory ] According to RFC6454, the origin is scheme+host+port https://stackoverflow.com/a/37366696/4818123 */
     export type HTTP = {
 
       readonly IP_AddressBasedMainOrigin: string;

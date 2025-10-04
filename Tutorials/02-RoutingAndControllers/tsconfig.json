@@ -1,7 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "moduleResolution": "Node",
-    "experimentalDecorators": true
+
+    "target": "es2023",
+    "module": "nodenext",
+    "moduleResolution": "NodeNext",
+    "experimentalDecorators": true,
+
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "skipLibCheck": true,
+
   }
+
 }

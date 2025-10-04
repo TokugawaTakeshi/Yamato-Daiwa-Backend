@@ -9,7 +9,6 @@ tutorials:
   helloWorld: { $heading: "\"Hello, world\" — The Minimal Example" }
   HTTPS: { $heading: "HTTPS Usage" }
   routingAndControllers: { $heading: "Routing and Controllers" }
-  routePathParameters: { $heading: "Route Path Parameters" }
   routeQueryParameters: { $heading: "Route Query Parameters" }
   dotEnvConfiguration: { $heading: "DotEnv Configuration" }
   consoleLineInterfaceConfiguration: { $heading: "Console Line Interface Configuration" }

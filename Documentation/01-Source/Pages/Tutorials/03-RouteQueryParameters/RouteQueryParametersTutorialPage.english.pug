@@ -1,0 +1,781 @@
+extends ../../../../node_modules/@yamato-daiwa/programming_documentation/Layouts/TwoColumns/TwoColumnsLayout.pug
+
+
+block append Requirements
+
+  include ../../../SharedAssets/Markup/SharedAssets.english.pug
+  include ../../../SharedComponents/SharedComponents.english.pug
+
+
+block append Metadata
+
+  -
+
+    const {
+      $heading: topHeading,
+      $sectioning: localizedSectioning
+    } = routing.english.tutorials.$children.routeQueryParameters;
+
+    RegularWebPageTemplate__YDF.configure({
+      metadata: {
+        title: buildHTML_PageTitle(topHeading),
+        description:
+          "Node.js framework \"Yamato Daiwa Backend\" (abbreviation: \"YDB\") allows flexible work with " +
+            "URI query parameters, in particular, configuring deserialization and validation."
+      },
+      stylesSheetsURIs: [
+        "$CommonStyles",
+        "$LayoutsStyles/TwoColumns/TwoColumnsLayout.css",
+        "$PreMadesStyles",
+        "@CustomizedExternalComponents"
+      ]
+    });
+
+    YDF.RoutingEmulator.setCurrentRoute("tutorials.routeQueryParameters");
+
+    LanguageDropDownList__YDF_DK.setLinks({
+      japanese: routing.japanese.tutorials.$children.routeQueryParameters.$URI,
+      russian: routing.russian.tutorials.$children.routeQueryParameters.$URI
+    });
+
+
+block append HeadScripts
+
+  if __IS_PRODUCTION_BUILDING_MODE__
+
+    +GoogleAnalyticsScript
+
+
+block append SpecificContent
+
+  article
+
+    //- ━━━ Route Query Parameters ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    h1.Article-Heading1= topHeading
+
+    +TutorialCodeIsNotOpimizedForProductionWarning
+
+    p.Article-Paragraph
+      | If you, following our strong recommendation to study the lessons in the suggested sequence, have already
+      |   become familiar with the
+      |
+      +Link--YDF({ internalURI: localizedRouting.tutorials.$children.routingAndControllers.$URI }) previous lesson
+      | , which covered working with #[+Term--YDID route path parameters], then working with
+      | #[+Term--YDID query] (#[+Term--YDID search]) #[+Term--YDID parameters] will seem similar to you:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        export default class ProductController extends Controller {
+
+          @Controller.RouteHandler({
+            HTTP_Method: HTTP_Methods.get,
+            pathTemplate: "products"
+          })
+          public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+            const {
+              fullOrPartialProductTitle,
+              paginationPageNumber,
+              itemsCountPerPaginationPage,
+            }: Readonly<{
+              fullOrPartialProductTitle: string;
+              paginationPageNumber: number;
+              itemsCountPerPaginationPage: number;
+            }> = request.validateAndProcessURI_QueryParameters({
+              fullOrPartialProductTitle: {
+                type: String,
+                isUndefinedForbidden: false,
+                isNullForbidden: true,
+                minimalCharactersCount: 2
+              },
+              paginationPageNumber: {
+                preValidationModifications: convertPotentialStringToNumberIfPossible,
+                type: Number,
+                isUndefinedForbidden: true,
+                isNullForbidden: true,
+                isNaN_Forbidden: true,
+                numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+              },
+              itemsCountPerPaginationPage: {
+                preValidationModifications: convertPotentialStringToNumberIfPossible,
+                type: Number,
+                isUndefinedForbidden: true,
+                isNullForbidden: true,
+                isNaN_Forbidden: true,
+                numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+              }
+            });
+
+            console.table({
+              name: fullOrPartialProductTitle,
+              page: paginationPageNumber,
+              size: itemsCountPerPaginationPage,
+            });
+
+            return response.submitWithSuccess({
+              HTML_Content: "<h1>Products list</h1>"
+            });
+
+          }
+
+        }
+
+    p.Article-Paragraph.
+      However, there are certain subtleties with #[+Term--YDID search parameters], which is why the
+        corresponding material on them has been moved to this separate lesson.
+
+
+    //- ┅┅┅ Theory ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅
+    +Heading--YDF({
+      level: 2,
+      text: localizedSectioning.theory.$heading,
+      HTML_ID: localizedSectioning.theory.$anchor
+    }).Article-Heading2
+
+    p.Article-Paragraph.
+      #[+Keyword--YDID Initially], #[+Term--YDID search parameters], being #[+Keyword--YDID part]
+        of the #[+ImportantEntity--YDID URI], are a #[+Keyword--YDID single] #[+Term--YDID string] called
+        #[+Term--YDID "query"] or #[+Term--YDID "search"].
+      As it is easy to see, #[+Keyword--YDID both] terms are #[+Keyword--YDID rather] #[+Keyword__Contrast--YDID ambiguous],
+        so when using them, it is #[+Keyword--YDID necessary] to clarify that it's about a #[+Keyword--YDID constituent]
+        of the #[+ImportantEntity--YDID URI].
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/03-RouteQueryParameters/Images/Tutorials-QueryParameters-1",
+      imageAlternateText:
+          "Query (search) parameters are a part of the URI separated from the path by a question mark, but other " +
+            "parts of the URI can follow it, for example, a hash separated by a pound sign, although the latter is " +
+            "relevant for client-side but not server-side development.",
+      autoAspectRatioByYDA: true
+    })
+
+    p.Article-Paragraph.
+      The part of the #[+ImportantEntity--YDID URI] called #[+Term--YDID "search"] is separated from the other part,
+        called the #[+Term--YDID "path"] (discussed in detail in the previous lesson), by a #[+Term--YDID question mark].
+      After it comes an #[+Term--YDID associative array] #[+Keyphrase--YDID represented as a #[+Term--YDID string]].
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/03-RouteQueryParameters/Images/Tutorials-QueryParameters-2",
+      imageAlternateText:
+          "In URI Query (search) parameters, each key is separated from its corresponding value by an = sign, " +
+            "and \"key-value\" pairs are separated from each other by an & sign.",
+      autoAspectRatioByYDA: true
+    })
+
+    ul.Article-UnorderedList
+
+      li.
+        #[+Keyword--YDID Each] #[+Term--YDID key] is separated from its #[+Keyword--YDID corresponding]
+          #[+Term--YDID value] by an #[+ImportantEntity--YDID =] sign.
+
+      li.
+        #[+Term--YDID "Key-value" pairs] are separated from each other by an #[+ImportantEntity--YDID &] sign.
+
+    p.Article-Paragraph.
+      It is in this form that #[+Term--YDID search parameters] are sent from the client side to the server side (or from
+        one server to another), but this is #[+Keyword--YDID not] the form in which it is convenient to work with them
+        when processing a #[+Term--YDID request].
+      Therefore, when processing a #[+Term--YDID request] on the server, it is necessary to #[+Keyword--YDID analyze]
+        the #[+Term--YDID search parameters] if any are expected on a specific #[+Term--YDID route], and them
+        transform them to convenient for the processing mode.
+
+    p.Article-Paragraph.
+      And that is exactly where the problem lies.
+      The fact is that there is #[+Keyword--YDID no]&nbsp;the&nbsp;single standard that uniformly dictates how to
+        interpret certain #[+Term--YDID search parameters].
+      While in the case of #[+Term--YDID route] #[+Keyword--YDID path] #[+Term--YDID parameters], the work in the
+        vast majority of cases involves #[+Term--YDID string] or #[+Term--YDID numeric] values, in the case of
+        #[+Keyword--YDID search] #[+Term--YDID parameters], #[+Term__Contrast--YDID boolean] types,
+        #[+Term__Contrast--YDID arrays] (#[+Keyword--YDID both] indexed #[+Keyword--YDID and] associative), and in some
+        cases even nested #[+Term--YDID arrays] and #[+Term--YDID objects] are in demand.
+      Of course, the latter are best avoided as they greatly complicate the #[+ImportantEntity--YDID API], but sometimes
+        this is #[+Keyword--YDID not] under our control (for example, if third-party services are used or an important
+        customer requests such a complex #[+ImportantEntity--YDID API]).
+
+
+    //- ╍╍╍ Deserialization ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.deserialization.$heading,
+      HTML_ID: localizedSectioning.theory.$children.deserialization.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      So, as in the case of #[+Term--YDID route path parameters], #[+Keyword--YDID initially]　
+        #[+Keyword__Contrast--YDID all] #[+Term--YDID search parameters] are #[+Keyword--YDID strings] (or rather
+        even #[+Keyword--YDID substrings] of a #[+Keyword__Contrast--YDID single] #[+Term--YDID string]).
+      Like #[+Term--YDID route path parameters], it would be good to convert #[+Term--YDID search parameters]　into a
+        regular #[+Term--YDID object] so that they are easy to work with.
+      Converting "array-like" data presented as a single #[+Term--YDID string], such as #[+Term--YDID search parameters],
+        into an #[+Term--YDID object] is called #[+DefinableTerm--YDID deserialization].
+      What does the native #[+ImportantEntity--YDID API] offer for this?
+
+    p.Article-Paragraph.
+      The first tool is the
+        #[+Link--YDF({ unendorsedExternalURI: "https://developer.mozilla.org/en-US/docs/Web/API/URL" }) WHATWG URL].
+      #[+ImportantEntity--YDID WHATWG] has to be mentioned because older versions of #[+ImportantEntity--YDID Node.js]
+        used a different implementation of #[+ImportantEntity--YDID URL], which is now obsolete and therefore
+        not&nbsp;recommended.
+      And immediately, there is mentioned above confusion about what is #[+ImportantEntity--YDID URL] and what is
+        #[+ImportantEntity--YDID URI],.
+      The #[+Keyword--YDID native] #[+Term--YDID request] #[+Term--YDID object] (type
+        #[+ImportantEntity__Code--YDID HTTP.Request]) has a #[+ImportantEntity__Code--YDID url] #[+Term--YDID property],
+        the value of which is a #[+Keyword--YDID part] of the #[+ImportantEntity--YDID URI]
+        #[+Keyphrase--YDID starting with the #[+Keyword--YDID path]], while the #[+ImportantEntity--YDID WHATWG URL]
+        #[+Term--YDID object] can be created #[+Keyword--YDID only] #[+Keyword__Contrast--YDID if] an
+        #[+Term--YDID origin] such as #[+SecondaryEntity__Code--YDID http://localhost:80/] is specified.
+      If we look at the #[+ImportantEntity--YDID JSDoc] description for the
+        #[+ImportantEntity__Code--YDID HTTP.Request.url] property in the #[+ImportantEntity--YDID @types/node] package
+        (checked for version #[+ImportantEntity--YDID 22.15.31]), there will be such an example:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        new URL(`http://${process.env.HOST ?? 'localhost'}${request.url}`);
+
+    p.Article-Paragraph.
+      From this example, it seems as if "a #[+ImportantEntity--YDID URL] is #[+ImportantEntity__Code--YDID request.url]
+        plus an #[+Term--YDID origin]", which of course is absurd from a logical point of view, just as one could
+        say that "a car steering wheel is a steering wheel plus pedals".
+      But since this #[+ImportantEntity--YDID API] is not under our control, we have what we have.
+
+    p.Article-Paragraph.
+      Let's return to the #[+Term--YDID query parameters].
+      In the #[+ImportantEntity--YDID WHATWG URL] #[+Term--YDID object], there are #[+Keyword--YDID two]
+        #[+Term--YDID properties] responsible for #[+Term--YDID query parameters]:
+
+    dl.Article-DescriptionList
+
+      dt #[+ImportantEntity__Code--YDID search]
+      dd.
+        A #[+Term--YDID substring] starting with #[+ImportantEntity--YDID ?], as which all #[+Term--YDID query parameters]
+          being represented.
+        For instance, in #[+SecondaryEntity__Code--YDID "https://example.com/?alpha=foo&bravo=bar"] the
+          #[+ImportantEntity__Code--YDID search] #[+Term--YDID property] will have the value
+          #[+SecondaryEntity__Code--YDID "?alpha=foo&bravo=bar"].
+
+      dt #[+ImportantEntity__Code--YDID searchParams]
+      dd
+        | A special kind of #[+Term--YDID "associative array"] type #[+Term--YDID collection], similar to
+        |
+        +Link--YDF({
+          unendorsedExternalURI: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"
+        }) Map
+        | .
+        | Its keys and values can be iterated in a loop, and access to a specific value is carried out as in
+        |   #[+ImportantEntity--YDID Map] — using the #[+ImportantEntity__Code--YDID get] #[+Term--YDID method]
+        |   (for instance, #[+SecondaryEntity__Code--YDID searchParams.get("alpha")]).
+        | This #[+Term--YDID method] can return #[+ImportantEntity__Code--YDID undefined], so before you can fully
+        |   use the returned value, #[+ImportantEntity--YDID TypeScript] with strict settings will require you to first
+        |   check it for #[+ImportantEntity__Code--YDID undefined] (which is more good than bad).
+
+    p.Article-Paragraph.
+      Thus, the #[+ImportantEntity__Code--YDID searchParams] #[+Term--YDID collection] is the closest thing to what
+        we need, but #[+Keyword--YDID all] #[+Term--YDID search parameters] it contains have a #[+Keyword--YDID string] type.
+      For example, with
+        #[+SecondaryEntity__Code--YDID ?fullOrPartialProductTitle=test&paginationPageNumber=1&itemsCountPerPaginationPage=20]
+        the output of the #[+ImportantEntity__Code--YDID searchParams] #[+Term--YDID property] value will be:
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+          'fullOrPartialProductTitle' => 'test',
+          'paginationPageNumber' => '1',
+          'itemsCountPerPaginationPage' => '20' }
+
+    p.Article-Paragraph
+      | Another alternative is the native module
+      |
+      +Link--YDF({
+        unendorsedExternalURI: "https://nodejs.org/docs/latest-v22.x/api/querystring.html"
+      }) querystring
+      | .
+      | Unlike #[+ImportantEntity--YDID WHATWG URL], it works #[+Keyword--YDID already] #[+Keyword__Contrast--YDID not]
+      |   with complete #[+ImportantEntity--YDID URIs], but only with the #[+Term--YDID query substring]
+      |   #[+Keyphrase--YDID #[+Keyword--YDID not]&nbsp;including the #[+Term--YDID question mark]].
+      | For example, if we pass a #[+Term--YDID string] starting with a #[+Term--YDID question mark] to the
+      |   #[+ImportantEntity__Code--YDID parse] #[+Term--YDID method] (which has a #[+ImportantEntity__Code--YDID decode]
+      |   #[+Keyword--YDID alias]), it will considered it as #[+Keyword--YDID part] of the
+      |   #[+Keyword__Contrast--YDID first] #[+Term--YDID query parameter]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import Querystring from "node:querystring";
+
+        console.log(
+          Querystring.parse(
+            "?fullOrPartialProductTitle=test&" +
+              "paginationPageNumber=1&" +
+              "itemsCountPerPaginationPage=20"
+          )
+        );
+
+    +ConsoleOutput--YDF.
+      [Object: null prototype] {
+        '?fullOrPartialProductTitle': 'test',
+        paginationPageNumber: '1',
+        itemsCountPerPaginationPage: '20'
+      }
+
+    p.Article-Paragraph.
+      Seeing the quotations which are wrapping the values we also can conclude that, as in
+        #[+ImportantEntity--YDID WHATWG URL] case, numeric values are #[+Keyword--YDID not]&nbsp;automatically converted
+        to a numeric type.
+      However, unlike #[+ImportantEntity--YDID WHATWG URL], #[+ImportantEntity--YDID querystring] already
+        recognizes #[+Term--YDID arrays].
+      Let's assume that, in addition to all the previously specified #[+Term--YDID query parameters], we now want to find
+        products only from categories with IDs #[+SecondaryEntity--YDID 1] and #[+SecondaryEntity--YDID 2]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "fullOrPartialProductTitle=test&" +
+            "paginationPageNumber=1&" +
+            "itemsCountPerPaginationPage=20&" +
+            "categoryID=1&" +
+            "categoryID=2";
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID WHATWG URL] will add #[+Keyword--YDID two] #[+Term--YDID elements] with
+        #[+Keyword--YDID identical] keys to the #[+Term--YDID collection], which is an important difference from
+        #[+ImportantEntity--YDID Map], where duplicate keys are #[+Keyword--YDID impossible]:
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+        'fullOrPartialProductTitle' => 'test',
+        'paginationPageNumber' => '1',
+        'itemsCountPerPaginationPage' => '20',
+        'categoryID' => '1',
+        'categoryID' => '2' }
+
+    p.Article-Paragraph.
+      And #[+ImportantEntity--YDID querystring] will set an #[+Term--YDID array] as the value for the
+        #[+SecondaryEntity__Code--YDID categoryID] #[+Term--YDID property]:
+
+    +ConsoleOutput--YDF.
+      [Object: null prototype] {
+        fullOrPartialProductTitle: 'test',
+        paginationPageNumber: '1',
+        itemsCountPerPaginationPage: '20',
+        categoryID: [ '1', '2' ]
+      }
+
+    p.Article-Paragraph.
+      But one should&nbsp;#[+Keyword--YDID not] forget that there is&nbsp;#[+Keyword--YDID no]&nbsp;standard that
+        unequivocally establishes how to #[+Term--YDID deserialize] #[+Term__Contrast--YDID arrays], so repeating keys
+        in the #[+Term--YDID query substring] is a format that #[+ImportantEntity--YDID querystring] native module
+        understands, but it is #[+Keyword--YDID not]&nbsp;the only possible format.
+      There is, for example, a format with square brackets and an explicit #[+Term--YDID array index]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "fullOrPartialProductTitle=test&" +
+            "paginationPageNumber=1&" +
+            "itemsCountPerPaginationPage=20&" +
+            "categoryID[0]=1&" +
+            "categoryID[1]=2";
+
+    p.Article-Paragraph.
+      #[+Keyword--YDID Neither] #[+ImportantEntity--YDID WHATWG URL] #[+Keyword--YDID nor]
+        #[+ImportantEntity__Code--YDID querystring] will understand this format:
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+        'fullOrPartialProductTitle' => 'test',
+        'paginationPageNumber' => '1',
+        'itemsCountPerPaginationPage' => '20',
+        'categoryID[0]' => '1',
+        'categoryID[1]' => '2' }
+
+      [Object: null prototype] {
+        fullOrPartialProductTitle: 'test',
+        paginationPageNumber: '1',
+        itemsCountPerPaginationPage: '20',
+        'categoryID[0]': '1',
+        'categoryID[1]': '2'
+      }
+
+    p.Article-Paragraph.
+      The situation is even worse with #[+Term--YDID objects] — #[+Keyword--YDID neither]
+        #[+ImportantEntity--YDID WHATWG URL] #[+Keyword--YDID nor] #[+ImportantEntity--YDID querystring] understand
+        #[+Keyword--YDID any] of the popular formats for #[+Term--YDID "object"] type #[+Term--YDID query parameters].
+      Let's consider this with an example: we have two #[+Term--YDID parameters] responsible for
+        #[+Term--YDID pagination] — #[+SecondaryEntity__Code--YDID paginationPageNumber] and
+        #[+SecondaryEntity__Code--YDID itemsCountPerPaginationPage].
+      Let's move them into a #[+SecondaryEntity__Code--YDID pagination] #[+Term--YDID object].
+      The first variant of syntax is specifying the object's #[+Term--YDID property] key in square brackets:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "fullOrPartialProductTitle=test&" +
+            "pagination[pageNumber]=1&" +
+            "pagination[itemsCountPerPage]=20";
+
+    p.Article-Paragraph.
+      The tools mentioned above for working with #[+Term--YDID query parameters] will deserialize this as follows:
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+        'fullOrPartialProductTitle' => 'test',
+        'pagination[pageNumber]' => '1',
+        'pagination[itemsCountPerPage]' => '20' }
+
+      [Object: null prototype] {
+        'fullOrPartialProductTitle': 'test',
+        'pagination[pageNumber]': '1',
+        'pagination[itemsCountPerPage]': '20'
+      }
+
+    p.Article-Paragraph.
+      As you can see, no nested #[+Term--YDID objects] were created.
+      Similarly for the dot notation syntax:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "fullOrPartialProductTitle=test&" +
+            "pagination.pageNumber=1&" +
+            "pagination.itemsCountPerPage=20";
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+        'fullOrPartialProductTitle' => 'test',
+        'pagination.pageNumber' => '1',
+        'pagination.itemsCountPerPage' => '20' }
+
+      [Object: null prototype] {
+        '?fullOrPartialProductTitle': 'test',
+        'pagination.pageNumber': '1',
+        'pagination.itemsCountPerPage': '20'
+      }
+
+    p.Article-Paragraph.
+      Finally, let's consider #[+Keyword--YDID boolean] #[+Term--YDID query parameters].
+      In short, for both #[+ImportantEntity--YDID WHATWG URL] and #[+ImportantEntity--YDID querystring], both
+        #[+ImportantEntity__Code--YDID true] and #[+ImportantEntity__Code--YDID false] within the
+        #[+ImportantEntity--YDID URI] are just #[+Keyword--YDID strings] and nothing more:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "outOfStock=true&" +
+            "comingSoon=false&" +
+            "unavailableInUserRegion";
+
+    +ConsoleOutput--YDF.
+      URLSearchParams { 'outOfStock' => 'true', 'comingSoon' => 'false', 'unavailableInUserRegion' => '' }
+
+      [Object: null prototype] {
+        'outOfStock': 'true',
+        comingSoon: 'false',
+        unavailableInUserRegion: ''
+      }
+
+    p.Article-Paragraph.
+      In #[+Keyword--YDID some] conventions, a #[+Keyword--YDID boolean] #[+Term--YDID query parameter] might not have
+        an explicit value (like #[+SecondaryEntity__Code--YDID unavailableInUserRegion] above), and in this case, it is
+        interpreted as #[+ImportantEntity__Code--YDID true], and if the corresponding key is completely missing from the
+        #[+ImportantEntity__Code--YDID URI], it is equivalent to #[+ImportantEntity__Code--YDID false].
+      But again, this is #[+Keyword--YDID not] a standard, just #[+Keyphrase--YDID one of] the possible
+        #[+Keyword--YDID conventions].
+
+
+    //- ╍╍╍ Serialization ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.serialization.$heading,
+      HTML_ID: localizedSectioning.theory.$children.serialization.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      #[+Keyphrase--YDID With respect to #[+Term--YDID search parameters]], #[+DefinableTerm--YDID serialization]
+        is the #[+Term--YDID transforming] of #[+Term__Contrast--YDID search parameters] represented as an
+        #[+Term--YDID object] into a #[+Term--YDID string] that must be a valid part of the
+        #[+ImportantEntity--YDID URI].
+      This is more about client-side development than server-side, but there are cases where the server also sends
+        #[+Term--YDID HTTP requests] to other servers — in this case, the task of #[+Term--YDID serializing]
+        #[+Term__Contrast--YDID search parameters] will be relevant for the server-side develpment too.
+
+    p.Article-Paragraph.
+      There is one important point here — seemingly completely obvious, but programmers (especially beginners) often
+        miss it:
+
+    +AdmonitionBlock--YDF({
+      title: "Obvious, but often missed in practice",
+      SVG_Icon: true,
+      geometricVariation: AdmonitionBlock__YDF.GeometricVariations.stickyNoteLike,
+      decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.error
+    }).
+      #[+Term--YDID Serialization] and #[+Term--YDID deserialization] #[+Keyword--YDID must] be
+        #[+Keyword--YDID symmetrical].
+
+    p.Article-Paragraph.
+      This means that if you #[+Term--YDID serialize] #[+Term__Contrast--YDID search parameters] represented as an
+        #[+Term--YDID object] and then #[+Term--YDID deserialize] them again, the resulting
+        #[+Keyword--YDID deserialized] #[+Term--YDID object] #[+Keyword--YDID must] be
+        #[+Keyword__Contrast--YDID equivalent] to the initial one
+        (#[+Keyphrase--YDID from the perspective of #[+ImportantEntity--YDID JavaScript]], these will be two
+        #[+Keyword--YDID independent] #[+Term--YDID objects], but the #[+Keyword--YDID set] of
+          #[+Keyword__Contrast--YDID all] #[+Term--YDID properties] and their values] #[+Keyword--YDID must]
+          match #[+Keyphrase--YDID regardless of nesting levels]).
+
+    p.Article-Paragraph.
+      If the same language is used on the #[+Term--YDID frontend] and #[+Term--YDID backend], then ensuring this
+        correspondence is much easier by using the same library (for example, #[+ImportantEntity--YDID qs]).
+
+
+    //- ╍╍╍ Validation ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.validation.$heading,
+      HTML_ID: localizedSectioning.theory.$children.validation.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      #[+Keyphrase--YDID Same as any other external data], #[+Term--YDID search parameters] #[+Keyword--YDID must]
+        be #[+Term--YDID validated] before being used.
+      In native #[+ImportantEntity--YDID Node.js], such functionality is #[+Keyword--YDID absent] (and in few
+        languages it exists, because validation is a high-level task implying many conventions, although much
+        demanded in practice).
+      Validation of #[+Term--YDID query parameters] is also not included in some frameworks such as
+        #[+SecondaryEntity--YDID Express.js] — to solve this task, third-party libraries like
+        #[+SecondaryEntity--YDID query-validation] or #[+SecondaryEntity--YDID ajv] are used.
+
+
+    //- ┅┅┅ Search Parameters in YDB ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅
+    +Heading--YDF({
+      level: 2,
+      text: localizedSectioning.queryParametersInYDB.$heading,
+      HTML_ID: localizedSectioning.queryParametersInYDB.$anchor
+    }).Article-Heading2
+
+    p.Article-Paragraph.
+      Until now, the #[+SecondaryEntity__Code--YDID generateProductsPage] #[+Term--YDID method] of the
+        #[+SecondaryEntity__Code--YDID ProductController] #[+Term--YDID controller] from the previous lesson only
+        returned an #[+Term--YDID HTML heading] with the content "Products list":
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      }): :code_listing--yda
+        export default class ProductController extends Controller {
+
+          @Controller.RouteHandler({
+            HTTP_Method: HTTP_Methods.get,
+            pathTemplate: "products"
+          })
+          public async generateProductsPage(_request: Request, response: Response): Promise<void> {
+            return response.submitWithSuccess({
+              HTML_Content: "<h1>Products list</h1>"
+            });
+          }
+
+          // ...
+
+        }
+
+    p.Article-Paragraph.
+      In the future, of course, this will be a full-fledged #[+Term--YDID HTML page], and the list of products will be
+        filterable.
+      For now, however, let's focus on #[+Term--YDID deserializing] and validating of #[+Term--YDID search parameters].
+      The #[+Keyword--YDID initial] #[+Term--YDID search parameters] will be the same as in the theoretical part:
+
+    dl.Article-DescriptionList
+
+      dt: +SecondaryEntity__Code--YDID fullOrPartialProductTitle
+      dd Full or partial product name.
+
+      dt: +SecondaryEntity__Code--YDID paginationPageNumber
+      dd Pagination page number. A #[+Term--YDID natural number] is expected.
+
+      dt: +SecondaryEntity__Code--YDID itemsCountPerPaginationPage
+      dd Number of items per pagination page. A #[+Term--YDID natural number] is expected.
+
+    p.Article-Paragraph.
+      For the performance optimization reasons, #[+ImportantEntity--YDID YDB] does&nbsp;#[+Keyword--YDID not] deserialize
+        #[+Term--YDID query parameters] #[+Keyphrase--YDID until requested].
+      To be more precise, the #[+ImportantEntity__Code--YDID request] #[+Term--YDID object] has a
+        #[+ImportantEntity--YDID URI] #[+Term--YDID field] — this is the same #[+ImportantEntity--YDID WHATWG URL]
+        mentioned in the theoretical part, except it lacks the #[+ImportantEntity__Code--YDID hash] #[+Term--YDID property]
+        because it is not relevant for server-side development.
+      However, as discussed above, #[+Term--YDID deserialization] in #[+ImportantEntity--YDID WHATWG URL] supports
+        #[+Keyword--YDID only] #[+Keyword__Contrast--YDID string] #[+Term--YDID data types], which might be
+        insufficient as in our case.
+      To perform basic #[+Term--YDID deserialization], as well as data validation, call the
+        #[+ImportantEntity__Code--YDID validateAndProcessURI_QueryParameters] method on
+        #[+ImportantEntity__Code--YDID request] with an #[+Keyword--YDID obligatory] specification of constraints in
+        the #[+ImportantEntity--YDID RawObjectDataProcessor] format:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      }): :code_listing--yda
+        @Controller.RouteHandler({
+          HTTP_Method: HTTP_Methods.get,
+          pathTemplate: "products"
+        })
+        public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+          const {
+            fullOrPartialProductTitle,
+            paginationPageNumber,
+            itemsCountPerPaginationPage,
+          }: Readonly<{
+            fullOrPartialProductTitle: string;
+            paginationPageNumber: number;
+            itemsCountPerPaginationPage: number;
+          }> = request.validateAndProcessURI_QueryParameters({
+            fullOrPartialProductTitle: {
+              type: String,
+              isUndefinedForbidden: false,
+              isNullForbidden: true,
+              minimalCharactersCount: 2
+            },
+            paginationPageNumber: {
+              preValidationModifications: convertPotentialStringToNumberIfPossible,
+              type: Number,
+              isUndefinedForbidden: true,
+              isNullForbidden: true,
+              isNaN_Forbidden: true,
+              numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+            },
+            itemsCountPerPaginationPage: {
+              preValidationModifications: convertPotentialStringToNumberIfPossible,
+              type: Number,
+              isUndefinedForbidden: true,
+              isNullForbidden: true,
+              isNaN_Forbidden: true,
+              numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+            }
+          });
+
+          console.table({
+            fullOrPartialProductTitle,
+            paginationPageNumber,
+            itemsCountPerPaginationPage
+          });
+
+          return response.submitWithSuccess({
+            HTML_Content: "<h1>Products list</h1>"
+          });
+
+        }
+
+    p.Article-Paragraph.
+      #[+Keyphrase--YDID By default], #[+ImportantEntity--YDID YDB] uses the #[+ImportantEntity__Code--YDID parse]
+        method of the　#[+Link--YDF({ endorsedExternalURI: "https://www.npmjs.com/package/qs" }) qs] library as a
+        #[+Term--YDID deserializer].
+      This method already works with #[+Keyword--YDID nested] #[+Term--YDID objects] and #[+Term--YDID arrays],
+        although, of course, #[+Keyphrase--YDID only within the supported notations]; however, configuration is
+        offered.
+      Nevertheless, this library does&nbsp;#[+Keyword--YDID not] automatically convert #[+Term--YDID strings] to
+        #[+Term--YDID numbers], which is more good than bad, as otherwise computational resources would be spent
+        analyzing each string.
+
+    p.Article-Paragraph.
+      Once the #[+Term--YDID deserialization] is finished, the resulting #[+Term--YDID object] is accepted by
+        the #[+ImportantEntity--YDID RawObjectProcessor], which can not&nbsp;only validate #[+Term--YDID objects] but
+        also modify them if necessary.
+      Herewith certainly, the need for these modifications, as well as validation, #[+Keyword--YDID must] take
+        into account the #[+Term--YDID deserialization] algorithm.
+
+    p.Article-Paragraph
+      | That's basically it for this example — as already mentioned at the beginning of the lesson, except for the
+      |   need to account for #[+Term--YDID deserialization], everything is similar to working with
+      |   #[+Term--YDID path parameters].
+      | Let's test this code by sending a request to
+      |
+      +SecondaryEntity__Code--YDID.
+        http://localhost:80/products?fullOrPartialProductTitle=test&paginationPageNumber=1&itemsCountPerPaginationPage=20
+      | :
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/03-RouteQueryParameters/Images/Tutorials-QueryParameters-Step1-Output",
+      imageAlternateText:
+          "Console output of deserialized search parameters: the \"fullOrPartialProductTitle\" parameter has the " +
+            "string value \"test\", the \"paginationPageNumber\" parameter has the numeric value 1, and the " +
+            "\"itemsCountPerPaginationPage\" parameter has the numeric value 20.",
+      autoAspectRatioByYDA: true
+    })
+
+
+    //- ╍╍╍ Boolean Parameters ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.queryParametersInYDB.$children.booleanParameters.$heading,
+      HTML_ID: localizedSectioning.queryParametersInYDB.$children.booleanParameters.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      Let's implement three #[+Keyword--YDID boolean] #[+Term--YDID parameters] in the application:
+        #[+SecondaryEntity__Code--YDID outOfStock], #[+SecondaryEntity__Code--YDID comingSoon], and
+        #[+SecondaryEntity__Code--YDID unavailableInUserRegion].
+      According to the #[+ImportantEntity--YDID API] #[+ImportantEntity--YDID RawObjectDataProcessor],
+        the code changes will be #[+Keyphrase--YDID at least] as follows:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      }): :code_listing--yda
+
+        @Controller.RouteHandler({
+          HTTP_Method: HTTP_Methods.get,
+          pathTemplate: "products"
+        })
+        public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+          const {
+            outOfStock,
+            comingSoon,
+            // ...
+          }: Readonly<{
+            outOfStock?: boolean;
+            comingSoon?: boolean;
+            // ...
+          }> = request.validateAndProcessURI_QueryParameters({
+
+            outOfStock: {
+              type: Boolean,
+              isUndefinedForbidden: false,
+              isNullForbidden: true
+            },
+
+            comingSoon: {
+              type: Boolean,
+              isUndefinedForbidden: false,
+              isNullForbidden: true
+            },
+
+            unavailableInUserRegion: {
+              type: Boolean,
+              isUndefinedForbidden: false,
+              isNullForbidden: true
+            },
+
+            // ...
+
+          });
+
+          // ...
+
+          return response.submitWithSuccess({
+            HTML_Content: "<h1>Products list</h1>"
+          });
+
+        }
+
+    p.Article-Paragraph.
+      However, if #[+Keyphrase--YDID with the current #[+Term--YDID deserialization] algorithm] you send a
+        #[+Term--YDID request] containing the aforementioned #[+Term--YDID query parameters]
+        (for example, one including #[+SecondaryEntity__Code--YDID outOfStock=true&comingSoon=false]), then the
+        #[+Term--YDID query parameters] will #[+Keyword--YDID not] pass validation, and an answer with the
+        #[+ImportantEntity--YDID 400 Bad Request] status will be returned:
+
+          return response.submitWithSuccess({
+            HTML_Content: "<h1>Products list</h1>"
+          });
+
+        }

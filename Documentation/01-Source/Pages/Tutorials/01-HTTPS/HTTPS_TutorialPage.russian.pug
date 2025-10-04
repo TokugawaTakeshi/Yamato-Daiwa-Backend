@@ -18,7 +18,7 @@ block append Metadata
 
     RegularWebPageTemplate__YDF.configure({
       metadata: {
-        title: buildHTML_PageTitle("Использование HTTPS"),
+        title: buildHTML_PageTitle(topHeading),
         description:
             "Node.js-фреймворк «Yamato Daiwa Backend» (сокращённо: «YDB») имеет поддержку протокола HTTPS «из коробки», " +
               "при этом с лаконичным синтаксисом."
@@ -31,7 +31,7 @@ block append Metadata
       ]
     });
 
-    RoutingEmulator.setCurrentRoute("tutorials.HTTPS");
+    YDF.RoutingEmulator.setCurrentRoute("tutorials.HTTPS");
 
     LanguageDropDownList__YDF_DK.setLinks({
       english: routing.english.tutorials.$children.HTTPS.$URI,
@@ -51,7 +51,10 @@ block append SpecificContent
   article
 
     //- ━━━ Использование HTTPS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    h1.Article-Heading1= localizedRouting.tutorials.$children.HTTPS.$heading
+    h1.Article-Heading1= topHeading
+
+    +TutorialCodeIsNotOpimizedForProductionWarning
+
 
     //- ━━━ Теория ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     +Heading--YDF({
@@ -251,20 +254,13 @@ block append SpecificContent
       +CodeViewer-TabPanel--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript })
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda
-          import {
-            Server,
-            Request,
-            Response,
-            ProtocolDependentDefaultPorts,
-            HTTP_Methods
-          } from "@yamato-daiwa/backend";
+          import * as YDB from "@yamato-daiwa/backend";
           import Path from "path";
 
-
-          Server.initializeAndStart({
+          YDB.Server.initializeAndStart({
             IP_Address: "127.0.0.1",
             HTTPS: {
-              port: ProtocolDependentDefaultPorts.HTTPS,
+              port: YDB.ProtocolDependentDefaultPorts.HTTPS,
         +CodeViewer-Explanation--YDF.
           Для #[+ImportantEntity--YDID HTTPS] #[+Term--YDID портом] #[+Keyphrase--YDID по умолчанию] является
             #[+ImportantEntity__Code--YDID 443].
@@ -291,9 +287,9 @@ block append SpecificContent
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="2" indentationString="  ")
           routing: [
               {
-                HTTP_Method: HTTP_Methods.get,
+                HTTP_Method: YDB.HTTP_Methods.get,
                 pathTemplate: "/",
-                async handler(_request: Request, response: Response): Promise<void> {
+                async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
                   return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
                 }
               }

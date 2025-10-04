@@ -21,7 +21,7 @@ block append Metadata
         title: buildHTML_PageTitle(topHeading),
         description:
           "Node.js framework \"Yamato Daiwa Backend\" (abbreviation: \"YDB\") allows to setup the routing with " +
-            "controller classes or wihtout them."
+            "controller classes or without them."
       },
       stylesSheetsURIs: [
         "$CommonStyles",
@@ -31,7 +31,7 @@ block append Metadata
       ]
     });
 
-    RoutingEmulator.setCurrentRoute("tutorials.routingAndControllers");
+    YDF.RoutingEmulator.setCurrentRoute("tutorials.routingAndControllers");
 
     LanguageDropDownList__YDF_DK.setLinks({
       japanese: routing.japanese.tutorials.$children.routingAndControllers.$URI,
@@ -53,14 +53,19 @@ block append SpecificContent
     //- ━━━ Routing and Controllers ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     h1.Article-Heading1= topHeading
 
-    //- ━━━ Теория ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    +PageNotReadyApology--YDPD({ currentState: PageNotReadyApology__YDPD.States.notCheckedByNativeSpeakers })
+
+    +TutorialCodeIsNotOpimizedForProductionWarning
+
+
+    //- ┅┅┅ Theory ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅
     +Heading--YDF({
       level: 2,
       text: localizedSectioning.theory.$heading,
       HTML_ID: localizedSectioning.theory.$anchor
     }).Article-Heading2
 
-    //- ─── URL, URN, URI ──────────────────────────────────────────────────────────────────────────────────────────────
+    //- ╍╍╍ URL, URN, URI ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
     +Heading--YDF({
       level: 3,
       text: localizedSectioning.theory.$children.URL_URN_URI.$heading,
@@ -79,15 +84,15 @@ block append SpecificContent
     p.Article-Paragraph.
       First of all, we will #[+Keyword--YDID not]&nbsp;discuss the differences between #[+ImportantEntity--YDID URL]
         and #[+ImportantEntity--YDID URL], just note that #[+ImportantEntity--YDID URI] is the
-        #[+Keyword--YDID fullest] entity including #[+Keyword--YDID both] of #[+ImportantEntity--YDID URL] and
-        #[+ImportantEntity--YDID URN] (#[+Keyphrase--YDID depending on information source],
-        #[+ImportantEntity--YDID URL] and #[+ImportantEntity--YDID URN] parts could intersect #[+Keyword--YDID or] not).
+        #[+Keyword--YDID fullest] entity #[+Keyword--YDID including] #[+Keyword--YDID both] of
+        #[+ImportantEntity--YDID URL] and #[+ImportantEntity--YDID URN], and does these parts intersect or no —
+        it is being #[+Keyphrase--YDID explained differently depending on information source].
 
     p.Article-Paragraph.
       Second, besides the #[+Term--YDID web], the
         #[+ImportantEntity--YDID URL]/#[+ImportantEntity--YDID URN]/#[+ImportantEntity--YDID URI] is applicable to
         #[+Term--YDID local file system].
-      Although it has #[+Keyword--YDID single] conception, here #[+Keyphrase--YDID we are focused on web].
+      Although it has #[+Keyword--YDID single] conception, here we will #[+Keyphrase--YDID focus on web].
 
 
     //- ─── URI Anatomy ────────────────────────────────────────────────────────────────────────────────────────────────
@@ -100,7 +105,7 @@ block append SpecificContent
     p.Article-Paragraph.
       Consider the constituents of #[+ImportantEntity--YDID URI].
       For now we will focus on how we use these constituents rather than the canonical definitions, so the following
-        glossary includes the descriptions, #[+Keyword--YDID not]&nbsp;definitions.
+        glossary includes the #[+Keyword--YDID descriptions], #[+Keyword--YDID not]&nbsp;definitions.
 
     +SingleImageViewer--YDF({
       imageURI: "@AssociatedWithPages/Tutorials/02-RoutingAndControllers/Images/URI_Decomposition.svg",
@@ -110,42 +115,44 @@ block append SpecificContent
     dl.Article-DescriptionList
 
       dt Protocol
-      dd Currently, we need the #[+ImportantEntity--YDID HTTP] and #[+ImportantEntity--YDID HTTPS] #[+Term--YDID protocols].
+      dd Currently, we are focused #[+ImportantEntity--YDID HTTP] and #[+ImportantEntity--YDID HTTPS] #[+Term--YDID protocols].
 
       dt IP-адрес (IP address)
       dd.
         For the local development case mostly it is the #[+Keyword--YDID local] #[+Term--YDID IP Address]
-          (#[+Keyword--YDID usually] #[+ImportantEntity--YDID 127.0.0.1]).
-        When deploying the the site or application to the server, wil will the #[+Term--YDID IP Address] issued by the
-          server provider.
-        We can rent the #[+Term--YDID domain name] and bind it to this #[+Term--YDID IP-адресу], then instead of the
+          (#[+Keyword--YDID usually] #[+ImportantEntity--YDID 127.0.0.1] #[+Keyword--YDID AKA]
+          #[+ImportantEntity__Code--YDID localhost]).
+        When deploying the the site or application to the server, it will the #[+Term--YDID IP Address] issued by the
+          server provider, but from the viewpoint of the server, it will be already its #[+ImportantEntity--YDID localhost].
+        We can rent the #[+Term--YDID domain name] and bind it to this #[+Term--YDID IP address], then instead of the
           #[+Term--YDID IP address] it will be this #[+Term--YDID domain name].
 
       dt Domain
       dt Domain Name
       dd.
-        The #[+Term--YDID domain name] is required mainly on production mode.
-        Besides the technological aspect, the #[+Term--YDID domain name] is part of the branding.
-        However, developing the website or web application, it is required to provide the easy migration to new
-          #[+Term--YDID domain] (ideally, wihtout changes in the source code).
+        The #[+Term--YDID domain name] is required mainly on publishing of the web site or web application to a server.
+        Besides the technological aspect, the #[+Term--YDID domain name] is #[+Keyword--YDID part] of the
+          #[+Keyword--YDID branding].
+        However, developing a web site or web application, it is required to provide the easy migration to new
+          #[+Term--YDID domain] (ideally, without changes in the source code).
 
       dt Port
       dd.
-        Thanks to there are the plenty of #[+Term--YDID ports], multiple web sites and/or web application could be
-          hosted on the same server.
-        Some of them is being used by software for various targets, but now we need one, maximally 2
-          #[+Term--YDID ports] (when both #[+ImportantEntity--YDID HTTP] and #[+ImportantEntity--YDID HTTPS] are
-          supported) for the serving of #[+Term--YDID HTTP requests].
+        Thanks to there are the plenty (in fact, #[+ImportantEntity--YDID 65535]) of #[+Term--YDID ports], multiple web
+          sites and/or web applications can be hosted on the same server.
+        #[+Keyphrase--YDID Some of them] is being used by a software for various targets, but now we need one, maximally
+          #[+ImportantEntity--YDID 2] #[+Term--YDID ports] (when both #[+ImportantEntity--YDID HTTP] and
+          #[+ImportantEntity--YDID HTTPS] are supported) for the serving of #[+Term--YDID HTTP requests].
 
       dt Socket
       dd.
         The #[+Term--YDID domain] and #[+Term--YDID port] #[+Keyword--YDID combination].
-        If the #[+Term--YDID port] has the default number (for the specific #[+Term--YDID protocol] which
-          is&nbsp;#[+Keyword--YDID not]&nbsp;the part of the #[+Term--YDID socket]), then the #[+Term--YDID port]
-          could be omitted.
-        For example, #[+SecondaryEntity__Code--YDID https://example.com:443] is same as
-          #[+SecondaryEntity__Code--YDID https://example.com:443]
-          #[+Keyphrase--YDID while the #[+Term--YDID protocol] is #[+SecondaryEntity__Code--YDID HTTPS]].
+        If the #[+Term--YDID port] has the default number (#[+Keyphrase--YDID for the specific #[+Term--YDID protocol]]
+          which　is&nbsp;#[+Keyword--YDID not]&nbsp;the part of the #[+Term--YDID socket]), then the #[+Term--YDID port]
+          #[+Keyword--YDID can] be #[+SecondaryEntity__Code--YDID omitted].
+        For instance, #[+SecondaryEntity__Code--YDID https://example.com:443] is same as
+          #[+SecondaryEntity__Code--YDID https://example.com]
+          #[+Keyphrase--YDID while the #[+Term--YDID protocol] is the #[+SecondaryEntity__Code--YDID HTTPS]].
 
       dt Origin
       dd The #[+Keyword--YDID combination] of the #[+Term--YDID protocol], #[+Term--YDID domain] and #[+Term--YDID port].
@@ -153,20 +160,23 @@ block append SpecificContent
       dt Path
       dd.
         Exactly this part is #[+Keyword--YDID most] #[+Keyword__Contrast--YDID important] for the #[+Term--YDID routing]
-          because #[+Keyword--YDID usually] depending on it one or the other data is being given out (frequently the
-          #[+ImportantEntity--YDID HTML] or #[+ImportantEntity--YDID JSON] if to talk about web sites or web application
+          because #[+Keyword--YDID usually] depending on certain data is being given out (frequently the
+          #[+ImportantEntity--YDID JSON] or #[+ImportantEntity--YDID HTML] if to talk about web sites or web applications
           development).
-        The segments separated by the slash could be multiple but if there are too many of them, the routing will
-          become complicated.
+        The segments separated by the slash can be multiple but if there are too many of them, the routing will become
+          complicated.
 
       dt Query Parameters
       dd.
-        Usually being used for the filtering of specific dataset given out depending of #[+Term--YDID path].
+        Usually being used for the searching/filtering of specific dataset given out depending of certain
+          #[+Term--YDID path].
         However, it just a practice while the actual behavior depending on the #[+Term--YDID query parameters] is
-          fully programmable.
+          implementation dependent.
 
       dt Hash
-      dd This part usually&nbsp;#[+Keyword--YDID not]&nbsp;being processed at backend and matters only for the frontend.
+      dd.
+        This part usually&nbsp;#[+Keyword--YDID not]&nbsp;being processed at the backend side and matters only for the
+          frontend.
 
     p.Article-Paragraph.
       According to #[+Keyphrase--YDID one of] interpretations of #[+ImportantEntity--YDID URL] and
@@ -174,18 +184,16 @@ block append SpecificContent
         #[+ImportantEntity--YDID URN] is the part begins from the #[+Term--YDID path], and thus, we will get
         #[+ImportantEntity--YDID URI] if join the #[+ImportantEntity--YDID URL] and #[+ImportantEntity--YDID URN].
       However, in many programming interfaces same as in daily life the #[+ImportantEntity--YDID URL] is frequently being
-        used as hte #[+Keyword--YDID synonym] of #[+ImportantEntity--YDID URI] or its part does not matching with above
-        interpretation.
+        used as the synonym of #[+ImportantEntity--YDID URI] or its some part.
       For example, in the native #[+ImportantEntity--YDID Node.js], the #[+Term--YDID property]
         #[+ImportantEntity__Code--YDID url] of the #[+ImportantEntity__Code--YDID request] #[+Term--YDID object] of
-        #[+ImportantEntity__Code--YDID http] module includes #[+Term--YDID path] and #[+Term--YDID query parameters],
-        (example from the official documentation: #[+SecondaryEntity__Code--YDID "/status?name=ryan"]), and only look
-        the example
-        #[+SecondaryEntity__Code--YDID new URL(`https://${process.env.HOST ?? 'localhost'}${request.url}`);]
-        it is completely unclear what it the #[+ImportantEntity--YDID URL].
+        #[+ImportantEntity__Code--YDID http] module includes #[+Term--YDID path] and #[+Term--YDID query parameters]
+        (example from the official documentation: #[+SecondaryEntity__Code--YDID "/status?name=ryan"]), and the example
+        #[+SecondaryEntity__Code--YDID new URL(`https://${process.env.HOST ?? 'localhost'}${request.url}`);] seems
+        to be the recursion, so just from this example it is completely unclear what it the #[+ImportantEntity--YDID URL].
 
 
-    //- ─── Working with Entities ──────────────────────────────────────────────────────────────────────────────────────
+    //- ╍╍╍ Working with Entities ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
     +Heading--YDF({
       level: 3,
       text: localizedSectioning.theory.$children.workingWithEntities.$heading,
@@ -198,25 +206,25 @@ block append SpecificContent
       If to consider the usual server application, the target of the #[+Term--YDID routing] is to provide the
         #[+Keyphrase--YDID working with data].
       But "working with data" is too abstract, and if to reduce the abstractness, it will be the "working with the
-        objects" of "working with the entities".
-      Again, both "object" and "entity" are multivalued terms so it is easy to being confined, however
+        objects" or "working with the entities".
+      Again, both "object" and "entity" are still ambiguous terms so it is easy to being confined, however
         #[+Keyphrase--YDID on the conceptual level] it is the #[+Keyword--YDID set] of the information corresponding
         to specific item or person.
-      Each of them could be represented as the table row, #[+Term--YDID associative array], #[+Term--YDID object]
-        #[+Keyword--YDID in the meaning of #[+Term--YDID Object-Oriented Programming]] and so on.
+      Each of them can be represented as the table row, #[+Term--YDID associative array] value, #[+Term--YDID object]
+        #[+Keyphrase--YDID in the meaning of #[+Term--YDID Object-Oriented Programming]] and so on.
 
     p.Article-Paragraph.
-      One of major tasks for the #[+Term--YDID frameworks] for the #[+Term--YDID backend development] are being used is
-        the providing of the comfortable data manipulations, and if the data does not change with the time, then
-        frequently no&nbsp;need to involve the backend programming.
+      One of major tasks of the #[+Term--YDID frameworks] for the #[+Term--YDID backend development] are being used is
+        the providing of the comfortable data manipulations, and if the data does&nbsp;not&nbsp;change with the time,
+        then frequently no&nbsp;need to involve the backend programming.
       The basic types of the data manipulations are:
 
     ul.Article-UnorderedList
-      li Retrieving of the entities satisfying to the certain conditions (filtering)
-      li Retrieving of the specific entity which is unique is something
-      li Creating of the new entities
-      li Changing of the existing entities
-      li Deleting of the entities
+      li Retrieving of entities satisfying to the certain conditions (filtering)
+      li Retrieving of specific entity which is unique is something
+      li Creating of new entities
+      li Changing of existing entities
+      li Deleting of entities
 
     +AdmonitionBlock--YDF({
       SVG_Icon: true,
@@ -224,13 +232,13 @@ block append SpecificContent
       decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.notice
     }).
       Working with entities concept has&nbsp;#[+Keyword--YDID not]&nbsp;been given rise by the IT and was in all times.
-      For example, we can bring the apple to the food stock (creating of the new entity) or, or vice versa, get the
+      For example, we can bring the apple to the food stock (creating of the new entity) or vice versa, get the
         apple from the stock, or get all spoiled apples (filtering) and then dispose them (deleting).
-      However, when implementing the web sites and web applications, the working with entities is implicit while in
-        daily life we are frequently not aware this.
+      However, which paradoxically enough, in the abstract IT, when implementing the web sites and web applications,
+        the working with entities is implicit while in daily life we are frequently not aware this.
 
 
-    //- ─── HTTP Methods ───────────────────────────────────────────────────────────────────────────────────────────────
+    //- ╍╍╍ HTTP Methods ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
     +Heading--YDF({
       level: 3,
       text: localizedSectioning.theory.$children.HTTP_Methods.$heading,
@@ -238,15 +246,15 @@ block append SpecificContent
     }).Article-Heading3
 
     p.Article-Paragraph.
-      Well, the server respond depends on to which #[+ImportantEntity--YDID URI] #[+Term--YDID HTTP requires] has been
+      Well, the server respond depends on to which #[+ImportantEntity--YDID URI] #[+Term--YDID HTTP request] has been
         submitted, but if we are talking about server side of specific site or application, the #[+Term--YDID origin]
         will be #[+Keyword--YDID constant], and the #[+Term--YDID response] will depend #[+Keyword--YDID mainly] on a
         #[+Term--YDID path] and #[+Term--YDID query parameters].
-      But there is one more factor on which the server response depends but which is not the part of the
-        #[+ImportantEntity--YDID URI] — it is the #[+Term--YDID HTTP method].
-      Indeed, the #[+Term--YDID HTTPS methods] are #[+Term--YDID types] or #[+Term--YDID categories] of the
-        #[+Term--YDID HTTP requests], many of which are #[+Keyword--YDID not]&nbsp;equivalent and have its own
-        features, but the #[+Keyphrase--YDID logical grouping of the #[+Term--YDID routes]] is their important role.
+      But there is one more factor on which the server response depends but which is #[+Keyword--YDID not]&nbsp;the
+        part of the #[+ImportantEntity--YDID URI] — it is the #[+Term--YDID HTTP method].
+      Indeed, the #[+DefinableTerm--YDID HTTPS methods] are #[+Keyword--YDID types] or #[+Keyword--YDID categories] of
+        the　#[+Term--YDID HTTP requests], many of which are #[+Keyword--YDID not]&nbsp;equivalent and have its own
+        features, and the #[+Keyphrase--YDID logical grouping] of the #[+Term--YDID routes] is their important role.
 
     p.Article-Paragraph.
       Before enumerate the most popular #[+Term--YDID HTTP methods], let us pay attention to some moments which
@@ -263,21 +271,21 @@ block append SpecificContent
         li.
           The names of #[+Term--YDID HTTP methods] are #[+Keyword--YDID conventional] while the specific effect is
             #[+Keyword--YDID completely] depends on specific implementation.
-          For example, the #[+Term--YDID method] which clearly named #[+ImportantEntity__Code--YDID "DELETE"] could
+          For example, the #[+Term--YDID method] which clearly named #[+SecondaryEntity--YDID "DELETE"] could
             be implemented such something will be created instead of nothing will be deleted.
-          The other thing is that you should not make the routing complicated therefore the implementation should
-            correspond to the #[+Term--YDID method] name.
+          The other thing is that you should&nbsp;not make the routing complicated therefore the implementation should
+            correspond to the #[+Term--YDID HTTP method] name.
 
         li.
           The routing will better organized if to use the #[+Keyword--YDID multiple] #[+Term--YDID HTTP-methods],
             at least #[+ImportantEntity--YDID 3-4].
-          However, it just the recommendation, but #[+Keyword--YDID not]&nbsp; the technical requirement.
-          There are the projects where still just two #[+Term--YDID methods] is being used —
-            #[+ImportantEntity--YDID GET] and #[+ImportantEntity--YDID POST], and some novice programmers even
+          However, it just the recommendation, but #[+Keyword--YDID not]&nbsp;the technical requirement.
+          There are the projects where still just two #[+Term--YDID HTTP methods] are being used —
+            #[+SecondaryEntity--YDID GET] and #[+SecondaryEntity--YDID POST], and some novice programmers even
             do&nbsp;not know that there are more #[+Term--YDID HTTP methods] exists.
 
     p.Article-Paragraph.
-      So, the #[+Keyword--YDID most] popular #[+Term--YDID HTTP methods] are:
+      So, the #[+Keyword--YDID most] #[+Keyword__Contrast--YDID popular] #[+Term--YDID HTTP methods] are:
 
     dl.Article-DescriptionList
 
@@ -290,27 +298,28 @@ block append SpecificContent
 
       dt PUT
       dd.
-        Intended to be used for the #[+Keyword--YDID creating] of the entity or #[+Keyword--YDID full]
-          #[+Keyword__Contrast--YDID changing] of entity, but #[+Keyphrase--YDID in practice] the 100% changing
-          of the entity is #[+Keyword--YDID extremely] #[+SecondaryEntity__Code--YDID rare] at least because
-          usually the entities has the unique identifier which designed as immutable for the entity life time.
+        Intended to be used for the #[+Keyword--YDID creating] of the or #[+Keyword--YDID full]
+          #[+Keyword__Contrast--YDID updating] of entity.
+        However #[+Keyphrase--YDID in practice] the 100% changing of the entity is #[+Keyword--YDID extremely]
+          #[+SecondaryEntity__Code--YDID rare] at least because usually the entities has the unique identifier which
+          designed as immutable for the entity life time.
 
       dt PATCH
       dd.
-        Intended to be used for the #[+Keyword--YDID partial] #[+Keyword__Contrast--YDID changing] of the entity.
+        Intended to be used for the #[+Keyword--YDID partial] #[+Keyword__Contrast--YDID changing] of an entity.
 
       dt POST
       dd.
-        In fact, it is the #[+Keyword--YDID generalizing] method for #[+ImportantEntity--YDID PUT] and
-          #[+ImportantEntity--YDID PATCH] frequently being used instead of them.
+        In fact, the #[+Keyword--YDID generalizing] method for #[+ImportantEntity--YDID PUT] and
+          #[+ImportantEntity--YDID PATCH] ones frequently being used instead of them.
 
       dt DELETE
       dd.
-        Intended to be used for the #[+Keyword--YDID deleting] of entity.
+        Intended to be used for the #[+Keyword--YDID deleting] of an entity.
 
     p.Article-Paragraph.
-      This way, the  #[+Term--YDID HTTP requests] #[+Keyword--YDID with the same] #[+ImportantEntity--YDID URI] could
-        give #[+Keyword--YDID different] effect depends on #[+Term--YDID HTTP method], for example:
+      This way, the #[+Term--YDID HTTP requests] #[+Keyphrase--YDID with the same] #[+ImportantEntity--YDID URI] could
+        give #[+Keyword--YDID different] effect depends on specific #[+Term--YDID HTTP method], for example:
 
     dl.Article-DescriptionList
 
@@ -324,7 +333,7 @@ block append SpecificContent
       dd Deleting of the data about user with ID #[+SecondaryEntity--YDID 1]
 
 
-    //- ─── Definition of Routing and Related Terms ──────────────────────────────────────────────────────────────────
+    //- ┅┅┅ Definition of Routing and Related Terms ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅
     +Heading--YDF({
       level: 3,
       text: localizedSectioning.theory.$children.routingDefinition.$heading,
@@ -341,24 +350,24 @@ block append SpecificContent
       SVG_Icon: true
     }).
       We will talk about the #[+Keyword--YDID backend] #[+Term--YDID routing].
-      With the spread of so-called #[+Term--YDID Single Page Applications] (#[+Term--YDID SPA]) the
+      With the spread of so-called #[+Term--YDID Single Page Applications] (#[+ImportantEntity--YDID SPA]) the
         #[+Term--YDID routing] has become implemented on the client side, and although it has a lot in common with
         the #[+Term--YDID routing] on the server (backend) side,
-        #[+Keyphrase--YDID there are also the significant differences].
-
+        #[+Keyphrase--YDID there are also the #[+Keyword--YDID significant] differences].
 
     dl.Article-DescriptionList
 
       dt Routing at the server side
       dd.
-        The generating of certain #[+Term--YDID responses] to #[+Term--YDID HTTP requests] depending on
-          specific #[+Term--YDID URIs] (mainly on #[+Term--YDID path] and #[+Term--YDID query parameters]) or the
-          #[+Term--YDID URI templates], and also on the #[+Term__Contrast--YDID HTTP methods] which are
+        The generating of certain #[+Term--YDID responses] to #[+Term__Contrast--YDID HTTP requests] depending on
+          specific #[+ImportantEntity--YDID URIs] (mainly on #[+Term--YDID path] and #[+Term--YDID query parameters])
+          or its templates, and also on the #[+Term__Contrast--YDID HTTP methods] which are
           #[+Keyword--YDID not]&nbsp;the part of the #[+ImportantEntity--YDID URI].
 
       dt Route
       dd.
-        The #[+Keyword--YDID combination] of the  #[+Term--YDID HTTP method] и #[+Term--YDID URI] or its template.
+        The #[+Keyword--YDID combination] of the  #[+Term--YDID HTTP method] and #[+ImportantEntity--YDID URI] or its
+          template.
 
       dt API of the server application
       dd #[+Keyword--YDID Implemented] #[+Term--YDID routes] set
@@ -391,11 +400,12 @@ block append SpecificContent
       dd The submitting of the contact request form
 
     p.Article-Paragraph
-      | If there is no the feedback form, the above site could be implemented wihtout server programming, just with the
+      | If there is no the content form, the above site could be implemented wihtout server programming, just with the
       |   set of #[+Term--YDID HTML files].
       | However, in order to all #[+ImportantEntity--YDID URIs] match with above routing, not&nbsp;be the references to
       |   #[+Term--YDID HTML files] (such as #[+SecondaryEntity__Code--YDID "https://example.com/about.html"]), the
       |   additional configuration of the web server will required
+      |
       +Link--YDF({
         unendorsedExternalURI: "https://nginx.org/en/docs/http/ngx_http_core_module.html#location"
       }) example for nginx
@@ -411,7 +421,7 @@ block append SpecificContent
     p.Article-Paragraph.
       In more complicated case, we will have the dynamic segments in the #[+Term--YDID paths].
       On e-commerce store example, the #[+Term--YDID routing] could the similar to the following one (part of static
-        routes which are not interesting for us anymore has been omitted):
+        routes which are frequently presents on e-commerce stores but not&nbsp;interesting for us anymore has been omitted):
 
     dl.Article-DescriptionList
 
@@ -431,10 +441,10 @@ block append SpecificContent
       dd Deleting of the product to cart
 
       dt [GET] https://example.com/checkout
-      dd The checkout page (because the checkout is not completed yet, there is no the order identifier)
+      dd The checkout page (because the checkout is not completed yet, there is no&nbsp;the order identifier)
 
       dt [POST] https://example.com/checkout
-      dd Submitting of the data of new order (because the checkout is not completed yet, there is no the order identifier)
+      dd Submitting of the data of new order (because the checkout is not completed yet, there is no&nbsp;the order identifier)
 
       dt [GET] https://example.com/vendors/{vendorID}
       dd The page of the specific vendor where #[+SecondaryEntity__Code--YDID {vendorID}] is the vernor ID
@@ -448,23 +458,23 @@ block append SpecificContent
     +QuestionAndAnswerBox--YDF({
       type: QuestionAndAnswerBox__YDF.Types.question,
       question: "Is the routing common for all users? " +
-          "How server will understand to card of which user the product must be added?"
+          "How server will understand to cart of which user the product must be added?"
     })
 
       p.Article-Paragraph.
         Yes, common for all.
-        There are could be the routes actual only for specific group of the users, but the route individual for user
+        There are may be the routes actual only for specific group of the users, but the route individual for user
           is something extraordinary.
 
       p.Article-Paragraph.
         The identification of user it is the separate and very large topics — #[+Term--YDID authentication] and
           #[+Term--YDID authorization].
         There are many approaches how to implement the #[+Term--YDID authentication] and #[+Term--YDID authorization],
-          but if you need the example, the data identifying the specific user could be submitted via
-          #[+Term--YDID HTTP headers].
+          but if you need the example, the data identifying the specific user may be submitted via
+          #[+Term--YDID HTTP headers] (of course, it must be some mechanism which checks this data for the authenticity).
 
 
-    //- ─── Primitive Routing Implementation ───────────────────────────────────────────────────────────────────────────
+    //- ╍╍╍ Primitive Routing Implementation ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
     +Heading--YDF({
       level: 3,
       text: localizedSectioning.theory.$children.routingPrimitiveImplementation.$heading,
@@ -472,9 +482,10 @@ block append SpecificContent
     }).Article-Heading3
 
     p.Article-Paragraph.
-      #[+ImportantEntity--YDID Node.js], same as many other programming language has&nbsp;#[+Keyword--YDID no] built-in
+      #[+ImportantEntity--YDID Node.js], same as many other programming languages has&nbsp;#[+Keyword--YDID no] built-in
         functionality for the specifying of the routes and matching of the routes with submitted
-        #[+Term--YDID HTTP request].
+        #[+Term--YDID HTTP request], thus the #[+Term--YDID routing] is one of primary functionality demanded from
+        the backend framework.
       But if you are interesting what the framework does instead of you, generally, to implement the routing, the
         following things must be done:
 
@@ -520,21 +531,21 @@ block append SpecificContent
         });
 
     p.Article-Paragraph.
-      Note that unlike the previous example has been contained inside the #[+Term--YDID path]
-        (for example, #[+SecondaryEntity__Code--YDID https://example.com/products/1]) here the post identifier
+      Note that unlike the previous example where the identifier has been contained inside the #[+Term--YDID path]
+        (for example, #[+SecondaryEntity__Code--YDID https://example.com/products/1]), here the post identifier
         is being passed via #[+Term--YDID query parameters].
-      The implementation with posts identifiers passed via #[+Term--YDID path] will be more difficult especially it it
-        must work for the other routes too.
+      The implementation with posts identifiers passed via #[+Term--YDID path] will be more difficult, and it must work
+        for the other routes too.
 
 
-    //- ━━━ Routing in YDB ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    //- ┅┅┅ Routing in YDB ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅
     +Heading--YDF({
       level: 2,
       text: localizedSectioning.routingInYDB.$heading,
       HTML_ID: localizedSectioning.routingInYDB.$anchor
     }).Article-Heading2
 
-    //- ─── Functional API ─────────────────────────────────────────────────────────────────────────────────────────────
+    //- ╍╍╍ Functional API ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
     +Heading--YDF({
       level: 3,
       text: localizedSectioning.routingInYDB.$children.functionalAPI.$heading,
@@ -549,52 +560,40 @@ block append SpecificContent
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
-        import {
-          Server,
-          Request,
-          Response,
-          ProtocolDependentDefaultPorts,
-          HTTP_Methods
-        } from "@yamato-daiwa/backend";
+        import * as YDB from "@yamato-daiwa/backend";
 
-
-        Server.initializeAndStart({
+        YDB.Server.initializeAndStart({
           IP_Address: "127.0.0.1",
-          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          HTTP: { port: YDB.ProtocolDependentDefaultPorts.HTTP },
           routing: [
             {
-              HTTP_Method: HTTP_Methods.get,
+              HTTP_Method: YDB.HTTP_Methods.get,
               pathTemplate: "/",
-              async handler(request: Request, response: Response): Promise<void> {
-                return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });      }
+              async handler(request: YDB.Request, response: YDB.Response): Promise<void> {
+                return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
+              }
             }
           ]
         });
 
     p.Article-Paragraph.
       The #[+ImportantEntity__Code--YDID routing] #[+Term--YDID property] is the #[+Keyword--YDID array], so to
-        define other #[+Term--YDID routes], it is required to add the new #[+Term--YDID elements] by the same way:
+        define other #[+Term--YDID routes], it is required to add the new #[+Term--YDID elements]
+        #[+Keyphrase--YDID by the same way]:
 
     +CodeViewer--YDF
       +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
-        import {
-          Server,
-          Request,
-          Response,
-          ProtocolDependentDefaultPorts,
-          HTTP_Methods
-        } from "@yamato-daiwa/backend";
+        import * as YDB from "@yamato-daiwa/backend";
 
-
-        Server.initializeAndStart({
+        YDB.Server.initializeAndStart({
           IP_Address: "127.0.0.1",
-          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          HTTP: { port: YDB.ProtocolDependentDefaultPorts.HTTP },
           routing: [
 
             {
-              HTTP_Method: HTTP_Methods.get,
+              HTTP_Method: YDB.HTTP_Methods.get,
               pathTemplate: "/",
-              async handler(_request: Request, response: Response): Promise<void> {
+              async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
                 return response.submitWithSuccess({
                   HTML_Content: "<h1>Top Page</h1>"
                 });
@@ -602,9 +601,9 @@ block append SpecificContent
             },
 
             {
-              HTTP_Method: HTTP_Methods.get,
+              HTTP_Method: YDB.HTTP_Methods.get,
               pathTemplate: "/products",
-              async handler(_request: Request, response: Response): Promise<void> {
+              async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
                 return response.submitWithSuccess({
                   HTML_Content: "<h1>Products</h1>"
                 });
@@ -612,9 +611,9 @@ block append SpecificContent
             },
 
             {
-              HTTP_Method: HTTP_Methods.get,
+              HTTP_Method: YDB.HTTP_Methods.get,
               pathTemplate: "/checkout",
-              async handler(_request: Request, response: Response): Promise<void> {
+              async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
                 return response.submitWithSuccess({
                   HTML_Content: "<h1>Checkout</h1>"
                 });
@@ -627,14 +626,15 @@ block append SpecificContent
     p.Article-Paragraph.
       As you see, #[+Keyword--YDID each] #[+Term--YDID element] of #[+ImportantEntity__Code--YDID routing]
         #[+Term--YDID array] in the example above is the #[+Term--YDID object] with #[+Keyword--YDID three]
-          #[+Keyword__Contrast--YDID required] #[+Term--YDID properties]: #[+ImportantEntity__Code--YDID HTTP_Method],
-          #[+ImportantEntity__Code--YDID pathTemplate] and #[+ImportantEntity__Code--YDID handler].
+        #[+Keyword__Contrast--YDID required] #[+Term--YDID properties]: #[+ImportantEntity__Code--YDID HTTP_Method],
+        #[+ImportantEntity__Code--YDID pathTemplate] and #[+ImportantEntity__Code--YDID handler].
       But why the second one called #[+ImportantEntity__Code--YDID "pathTemplate"], not&nbsp;just "path"?
       Because commonly the #[+Term--YDID path] could include the #[+Term--YDID parameters], but since their values
-      are #[+Keyphrase--YDID #[+Keyword--YDID unknown] at advance], they must be specified according to the covention.
+        are #[+Keyphrase--YDID #[+Keyword--YDID unknown] at advance], they must be specified
+        #[+Keyphrase--YDID according to the convention].
 
 
-    //- ─── Defining of Routes with Path Parameters ────────────────────────────────────────────────────────────────────
+    //- ╍╍╍ Defining of Routes with Path Parameters ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
     +Heading--YDF({
       level: 3,
       text: localizedSectioning.routingInYDB.$children.pathParameters.$heading,
@@ -647,10 +647,10 @@ block append SpecificContent
         #[+SecondaryEntity__Code--YDID https://example.com/products/1]).
       However, there is #[+Keyword--YDID no]&nbsp;many frameworks which could do it #[+Term--YDID type-safely].
       To be fair, it is hardly possible to do it with 100% #[+Term--YDID type safety] in the
-        #[+ImportantEntity--YDID TypeScript] — we will consider below why.
+        #[+ImportantEntity--YDID TypeScript] — we will consider below why for the trainees who don't know yet.
       Nevertheless, it is possible not&nbsp;only to avoid the usage of #[+Keyword--YDID detrimental]
-        #[+ImportantEntity__Code--YDID any] type, but also corroborate the casting of more wide types to more narrow
-        ones by the #[+Term--YDID validation].
+        #[+ImportantEntity__Code--YDID any] #[+Term--YDID type], but also corroborate the casting of more wide
+        #[+Term--YDID types] to more narrow ones by the #[+Term--YDID validation].
 
     p.Article-Paragraph.
       To have something to compare it to, let us consider the case with #[+SecondaryEntity--YDID Express.js].
@@ -692,7 +692,7 @@ block append SpecificContent
           #[+Keyword--YDID template], we can specify completely unrelated #[+Term--YDID type]
           (for example, #[+SecondaryEntity__Code--YDID { foo: string; bar: string; }]) and
           #[+ImportantEntity--YDID TypeScript] will #[+Keyword--YDID not] suspect #[+Keyword--YDID anything].
-        #[+Keyword--YDID Fundamentally] this problem can&nbsp;#[+Keyword--YDID not]&nbsp;be solved because the
+        #[+Keyword__Contrast--YDID Fundamentally] this problem can&nbsp;#[+Keyword--YDID not]&nbsp;be solved because the
           #[+Term--YDID type] annotation #[+Keyphrase--YDID ceases to exist] during the the #[+Term--YDID transpiling]
           from #[+ImportantEntity--YDID TypeScript] to #[+ImportantEntity--YDID JavaScript], thus when executing the
           #[+Term--YDID JavaScript code] by the #[+Term__Contrast--YDID Node.js server] the specified type
@@ -700,15 +700,15 @@ block append SpecificContent
           #[+ImportantEntity__Code--YDID request.params] #[+Term--YDID object] corresponding to specified
           #[+Term--YDID type].
         However, the #[+Term--YDID casting] of #[+ImportantEntity__Code--YDID { &lsqb;key: string&rsqb;: string; }] to
-         #[+ImportantEntity__Code--YDID { ID: string; }] must be reinforced by something, and it is primarily
-          a #[+Term--YDID validation].
+         #[+ImportantEntity__Code--YDID { ID: string; }] must be reinforced by something, and it is
+          #[+Keyword--YDID primarily] a #[+Term--YDID validation].
         The #[+SecondaryEntity--YDID Express.js] does&nbsp;#[+Keyword--YDID not]&nbsp;suggest such functionality,
           but there are the third-party solutions like
           #[+Link--YDF({ unendorsedExternalURI: "https://express-validator.github.io/docs" }).Article-Link express-validator].
 
       dt Uncomfortable API
       dd
-        | The #[+ImportantEntity__Code--YDID Express.Request] has whole #[+ImportantEntity--YDID 5]
+        | The #[+SecondaryEntity__Code--YDID Express.Request] #[+Term--YDID type] has whole #[+ImportantEntity--YDID 5]
         |   #[+Term--YDID generic parameters], herewith if we need, for example, the forth one (the
         |   #[+Term--YDID query parameters] represented as the #[+Term--YDID object]), it will required to specify the
         |   previous three ones ever they are not actual for use, so we will have something like
@@ -717,7 +717,7 @@ block append SpecificContent
         +Link--YDF({
           unendorsedExternalURI: sharedExternalLinks.ESLint.plugins.typeScript.top
         }).Article-Link typescript-eslint
-        |   can
+        |   may
         |
         +Link--YDF({
           unendorsedExternalURI: sharedExternalLinks.ESLint.plugins.typeScript.rules.noEmptyObjectType
@@ -725,7 +725,7 @@ block append SpecificContent
         |   about such code.
 
     p.Article-Paragraph.
-      In #[+ImportantEntity--YDID YDB], #[+Keyword--YDID both] problems has solution out of box.
+      #[+ImportantEntity--YDID YDB] suggesting the solutions for #[+Keyword--YDID both] problems out of the box.
 
     +AdmonitionBlock--YDF({
       title: "Careful with Terminology",
@@ -742,7 +742,7 @@ block append SpecificContent
 
         dt Function / Method Parameters
         dd.
-          Usually this kind of #[+Term--YDID parameters] is been associated first when "parameter" work has been said
+          Usually this kind of #[+Term--YDID parameters] is been associated first when "parameter" word is being said
             (in programming context).
           However, this term is being used not&nbsp;only in relation to #[+Term--YDID functions] and
             #[+Term--YDID methods].
