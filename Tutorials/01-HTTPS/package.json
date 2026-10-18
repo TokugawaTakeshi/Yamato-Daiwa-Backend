@@ -7,7 +7,10 @@
     "@yamato-daiwa/backend": "../../MainPackage"
   },
   "devDependencies": {
-    "tsx": "4.20.3",
-    "typescript": "5.8.3"
+    "tsx": "4.23.15",
+    "typescript": "6.0.3"
+  },
+  "allowScripts": {
+    "esbuild": true
   }
 }

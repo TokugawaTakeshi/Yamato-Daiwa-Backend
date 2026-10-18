@@ -36,7 +36,7 @@ block append Metadata
       ]
     });
 
-    RoutingEmulator.setCurrentRoute("tutorials.helloWorld");
+    YDF.RoutingEmulator.setCurrentRoute("tutorials.helloWorld");
 
     LanguageDropDownList__YDF_DK.setLinks({
       english: routing.english.tutorials.$children.helloWorld.$URI,
@@ -56,14 +56,10 @@ block append SpecificContent
   article
 
     //- ━━━ Простейший пример «Привет, мир!» ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    h1.Article-Heading1= localizedRouting.tutorials.$children.helloWorld.$heading
+    h1.Article-Heading1= topHeading
 
-    +AdmonitionBlock--YDF({ decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.warning, SVG_Icon: true }).
-      Структура проекта и код, представленные в этом уроке #[+Keyword--YDID предельно]
-      #[+Keyword__Contrast--YDID упрощены] в целях оптимизации под учебный материал, а потому
-      #[+Keyphrase--YDID #[+Keyword--YDID не]&nbsp;предназначены для продакшена].
-      Чтобы использовать полученные знания на практике, #[+Keyword--YDID необходимо] понять материал урока и
-        адаптировать примеры кода под Ваши задачи и стилистические требования.
+    +TutorialCodeIsNotOpimizedForProductionWarning
+
 
     //- ━━━ Требуемые знания и навыки ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     +Heading--YDF({
@@ -156,16 +152,9 @@ block append SpecificContent
 
         //- TODO Баг YDA: "метода" и "с" слитно
         +CodeViewer-PartialListing--YDF: :code_listing--yda
-          import {
-            Server,
-            Request,
-            Response,
-            ProtocolDependentDefaultPorts,
-            HTTP_Methods
-          } from "@yamato-daiwa/backend";
+          import * as YDB from "@yamato-daiwa/backend";
 
-
-          Server.initializeAndStart({
+          YDB.Server.initializeAndStart({
         +CodeViewer-Explanation--YDF
           | #[+Term--YDID Статический метод] #[+SecondaryEntity__Code--YDID initializeAndStart] #[+Term--YDID класса]
           |   #[+SecondaryEntity__Code--YDID Server] принимает
@@ -195,7 +184,7 @@ block append SpecificContent
           | .
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="2" indentationString="  ")
-          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          HTTP: { port: YDB.ProtocolDependentDefaultPorts.HTTP },
         +CodeViewer-Explanation--YDF.
           #[+ImportantEntity--YDID 80] — значение #[+ImportantEntity__Code--YDID ProtocolDependentDefaultPorts.HTTP] —
             это номер #[+Term--YDID порта] по #[+Keyword--YDID умолчанию]
@@ -209,7 +198,7 @@ block append SpecificContent
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="2" indentationString="  ")
           routing: [
             {
-              HTTP_Method: HTTP_Methods.get,
+              HTTP_Method: YDB.HTTP_Methods.get,
               pathTemplate: "/",
         +CodeViewer-Explanation--YDF.
           Мы будем отправлять ответ на #[+Term--YDID GET-запрос] по #[+ImportantEntity--YDID URI]
@@ -227,7 +216,7 @@ block append SpecificContent
             сервер отправит #[+Term--YDID ответ] с ошибкой «не найдено».
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="4" indentationString="  ")
-          async handler(request: Request, response: Response): Promise<void> {
+          async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
         +CodeViewer-Explanation--YDF
 
           //- TODO Баг YDA: "асинхронной" и "по" слитно

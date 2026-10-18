@@ -1,0 +1,1 @@
+GET http://localhost:80/products?fullOrPartialProductTitle=test&paginationPageNumber=1&itemsCountPerPaginationPage=20&outOfStock&comingSoon=false

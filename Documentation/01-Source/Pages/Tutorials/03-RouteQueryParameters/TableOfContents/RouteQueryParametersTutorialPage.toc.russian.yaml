@@ -1,0 +1,39 @@
+theory:
+
+  $heading: "Теория"
+
+  deserialization:
+
+    $heading: "Десериализация"
+
+  serialization:
+
+    $heading: "Сериализация"
+
+  validation:
+
+    $heading: "Валидация"
+
+queryParametersInYDB:
+
+  $heading: "Параметры поиска в YDB"
+
+  booleanParameters:
+
+    $heading: "Булевские параметры"
+
+  objectParameters:
+
+    $heading: "Объектные параметры"
+
+  arrayedParameters:
+
+    $heading: "Массивные параметры"
+
+  renamingOfKeys:
+
+    $heading: "Переименование ключей"
+
+  multipleDeserializingAlgorithms:
+
+    $heading: "Несколько алгоритмов десериализации"

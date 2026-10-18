@@ -1,0 +1,39 @@
+theory:
+
+  $heading: "理論"
+
+  deserialization:
+
+    $heading: "逆シリアル化"
+
+  serialization:
+
+    $heading: "シリアル化"
+
+  validation:
+
+    $heading: "妥当性確認"
+
+queryParametersInYDB:
+
+  $heading: "YDBに於けるクエリパラメータ"
+
+  booleanParameters:
+
+    $heading: "真偽型パラメータ"
+
+  objectParameters:
+
+    $heading: "オブジェクト型パラメータ"
+
+  arrayedParameters:
+
+    $heading: "配列型パラメータ"
+
+  renamingOfKeys:
+
+    $heading: "キー名前変更"
+
+  multipleDeserializingAlgorithms:
+
+    $heading: "逆シリアル化の複数のアルゴリズム"

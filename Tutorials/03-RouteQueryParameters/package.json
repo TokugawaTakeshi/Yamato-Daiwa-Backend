@@ -1,13 +1,14 @@
 {
   "name": "tutorials-route_query_parameters",
   "private": true,
-  "version": "0.0.3",
+  "version": "0.0.0",
   "dependencies": {
     "@yamato-daiwa/backend": "../../MainPackage",
-    "@yamato-daiwa/es-extensions": "1.7.0"
+    "@yamato-daiwa/es-extensions": "1.8.0",
+    "qs": "6.15.0"
   },
   "devDependencies": {
-    "ts-node": "10.8.1",
-    "typescript": "5.5.4"
+    "ts-node": "10.9.2",
+    "typescript": "5.8.3"
   }
 }

@@ -36,7 +36,7 @@ block append Metadata
       ]
     });
 
-    RoutingEmulator.setCurrentRoute("tutorials.helloWorld");
+    YDF.RoutingEmulator.setCurrentRoute("tutorials.helloWorld");
 
     LanguageDropDownList__YDF_DK.setLinks({
       japanese: routing.japanese.tutorials.$children.helloWorld.$URI,
@@ -56,16 +56,11 @@ block append SpecificContent
   article
 
     //- ━━━ "Hello, world" — The Minimal Example ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    h1.Article-Heading1= localizedRouting.tutorials.$children.helloWorld.$heading
+    h1.Article-Heading1= topHeading
 
-    +ThisPageHasNotBeenCheckedByNativeSpeakersYetWarning
+    +PageNotReadyApology--YDPD({ currentState: PageNotReadyApology__YDPD.States.notCheckedByNativeSpeakers })
 
-    +AdmonitionBlock--YDF({ decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.warning, SVG_Icon: true }).
-      The project structure and the code introduced in this lesson is #[+Keyword--YDID extremely]
-        #[+Keyword__Contrast--YDID simplified] for the optimization to tutorial, thus
-        #[+Keyphrase--YDID #[+Keyword--YDID not]&nbsp;intended to be used in production].
-      To use the knowledge gained in practice, it is #[+Keyword--YDID required] understand the lesson material and
-        adapt the code examples to your tasks and style guides.
+    +TutorialCodeIsNotOpimizedForProductionWarning
 
 
     //- ━━━ Pre-requirement Knowledge and Skills ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -158,16 +153,9 @@ block append SpecificContent
       })
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda
-          import {
-            Server,
-            Request,
-            Response,
-            ProtocolDependentDefaultPorts,
-            HTTP_Methods
-          } from "@yamato-daiwa/backend";
+          import * as YDB from "@yamato-daiwa/backend";
 
-
-          Server.initializeAndStart({
+          YDB.Server.initializeAndStart({
         +CodeViewer-Explanation--YDF
           | The #[+Term--YDID static method] #[+SecondaryEntity__Code--YDID initializeAndStart] of
           |   #[+SecondaryEntity__Code--YDID Server] #[+Term--YDID class] accepts the
@@ -192,7 +180,7 @@ block append SpecificContent
           | .
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="2" indentationString="  ")
-          HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+          HTTP: { port: YDB.ProtocolDependentDefaultPorts.HTTP },
         +CodeViewer-Explanation--YDF.
           The #[+ImportantEntity--YDID 80] — the value of
             #[+ImportantEntity__Code--YDID ProtocolDependentDefaultPorts.HTTP] —
@@ -208,7 +196,7 @@ block append SpecificContent
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="2" indentationString="  ")
           routing: [
             {
-              HTTP_Method: HTTP_Methods.get,
+              HTTP_Method: YDB.HTTP_Methods.get,
               pathTemplate: "/",
         +CodeViewer-Explanation--YDF.
           We will respond to #[+Term--YDID GET-type request] towards #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/]
@@ -220,13 +208,13 @@ block append SpecificContent
             could have other parts #[+Keyword--YDID after] the #[+Term--YDID path] — we will&nbsp;not go into details
             about this to avoid of the oversaturating of this lesson.
           For now, it is important what if we will submit the #[+Term--YDID request] to another #[+Term--YDID route],
-            for example #[+SecondaryEntity__Code--YDID /foo] (corresponding to #[+Term--YDID URI]
+            for the instance #[+SecondaryEntity__Code--YDID /foo] (corresponding to #[+Term--YDID URI]
             #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/foo]) or
             #[+SecondaryEntity__Code--YDID /bar/baz] (corresponding to #[+Term--YDID URI]
             #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/bar/baz]), the server will respond with "not found" error.
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="4" indentationString="  ")
-          async handler(request: Request, response: Response): Promise<void> {
+          async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
         +CodeViewer-Explanation--YDF
 
           p.Article-Paragraph.
@@ -373,8 +361,8 @@ block append SpecificContent
     p.Article-Paragraph.
       Finally, let us see how the framework will behave when we will submit the #[+Term--YDID request] which has&nbsp;no
         the matching in #[+ImportantEntity__Code--YDID routing].
-      For example, in the #[+Term--YDID request] to #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/foo] case, the
-        log will be:
+      For the instance, in the #[+Term--YDID request] to #[+SecondaryEntity__Code--YDID http://127.0.0.1:80/foo] case,
+        the log will be:
 
     +SingleImageViewer--YDF({
       imageURI: "@AssociatedWithPages/Tutorials/00-HelloWorld/Images/ServerErrorLog",

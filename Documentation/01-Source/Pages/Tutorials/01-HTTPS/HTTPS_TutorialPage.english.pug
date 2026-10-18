@@ -31,7 +31,7 @@ block append Metadata
       ]
     });
 
-    RoutingEmulator.setCurrentRoute("tutorials.HTTPS");
+    YDF.RoutingEmulator.setCurrentRoute("tutorials.HTTPS");
 
     LanguageDropDownList__YDF_DK.setLinks({
       japanese: routing.japanese.tutorials.$children.HTTPS.$URI,
@@ -51,16 +51,11 @@ block append SpecificContent
   article
 
     //- ━━━ HTTPS Usage ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    h1.Article-Heading1= localizedRouting.tutorials.$children.HTTPS.$heading
+    h1.Article-Heading1= topHeading
 
-    +ThisPageHasNotBeenCheckedByNativeSpeakersYetWarning
+    +PageNotReadyApology--YDPD({ currentState: PageNotReadyApology__YDPD.States.notCheckedByNativeSpeakers })
 
-    +AdmonitionBlock--YDF({ decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.warning, SVG_Icon: true }).
-      The project structure and the code introduced in this lesson is #[+Keyword--YDID extremely]
-        #[+Keyword__Contrast--YDID simplified] for the optimization to tutorial, thus
-        #[+Keyphrase--YDID #[+Keyword--YDID not]&nbsp;intended to be used in production].
-      To use the knowledge gained in practice, it is #[+Keyword--YDID required] understand the lesson material and
-        adapt the code examples to your tasks and style guides.
+    +TutorialCodeIsNotOpimizedForProductionWarning
 
 
     //- ━━━ Theory ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -154,7 +149,7 @@ block append SpecificContent
     p.Article-Paragraph.
       How we can mae the browser to trust the self-issues certificate?
       The easiest way is the #[+ImportantEntity--YDID mkcert], the cross-platform utility.
-      Although even it has the limitations (for example, at the moment of #[+SecondaryEntity--YDID Spring 2024]
+      Although even it has the limitations (for the instance, at the moment of #[+SecondaryEntity--YDID Spring 2024]
         the #[+SecondaryEntity--YDID Firefox] browser for #[+SecondaryEntity--YDID Windows] has not being supported),
         generally it can make the majority of popular browsers to trust the self-issues #[+Term--YDID certificates] and
         #[+Term--YDID keys] on most popular #[+Term--YDID Operationing Systems].
@@ -244,20 +239,13 @@ block append SpecificContent
       +CodeViewer-TabPanel--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript })
 
         +CodeViewer-PartialListing--YDF: :code_listing--yda
-          import {
-            Server,
-            Request,
-            Response,
-            ProtocolDependentDefaultPorts,
-            HTTP_Methods
-          } from "@yamato-daiwa/backend";
+          import * as YDB from "@yamato-daiwa/backend";
           import Path from "path";
 
-
-          Server.initializeAndStart({
+          YDB.Server.initializeAndStart({
             IP_Address: "127.0.0.1",
             HTTPS: {
-              port: ProtocolDependentDefaultPorts.HTTPS,
+              port: YDB.ProtocolDependentDefaultPorts.HTTPS,
         +CodeViewer-Explanation--YDF.
           The #[+Keyword--YDID default] #[+Keyphrase--YDID for #[+ImportantEntity--YDID HTTPS]] #[+Term--YDID port]
             number is #[+ImportantEntity__Code--YDID 443].
@@ -284,9 +272,9 @@ block append SpecificContent
         +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="2" indentationString="  ")
           routing: [
               {
-                HTTP_Method: HTTP_Methods.get,
+                HTTP_Method: YDB.HTTP_Methods.get,
                 pathTemplate: "/",
-                async handler(_request: Request, response: Response): Promise<void> {
+                async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
                   return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
                 }
               }

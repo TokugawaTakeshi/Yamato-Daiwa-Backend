@@ -1,14 +1,15 @@
-/* ─── Native Modules ─────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ━━━ < Imports ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ┅┅┅ Native Modules ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
 import Crypto from "crypto";
 
-/* ─── Framework's Constituents ───────────────────────────────────────────────────────────────────────────────────── */
+/* ┅┅┅ Framework's Constituents ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
 import ClassTypeMiddleware from "../../ClassTypeMiddleware";
-import type Request from "../../../Request/Request";
-import type Response from "../../../Response/Response";
+import type Request from "../../../Request";
+import type Response from "../../../Response";
 import type Session from "../../../AccessControl/Session";
 import Middleware from "../../Middleware";
 
-/* ─── General Utils ──────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ┅┅┅ General Utils ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
 import {
   DataRetrievingFailedError,
   isNotNull,
@@ -16,6 +17,7 @@ import {
   Logger,
   type ParsedJSON_Object
 } from "@yamato-daiwa/es-extensions";
+/* ━━━ Imports > ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 
 abstract class SessionManagerMiddleware<
@@ -35,7 +37,7 @@ abstract class SessionManagerMiddleware<
     {
       secretString,
       sessionID_CookieKey = "SESSION_ID",
-      mustRefreshSessionOnEachAccess = true,
+      mustRefreshSessionOnEachAccess,
       mustCreateSessionDataForNonAuthenticatedUsers
     }: Readonly<{
       secretString: string;
@@ -50,6 +52,7 @@ abstract class SessionManagerMiddleware<
     this.mustRefreshSessionOnEachAccess = mustRefreshSessionOnEachAccess;
     this.mustCreateSessionDataForNonAuthenticatedUsers = mustCreateSessionDataForNonAuthenticatedUsers;
   }
+
 
   /* ━━━ Protected Abstract Methods ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   protected abstract getSessionDataByID(sessionID: string): Promise<SessionData | null>;
@@ -132,11 +135,6 @@ abstract class SessionManagerMiddleware<
       `${ universallyUniqueIdentifier }${ Crypto.hash("sha256", universallyUniqueIdentifier + this.secretString) }`
     );
   }
-
-}
-
-
-namespace SessionManagerMiddleware {
 
 }
 

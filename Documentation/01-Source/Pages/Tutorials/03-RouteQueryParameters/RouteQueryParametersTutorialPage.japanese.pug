@@ -1,0 +1,735 @@
+extends ../../../../node_modules/@yamato-daiwa/programming_documentation/Layouts/TwoColumns/TwoColumnsLayout.pug
+
+
+block append Requirements
+
+  include ../../../SharedAssets/Markup/SharedAssets.japanese.pug
+  include ../../../SharedComponents/SharedComponents.japanese.pug
+
+
+block append Metadata
+
+  -
+
+    const {
+      $heading: topHeading,
+      $sectioning: localizedSectioning
+    } = routing.japanese.tutorials.$children.routeQueryParameters;
+
+    RegularWebPageTemplate__YDF.configure({
+      metadata: {
+        title: buildHTML_PageTitle(topHeading),
+        description:
+          "Node.jsフレームワーク「Yamato Daiwa Backend」（略称：YDB）では、URIクエリパラメータを柔軟に扱う事ができ、" +
+            "特にデセリアライズやバリデーションの設定が可能である。"
+      },
+      stylesSheetsURIs: [
+        "$CommonStyles",
+        "$LayoutsStyles/TwoColumns/TwoColumnsLayout.css",
+        "$PreMadesStyles",
+        "@CustomizedExternalComponents"
+      ]
+    });
+
+    YDF.RoutingEmulator.setCurrentRoute("tutorials.routeQueryParameters");
+
+    LanguageDropDownList__YDF_DK.setLinks({
+      english: routing.english.tutorials.$children.routeQueryParameters.$URI,
+      russian: routing.russian.tutorials.$children.routeQueryParameters.$URI
+    });
+
+
+block append HeadScripts
+
+  if __IS_PRODUCTION_BUILDING_MODE__
+
+    +GoogleAnalyticsScript
+
+
+block append SpecificContent
+
+  article
+
+    //- ━━━ ルート・クエリ・パラメータ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    h1.Article-Heading1= topHeading
+
+    +TutorialCodeIsNotOpimizedForProductionWarning
+
+    p.Article-Paragraph
+      +Link--YDF({ internalURI: localizedRouting.tutorials.$children.routingAndControllers.$URI }) 前回のレッスン
+      |   では、#[+Term--YDID ルートパスパラメータ]の扱い方について詳しく解説した。
+      | レッスンを提供したで受講するという強い推薦通り受講した場合、下記の例に於いて#[+Term--YDID クエリパラメータ]の取り扱いに馴染みが有ると感じられるだろう。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        export default class ProductController extends Controller {
+
+          @Controller.RouteHandler({
+            HTTP_Method: HTTP_Methods.get,
+            pathTemplate: "products"
+          })
+          public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+            const {
+              fullOrPartialProductTitle,
+              paginationPageNumber,
+              itemsCountPerPaginationPage,
+            }: Readonly<{
+              fullOrPartialProductTitle: string;
+              paginationPageNumber: number;
+              itemsCountPerPaginationPage: number;
+            }> = request.validateAndProcessURI_QueryParameters({
+              fullOrPartialProductTitle: {
+                type: String,
+                isUndefinedForbidden: false,
+                isNullForbidden: true,
+                minimalCharactersCount: 2
+              },
+              paginationPageNumber: {
+                preValidationModifications: convertPotentialStringToNumberIfPossible,
+                type: Number,
+                isUndefinedForbidden: true,
+                isNullForbidden: true,
+                isNaN_Forbidden: true,
+                numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+              },
+              itemsCountPerPaginationPage: {
+                preValidationModifications: convertPotentialStringToNumberIfPossible,
+                type: Number,
+                isUndefinedForbidden: true,
+                isNullForbidden: true,
+                isNaN_Forbidden: true,
+                numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+              }
+            });
+
+            console.table({
+              name: fullOrPartialProductTitle,
+              page: paginationPageNumber,
+              size: itemsCountPerPaginationPage,
+            });
+
+            return response.submitWithSuccess({
+              HTML_Content: "<h1>Products list</h1>"
+            });
+
+          }
+
+        }
+
+    p.Article-Paragraph
+      | 然し、#[+Term--YDID クエリパラメータ]には特有の細かな点が有る為、それらに関する内容は此の別のレッスンとして切り出している。
+
+
+    //- ┅┅┅ 理論 ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅
+    +Heading--YDF({
+      level: 2,
+      text: localizedSectioning.theory.$heading,
+      HTML_ID: localizedSectioning.theory.$anchor
+    }).Article-Heading2
+
+    p.Article-Paragraph.
+      #[+Keyword--YDID 最初]に、#[+ImportantEntity--YDID URI]の#[+Keyword--YDID 一部]として、#[+Term--YDID クエリパラメータ]は
+        #[+Term--YDID 「query」]（クエリ）又は#[+Term--YDID 「search」]（サーチ）と呼ばれる#[+Keyword--YDID 単一の]
+        #[+Term--YDID 文字列]である。
+      直ぐに分かる様に、#[+Keyword--YDID 何方の]用語も#[+Keyword--YDID 可成り]#[+Keyword__Contrast--YDID 多義的]である為、
+        それらを使用する際は#[+ImportantEntity--YDID URI]の#[+Keyword--YDID 要素]である事を明示する#[+Keyword--YDID 必要]がある。
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/03-RouteQueryParameters/Images/Tutorials-QueryParameters-1",
+      imageAlternateText:
+          "クエリ（探索）パラメータは、URIのパスから疑問符で区切られた部分である。" +
+          "その後には、例えば番号記号で区切られたハッシュ等、URIの他の部分が続く事も有るが、ハッシュがサーバーサイドでは扱われていなく、クライアントサイドと関係している。",
+      autoAspectRatioByYDA: true
+    })
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID URI]の#[+Term--YDID 「探索」]と呼ばれる部分は、前回のレッスンで詳しく説明した
+        #[+Term--YDID 「パス」]と呼ばれる部分から#[+ImportantEntity--YDID ?]に依って区切られている。
+      其の後には、#[+Keyphrase--YDID #[+Term--YDID 文字列]形式で表現された]#[+Term__Contrast--YDID 連想配列]が続く。
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/03-RouteQueryParameters/Images/Tutorials-QueryParameters-2",
+      imageAlternateText:
+          "URIのクエリ（探索）パラメータでは、各キーは対応する値と「=」記号で区切られ、「キーと値」のペアは互いに「&」記号で区切られる。",
+      autoAspectRatioByYDA: true
+    })
+
+    ul.Article-UnorderedList
+
+      li.
+        #[+Keyword--YDID 各]#[+Term--YDID キー]は、#[+Keyphrase--YDID 該当している]#[+Term--YDID 値]と
+          #[+ImportantEntity--YDID =]記号で区切られる。
+
+      li.
+        #[+Term--YDID 「キーと値」のペア]は、互いに#[+ImportantEntity--YDID &]記号で区切られる。
+
+    p.Article-Paragraph.
+      #[+Term--YDID クエリパラメータ]は此の形式でクライアントからサーバー（又は別のサーバー）へ送信されるが、#[+Term--YDID リクエスト]を処理する際に
+        そのままでは扱いが厳しい。
+      其の為、特定の#[+Term--YDID ルート]で#[+Term--YDID クエリパラメータ]が期待される場合、サーバー側でリクエストを処理する際にそれらを
+        #[+Keyword--YDID 解析]した上で扱いやすい形に変換する必要が有る。
+
+    p.Article-Paragraph.
+      問題が始まるのは此処だ。
+      実は、特定の#[+Term--YDID クエリパラメータ]をどの様に解釈すべきかを規定する規格が存在している訳では#[+Keyword--YDID ない]。
+      #[+Term--YDID ルート]#[+Keyword--YDID パス]#[+Term--YDID パラメータ]のだと、殆どが#[+Term--YDID 文字列]又は#[+Term--YDID 数値]
+        を扱うが、 #[+Keyword--YDID クエリ]#[+Term--YDID パラメータ]のだと、#[+Term--YDID 真偽値型]や#[+Term--YDID 配列]
+        （#[+Term--YDID 指数配列]と#[+Term--YDID 連想配列]の#[+Keyword--YDID 両方]）、場合に依っては多階層の#[+Term--YDID 配列]や
+        #[+Term--YDID オブジェクト]さえも求められる。
+      無論、多階層の#[+Term--YDID 配列]・#[+Term--YDID オブジェクト]が#[+ImportantEntity--YDID API]を複雑化しているから避けるのが最善だが、
+        サードパーティのサービスを使用する場合や重要な顧客がそのような複雑な#[+ImportantEntity--YDID API]を求められた様な場合には我々にとって
+        非常に変えにくい事です。
+
+
+    //- ╍╍╍ 逆シリアル化 ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.deserialization.$heading,
+      HTML_ID: localizedSectioning.theory.$children.deserialization.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      #[+Term--YDID ルートパスパラメータ]の場合と同様に、#[+Keyword--YDID 最初]は#[+Keyword__Contrast--YDID すべての]
+        #[+Term--YDID クエリパラメータ]は#[+Keyword--YDID 文字列]（正確には#[+Keyword--YDID 単一の]#[+Term--YDID 文字列]の
+        #[+Keyword--YDID 部分文字列]）である。
+      #[+Term--YDID ルートパスパラメータ]と同じ様に、#[+Term--YDID クエリパラメータ]も扱いやすい様に通常の#[+Term--YDID オブジェクト]に変換出来る事が
+        望ましい。
+      #[+Term--YDID クエリパラメータ]の様な、単一の#[+Term--YDID 文字列]として提示された配列系のデータを#[+Term--YDID オブジェクト]に変換する処理を
+        #[+DefinableTerm--YDID 逆シリアル化]と呼ぶ。
+      此れに対して、ネイティブの#[+ImportantEntity--YDID API]では何が提供されているだろうか。
+
+    p.Article-Paragraph.
+      最初の手段は、#[+Link--YDF({ unendorsedExternalURI: "https://developer.mozilla.org/ja/docs/Web/API/URL" }) WHATWG URL]
+        である。
+      #[+ImportantEntity--YDID WHATWG]について言及しないといけなかった理由は、古いバージョンの#[+ImportantEntity--YDID Node.js]では別の
+        #[+ImportantEntity--YDID URL]実装が使われていて、現在ではレガシー・利用非推奨となっている事。
+      此処で早速、何が#[+ImportantEntity--YDID URL]で何が#[+ImportantEntity--YDID URI]なのかという上述の混乱が始める。
+      #[+Keyword--YDID ネイティブ]の#[+Term--YDID リクエスト]#[+Term--YDID オブジェクト]（#[+ImportantEntity__Code--YDID HTTP.Request型]）
+        は#[+ImportantEntity__Code--YDID url]という#[+Term--YDID プロパティ]を持っており、其の値は
+        #[+Keyphrase--YDID #[+Keyword--YDID パス]から始まる]#[+ImportantEntity--YDID URI]の#[+Keyword--YDID 一部]である。
+      一方、#[+ImportantEntity--YDID WHATWG URL]#[+Term--YDID オブジェクト]は、
+      #[+SecondaryEntity__Code--YDID http://localhost:80/]の様な#[+Term--YDID オリジン]が指定されている場合に
+        #[+Keyword--YDID のみ]作成出来る。
+      #[+ImportantEntity--YDID @types/node]パッケージ（バージョン#[+ImportantEntity--YDID 22.15.31]で確認）の
+        #[+ImportantEntity__Code--YDID HTTP.Request.url]#[+Term--YDID プロパティ]の#[+ImportantEntity--YDID JSDoc]説明を見ると、
+        次の例が記載。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        new URL(`http://${process.env.HOST ?? 'localhost'}${request.url}`);
+
+    p.Article-Paragraph.
+      此の例からは、「#[+ImportantEntity--YDID URL]とは#[+ImportantEntity__Code--YDID request.url]に#[+Term--YDID オリジン]を加えたもの」
+        であるかの様に読み取れる。
+      此れは論理的な観点からは不条理であり、「車のハンドルとは、ハンドルに加えてペダルがあるものだ」と言っている様なものだ。
+      とは言え、此の#[+ImportantEntity--YDID API]の開発影響が無い我々にとって、現状を受け入れるしかない。
+
+    p.Article-Paragraph.
+      #[+Term--YDID クエリパラメータ]の話に戻ろう。
+      #[+ImportantEntity--YDID WHATWG URL]#[+Term--YDID オブジェクト]には、#[+Term--YDID クエリパラメータ]を扱う
+        #[+ImportantEntity--YDID 2つ]の#[+Term--YDID プロパティ]がある。
+
+    dl.Article-DescriptionList
+
+      dt #[+ImportantEntity__Code--YDID search]
+      dd.
+        全ての#[+Term--YDID クエリパラメータ]が表現されている#[+ImportantEntity--YDID ?]から始まる#[+Term--YDID 部分文字列]。
+        #[+SecondaryEntity__Code--YDID "https://example.com/?alpha=foo&bravo=bar"]を例にとると、
+        #[+ImportantEntity__Code--YDID search]プロパティの値は#[+SecondaryEntity__Code--YDID "?alpha=foo&bravo=bar"]に成る。
+
+      dt #[+ImportantEntity__Code--YDID searchParams]
+      dd
+        +Link--YDF({
+          unendorsedExternalURI: "https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Map"
+        }) Map
+        |   に似た、#[+Term--YDID 「連想配列」]型の特別な#[+Term--YDID コレクション]である。
+        | 其のキーと値はループで反復処理でき、特定の値へのアクセスは#[+ImportantEntity--YDID Map]と同様に
+        |   #[+ImportantEntity__Code--YDID get]#[+Term--YDID メソッド]
+        |  （例：#[+SecondaryEntity__Code--YDID searchParams.get("alpha")]）を使用して行う。
+        | 此の#[+Term--YDID メソッド]は#[+ImportantEntity__Code--YDID undefined]を返す可能性がある為、厳密な設定の
+        |   #[+ImportantEntity--YDID TypeScript]では、値を使用する前に先ず#[+ImportantEntity__Code--YDID undefined]チェックを行う
+        |   事が義務付けられ、悪い事より良い事だと、#[+ImportantEntity--YDID YDB]開発側の意見。
+
+    p.Article-Paragraph.
+      此の様に、#[+ImportantEntity__Code--YDID searchParams]#[+Term--YDID コレクション]は我々が必要としているものに最も近いが、
+      含まれる#[+Keyword--YDID 全ての]#[+Term--YDID クエリパラメータ]は#[+Keyword--YDID 文字列]型である。
+      例えば、
+        #[+SecondaryEntity__Code--YDID ?fullOrPartialProductTitle=test&paginationPageNumber=1&itemsCountPerPaginationPage=20]
+        の場合、#[+ImportantEntity__Code--YDID searchParams]#[+Term--YDID プロパティ]の値の出力は次の様になる。
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+          'fullOrPartialProductTitle' => 'test',
+          'paginationPageNumber' => '1',
+          'itemsCountPerPaginationPage' => '20' }
+
+    p.Article-Paragraph
+      | もう一つの選択肢は、ネイティブモジュールの
+      |   #[+Link--YDF({ unendorsedExternalURI: "https://nodejs.org/docs/latest-v22.x/api/querystring.html" }) querystring]
+      |   である。
+      | #[+ImportantEntity--YDID WHATWG URL]とは異なり、此れは#[+ImportantEntity--YDID URI]全体では#[+Keyword--YDID なく]、
+      |   #[+Keyphrase--YDID #[+Term--YDID 疑問符]を#[+Keyword--YDID 含まない]]#[+Term--YDID クエリ部分文字列]
+      |   #[+Keyword--YDID のみ]を扱う。
+      | 例えば、#[+ImportantEntity__Code--YDID parse]#[+Term--YDID メソッド]
+      |  （#[+ImportantEntity__Code--YDID decode]という#[+Keyword--YDID エイリアス]有り）に
+      | 　　#[+Term--YDID 疑問符]から始まる#[+Term--YDID 文字列]を渡すと、#[+Term--YDID 疑問符]は#[+Keyword__Contrast--YDID 最初の]
+      |   #[+Term--YDID クエリパラメータ]の#[+Keyword--YDID 一部]として認識されてしまう。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import Querystring from "node:querystring";
+
+        console.log(
+          Querystring.parse(
+            "?fullOrPartialProductTitle=test&" +
+              "paginationPageNumber=1&" +
+              "itemsCountPerPaginationPage=20"
+          )
+        );
+
+    +ConsoleOutput--YDF.
+      [Object: null prototype] {
+        '?fullOrPartialProductTitle': 'test',
+        paginationPageNumber: '1',
+        itemsCountPerPaginationPage: '20'
+      }
+
+    p.Article-Paragraph.
+      又、値を囲んでている括弧を見て、#[+ImportantEntity--YDID WHATWG URL]の場合と同様に、数値が自動的に数値型に
+        #[+Keyword--YDID 変換されない]事も分かる。
+      然し、#[+ImportantEntity--YDID WHATWG URL]とは異なり、#[+ImportantEntity--YDID querystring]なら、#[+Term--YDID 配列]を
+        認識している。
+      此処で、前述の全ての#[+Term--YDID クエリパラメータ]に加えて、識別子が#[+SecondaryEntity--YDID 1]と#[+SecondaryEntity--YDID 2]の
+        カテゴリの製品のみを検索したいとしよう。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "fullOrPartialProductTitle=test&" +
+            "paginationPageNumber=1&" +
+            "itemsCountPerPaginationPage=20&" +
+            "categoryID=1&" +
+            "categoryID=2";
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID WHATWG URL]は、#[+Term--YDID コレクション]に#[+Keyword--YDID 同じ]キーを持つ#[+Keyword--YDID 2つの]
+        #[+Term--YDID 要素]を追加する。
+      上記は、キーの重複が#[+Keyword--YDID 不可能]な#[+ImportantEntity--YDID Map]との重要な違いである。
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+        'fullOrPartialProductTitle' => 'test',
+        'paginationPageNumber' => '1',
+        'itemsCountPerPaginationPage' => '20',
+        'categoryID' => '1',
+        'categoryID' => '2' }
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID querystring]の場合#[+SecondaryEntity__Code--YDID categoryID]#[+Term--YDID プロパティ]の値として
+        #[+Term--YDID 配列]を設定する。
+
+    +ConsoleOutput--YDF.
+      [Object: null prototype] {
+        fullOrPartialProductTitle: 'test',
+        paginationPageNumber: '1',
+        itemsCountPerPaginationPage: '20',
+        categoryID: [ '1', '2' ]
+      }
+
+    p.Article-Paragraph.
+      然し、[+Term__Contrast--YDID 配列]をどの様に#[+Term--YDID デセリアライズ]すべきかを一義的に定める規格が#[+Keyword--YDID 無い]ので、
+        #[+Term--YDID クエリ部分文字列]内でのキーの繰り返しが#[+ImportantEntity--YDID querystring]ネイティブ。モジュールが理解出来る形式
+        ではあるが、其れが唯一の形式では#[+Keyword--YDID ない]事を忘れてはならない。
+      例えば、角括弧と#[+Term--YDID 配列の明示的指数]を使用した形式が存在している。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "fullOrPartialProductTitle=test&" +
+            "paginationPageNumber=1&" +
+            "itemsCountPerPaginationPage=20&" +
+            "categoryID[0]=1&" +
+            "categoryID[1]=2";
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID WHATWG URL]にも#[+ImportantEntity__Code--YDID querystring]にも、此の形式は理解
+        #[+Keyword--YDID 出来ない]。
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+        'fullOrPartialProductTitle' => 'test',
+        'paginationPageNumber' => '1',
+        'itemsCountPerPaginationPage' => '20',
+        'categoryID[0]' => '1',
+        'categoryID[1]' => '2' }
+
+      [Object: null prototype] {
+        fullOrPartialProductTitle: 'test',
+        paginationPageNumber: '1',
+        itemsCountPerPaginationPage: '20',
+        'categoryID[0]': '1',
+        'categoryID[1]': '2'
+      }
+
+    p.Article-Paragraph.
+      #[+Term--YDID オブジェクト]については更に状況が悪く、#[+ImportantEntity--YDID WHATWG URL]も#[+ImportantEntity--YDID querystring]も、
+        #[+Keyword--YDID オブジェクト型の]#[+Term--YDID クエリパラメータ]として普及している形式を#[+Keyword--YDID 一切]理解
+        #[+Keyword--YDID しない]。
+      例として、パギナシオンを担当している
+        #[+SecondaryEntity__Code--YDID paginationPageNumber]と#[+SecondaryEntity__Code--YDID itemsCountPerPaginationPage]
+        という2つの#[+Term--YDID パラメータ]を考えてみよう。
+      これらを#[+SecondaryEntity__Code--YDID pagination]#[+Term--YDID オブジェクト]に纏めてみる。
+      最初の構文パターンは、オブジェクトの#[+Term--YDID プロパティ]キーを角括弧で指定する方法である。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "fullOrPartialProductTitle=test&" +
+            "pagination[pageNumber]=1&" +
+            "pagination[itemsCountPerPage]=20";
+
+    p.Article-Paragraph.
+      前述の#[+Term--YDID クエリパラメータ]処理専用のモジュールは、上記を次の様にデセリアライズする。
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+        'fullOrPartialProductTitle' => 'test',
+        'pagination[pageNumber]' => '1',
+        'pagination[itemsCountPerPage]' => '20' }
+
+      [Object: null prototype] {
+        'fullOrPartialProductTitle': 'test',
+        'pagination[pageNumber]': '1',
+        'pagination[itemsCountPerPage]': '20'
+      }
+
+    p.Article-Paragraph.
+      見ての通り、入れ子の#[+Term--YDID オブジェクト]は作成されず。
+      ドット区切りの構文に代えても同じ効果。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "fullOrPartialProductTitle=test&" +
+            "pagination.pageNumber=1&" +
+            "pagination.itemsCountPerPage=20";
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+        'fullOrPartialProductTitle' => 'test',
+        'pagination.pageNumber' => '1',
+        'pagination.itemsCountPerPage' => '20' }
+
+      [Object: null prototype] {
+        '?fullOrPartialProductTitle': 'test',
+        'pagination.pageNumber': '1',
+        'pagination.itemsCountPerPage': '20'
+      }
+
+    p.Article-Paragraph.
+      最後に、#[+Keyword--YDID 真偽値の]#[+Term--YDID クエリパラメータ]を考察。
+      簡単に言うと、#[+ImportantEntity--YDID WHATWG URL]にせよ#[+ImportantEntity--YDID querystring]にせよ
+        #[+ImportantEntity--YDID URI]内の#[+ImportantEntity__Code--YDID true]・#[+ImportantEntity__Code--YDID false]は
+        #[+Keyword--YDID 単なる]#[+Keyword__Contrast--YDID 文字列]に過ぎない。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "outOfStock=true&" +
+            "comingSoon=false&" +
+            "unavailableInUserRegion";
+
+    +ConsoleOutput--YDF.
+      URLSearchParams { 'outOfStock' => 'true', 'comingSoon' => 'false', 'unavailableInUserRegion' => '' }
+
+      [Object: null prototype] {
+        'outOfStock': 'true',
+        comingSoon: 'false',
+        unavailableInUserRegion: ''
+      }
+
+    p.Article-Paragraph.
+      #[+Keyword--YDID 一部の]規約に於いて、#[+Keyword--YDID 真偽値]の#[+Term--YDID クエリパラメータ]が明示的な値を持たない場合
+        （例えば上記の#[+SecondaryEntity__Code--YDID unavailableInUserRegion]）が有り、其の場合は
+        #[+ImportantEntity__Code--YDID true]として解釈され、そもそも#[+ImportantEntity__Code--YDID URI]に対応するキーがない場合は
+        #[+ImportantEntity__Code--YDID false]に相当する。
+      大事な事について繰り返しにはなるが、上記も規格では#[+Keyword--YDID なく]、#[+Keyphrase--YDID 可能な規約の中一つに過ぎない]。
+
+
+    //- ╍╍╍ シリアル化 ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.serialization.$heading,
+      HTML_ID: localizedSectioning.theory.$children.serialization.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      #[+Keyphrase--YDID #[+Term--YDID クエリパラメータ]に関して]、#[+DefinableTerm--YDID シリアライズ]とは、
+        #[+Term--YDID オブジェクト]形式で表現された#[+Term--YDID 探索パラメータ]を、#[+ImportantEntity--YDID URI]の有効な一部となる
+        #[+Term--YDID 文字列]に#[+Keyword--YDID 変換]することを指す。
+      上記はサーバーサイドよりもクライアントサイドの開発に関わる内容だが、サーバーが他のサーバーに#[+Term--YDID HTTPリクエスト]を送信する事も有り、
+        此の場合#[+Term__Contrast--YDID クエリパラメータ]の#[+Term--YDID シリアル化]がサーバー開発にも関係が有る。
+
+    p.Article-Paragraph.
+      此処で非常に重要な点がもう一つある。
+      一方で、完全に自明的な事ではあるが、プログラマー（特に初心者）は見落としがちだ。
+
+    +AdmonitionBlock--YDF({
+      title: "当然だが、実務で見落とされがちな点",
+      SVG_Icon: true,
+      geometricVariation: AdmonitionBlock__YDF.GeometricVariations.stickyNoteLike,
+      decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.error
+    }).
+      #[+Term--YDID シリアル化]と#[+Term--YDID 逆シリアル化]は#[+Keyword--YDID 対称的]でなければならない。
+
+    p.Article-Paragraph.
+      つまり、#[+Term--YDID オブジェクト]形式の#[+Term__Contrast--YDID クエリパラメータ]を#[+Term--YDID シリアル化]した上で再び
+        #[+Term--YDID 逆シリアル化]した場合、得られる#[+Keyword--YDID 逆シリアル化]した#[+Term--YDID オブジェクト]は、
+        最初のものと#[+Keyword__Contrast--YDID 同等]でなければならない。
+      厳密に言うと、#[+Keyphrase--YDID #[+ImportantEntity--YDID JavaScript]の観点から]は2つの#[+Keyword--YDID 独立した]
+        #[+Term--YDID オブジェクト]になるが、全てのキーと値の#[+Term--YDID 遅り]は同一である必要がある（全ての子オブジェクトを含めて）。
+
+    p.Article-Paragraph.
+      フロントエンドとバックエンドで同じ言語が使用されている場合、同じライブラリ（例えば #[+ImportantEntity--YDID qs]）を
+        使用する事で、此の対称性を確保する事ははるかに容易に成る。
+
+
+    //- ╍╍╍ バリデーション ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.validation.$heading,
+      HTML_ID: localizedSectioning.theory.$children.validation.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      #[+Keyphrase--YDID 他の外部データの種類と同様に]、#[+Term--YDID クエリパラメータ]も使用の前に
+        #[+Term--YDID バリデーション]を#[+Keyword--YDID 行わなければならない]。
+      ネイティブの#[+ImportantEntity--YDID Node.js]には其の様な機能は#[+Keyword--YDID なく]、そもそもバリデーションは実践で強く求められるものの、
+        多くの規約を伴う高レベルな課題であるため、言語レベルでサポートされている事は稀である。
+      #[+SecondaryEntity--YDID Express.js]尚の一部のフレームワークにも#[+Term--YDID クエリパラメータ]のバリデーションは含まれておらず、
+        #[+SecondaryEntity--YDID query-validation]や#[+SecondaryEntity--YDID ajv]の様なサードパーティ製ライブラリが使用される。
+
+
+
+    //- ┅┅┅ YDBにおける探索パラメータ ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅
+    +Heading--YDF({
+      level: 2,
+      text: localizedSectioning.queryParametersInYDB.$heading,
+      HTML_ID: localizedSectioning.queryParametersInYDB.$anchor
+    }).Article-Heading2
+
+    p.Article-Paragraph.
+      以前、前回のレッスンの#[+SecondaryEntity__Code--YDID ProductController]#[+Term--YDID コントローラ]の
+        #[+SecondaryEntity__Code--YDID generateProductsPage] #[+Term--YDID メソッド]は、「Products list（「商品一覧」）」という内容の
+        #[+Term--YDID HTMLヘッダー]を返すだけだった。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      }): :code_listing--yda
+        export default class ProductController extends Controller {
+
+          @Controller.RouteHandler({
+            HTTP_Method: HTTP_Methods.get,
+            pathTemplate: "products"
+          })
+          public async generateProductsPage(_request: Request, response: Response): Promise<void> {
+            return response.submitWithSuccess({
+              HTML_Content: "<h1>Products list</h1>"
+            });
+          }
+
+          // ...
+
+        }
+
+    p.Article-Paragraph.
+      将来的には勿論、此れは本格的な#[+Term--YDID HTMLページ]に無い、商品一覧をフィルタリング出来る様に成る。
+      現時点では、#[+Term--YDID クエリパラメータ]を#[+Term--YDID 逆シリアル化]してバリデーションする事に集中しよう。
+      #[+Keyword--YDID 最初]に使用する#[+Term--YDID クエリパラメータ]は、上記の理論節と同じものとする。
+
+    dl.Article-DescriptionList
+
+      dt: +SecondaryEntity__Code--YDID fullOrPartialProductTitle
+      dd 商品名の全部または一部。
+
+      dt: +SecondaryEntity__Code--YDID paginationPageNumber
+      dd ページネーションのページ番号。#[+Term--YDID 自然数]が期待される。
+
+      dt: +SecondaryEntity__Code--YDID itemsCountPerPaginationPage
+      dd 1ページあたりの商品数。#[+Term--YDID 自然数]が期待される。
+
+    p.Article-Paragraph.
+      パフォーマンス最適化上、#[+ImportantEntity--YDID YDB]は#[+Keyphrase--YDID 要求される迄]#[+Term--YDID クエリパラメータ]を
+        #[+Term--YDID 逆シリアル化]#[+Keyword--YDID しない]。
+      正確には、#[+ImportantEntity__Code--YDID request]#[+Term--YDID オブジェクト]には#[+ImportantEntity--YDID URI]という
+        #[+Term--YDID フィールド]が有り、此れは上記の理論節で触れた#[+ImportantEntity--YDID WHATWG URL]と同じもの、
+        但しサーバーサイド開発には関係ない#[+ImportantEntity__Code--YDID hash]プロパティは#[+Keyword--YDID 除外]されている。
+      然し、前述の通り、#[+ImportantEntity--YDID WHATWG URL]の#[+Term--YDID デセリアライズ]は#[+Keyword__Contrast--YDID 文字列型]
+        #[+Term--YDID のみ]をサポートしているが、今回のケースの様に不十分な場合が有る。
+      基本的な#[+Term--YDID デセリアライズ]とデータのバリデーションを行うには、#[+ImportantEntity__Code--YDID request]の
+        #[+ImportantEntity__Code--YDID validateAndProcessURI_QueryParameters]#[+Term--YDID メソッド]を、
+        #[+ImportantEntity--YDID RawObjectDataProcessor]形式で制約を#[+Keyword--YDID 明示して]呼び出す必要が有る。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      }): :code_listing--yda
+        @Controller.RouteHandler({
+          HTTP_Method: HTTP_Methods.get,
+          pathTemplate: "products"
+        })
+        public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+          const {
+            fullOrPartialProductTitle,
+            paginationPageNumber,
+            itemsCountPerPaginationPage,
+          }: Readonly<{
+            fullOrPartialProductTitle: string;
+            paginationPageNumber: number;
+            itemsCountPerPaginationPage: number;
+          }> = request.validateAndProcessURI_QueryParameters({
+            fullOrPartialProductTitle: {
+              type: String,
+              isUndefinedForbidden: false,
+              isNullForbidden: true,
+              minimalCharactersCount: 2
+            },
+            paginationPageNumber: {
+              preValidationModifications: convertPotentialStringToNumberIfPossible,
+              type: Number,
+              isUndefinedForbidden: true,
+              isNullForbidden: true,
+              isNaN_Forbidden: true,
+              numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+            },
+            itemsCountPerPaginationPage: {
+              preValidationModifications: convertPotentialStringToNumberIfPossible,
+              type: Number,
+              isUndefinedForbidden: true,
+              isNullForbidden: true,
+              isNaN_Forbidden: true,
+              numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+            }
+          });
+
+          console.table({
+            fullOrPartialProductTitle,
+            paginationPageNumber,
+            itemsCountPerPaginationPage
+          });
+
+          return response.submitWithSuccess({
+            HTML_Content: "<h1>Products list</h1>"
+          });
+
+        }
+
+    p.Article-Paragraph.
+      規定では#[+ImportantEntity--YDID YDB]は#[+Link--YDF({ endorsedExternalURI: "https://www.npmjs.com/package/qs" }) qs]
+        ライブラリの#[+ImportantEntity__Code--YDID parse]#[+Term--YDID メソッド]を#[+Term--YDID デセリアライザ]として使用する。
+      此の#[+Term--YDID メソッド]は、#[+Keyphrase--YDID サポートされている記法の範囲内であれば（設定も可能）]、#[+Keyword--YDID 多層]
+        #[+Term--YDID オブジェクト]や#[+Term--YDID 配列]も扱う事が出来る。
+      それでも、此のライブラリは#[+Keyword--YDID 自動的に]#[+Term--YDID 文字列]を#[+Term--YDID 数値]に変換#[+Keyword--YDID しない]。
+      此れは、各#[+Term--YDID 文字列]の解析に計算リソースを浪費しない為であり、寧ろ好ましい事と言える。
+
+    p.Article-Paragraph.
+      #[+Term--YDID 逆シリアル化]が終わり次第、得られた#[+Term--YDID オブジェクト]は#[+ImportantEntity--YDID RawObjectProcessor]に渡される。
+      #[+ImportantEntity--YDID RawObjectProcessor]は#[+Term--YDID オブジェクト]のバリデーションだけでなく、必要に応じて変換する事も出来る。
+      但し勿論、変換やバリデーションは#[+Term--YDID 逆シリアル化]のアルゴリズムを#[+Keyword--YDID 考慮しなければならない]。
+
+    p.Article-Paragraph
+      | 此のチュートリアルの冒頭でも述べた通り、#[+Term--YDID 逆シリアル化]を考慮する必要がある点以外、#[+Term--YDID パスパラメータ]の扱いと同様であるので、
+      |   上記の例について追加で解説するべき事は無い。
+      | 上記のコードをテストする為に、
+      +SecondaryEntity__Code--YDID.
+        http://localhost:80/products?fullOrPartialProductTitle=test&paginationPageNumber=1&itemsCountPerPaginationPage=20
+      |   という#[+SecondaryEntity__Code--YDID URI]に#[+Term--YDID リクエスト]を送信してみよう。
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/03-RouteQueryParameters/Images/Tutorials-QueryParameters-Step1-Output",
+      imageAlternateText:
+          "逆シリアル化されたクエリパラメータのコンソール出力において、「fullOrPartialProductTitle」は文字列型の「\"test\"」値を持ち、" +
+            "「paginationPageNumber」は数値1を持ち、「itemsCountPerPaginationPage」は数値20を持っている。",
+      autoAspectRatioByYDA: true
+    })
+
+
+    //- ╍╍╍ 真偽値パラメータ ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.queryParametersInYDB.$children.booleanParameters.$heading,
+      HTML_ID: localizedSectioning.queryParametersInYDB.$children.booleanParameters.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      アプリケーションに3つの#[+Keyword--YDID 真偽値]#[+Term--YDID パラメータ]即ち#[+SecondaryEntity__Code--YDID outOfStock]、
+        #[+SecondaryEntity__Code--YDID comingSoon]、#[+SecondaryEntity__Code--YDID unavailableInUserRegion]を導入してみよう。
+      #[+ImportantEntity--YDID RawObjectDataProcessor]の#[+ImportantEntity--YDID API]に従うと、コードの変更は
+        #[+Keyword--YDID 少なくとも]以下の様に成る。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      }): :code_listing--yda
+
+        @Controller.RouteHandler({
+          HTTP_Method: HTTP_Methods.get,
+          pathTemplate: "products"
+        })
+        public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+          const {
+            outOfStock,
+            comingSoon,
+            // ...
+          }: Readonly<{
+            outOfStock?: boolean;
+            comingSoon?: boolean;
+            // ...
+          }> = request.validateAndProcessURI_QueryParameters({
+
+            outOfStock: {
+              type: Boolean,
+              isUndefinedForbidden: false,
+              isNullForbidden: true
+            },
+
+            comingSoon: {
+              type: Boolean,
+              isUndefinedForbidden: false,
+              isNullForbidden: true
+            },
+
+            unavailableInUserRegion: {
+              type: Boolean,
+              isUndefinedForbidden: false,
+              isNullForbidden: true
+            },
+
+            // ...
+
+          });
+
+          // ...
+
+          return response.submitWithSuccess({
+            HTML_Content: "<h1>Products list</h1>"
+          });
+
+        }
+
+    p.Article-Paragraph.
+      然し、#[+Keyphrase--YDID 現在の#[+Term--YDID 逆シリアル化]アルゴリズムの儘だと]、前述の
+        #[+Term--YDID クエリパラメータ]を含む#[+Term--YDID リクエスト]
+        （例えば#[+SecondaryEntity__Code--YDID outOfStock=true&comingSoon=false]）を送信すると、
+        #[+Term--YDID クエリパラメータ]はバリデーションを通過できず、#[+ImportantEntity--YDID 400 Bad Request]#[+Term--YDID レスポンス]が
+        返される。
+          });
+
+        }

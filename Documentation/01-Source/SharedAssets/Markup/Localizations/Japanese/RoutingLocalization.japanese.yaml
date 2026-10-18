@@ -9,8 +9,7 @@ tutorials:
   helloWorld: { $heading: "初手の例の「ハロー・ワールド」" }
   HTTPS: { $heading: "HTTPS利用" }
   routingAndControllers: { $heading: "ルーティング・コントローラー" }
-  routePathParameters: { $heading: "ルートパスパラメータ" }
-  routeQueryParameters: { $heading: "ルート食えりパラメータ" }
+  routeQueryParameters: { $heading: "ルート・クエリ・パラメータ" }
   dotEnvConfiguration: { $heading: "DotEnvコンフィグレーション" }
   consoleLineInterfaceConfiguration: { $heading: "コンソール・ライン・インターフェース・コンフィグレーション" }
 

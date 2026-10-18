@@ -41,8 +41,8 @@ npm i @yamato-daiwa/backend -E
 
 ## Quick Examples
 
-> :warning: **Warning:** 
-> Below examples has been developed to demonstrate the API of the framework such as easy to understand.
+> [!WARNING] 
+> The Below examples have been developed to demonstrate the API of the framework such as easy to understand.
 > For this, the splitting of the code to files and code itself has been minified, but this approach is unfit
 > for the development of the real applications from the viewpoint of architecture.
 
@@ -50,26 +50,16 @@ npm i @yamato-daiwa/backend -E
 ### "Hello, world!"
 
 ```typescript
-import {
-  Server,
-  Request,
-  Response,
-  ProtocolDependentDefaultPorts,
-  HTTP_Methods
-} from "@yamato-daiwa/backend";
+import * as YDB from "@yamato-daiwa/backend";
 
-
-/* Running the test:
- *  tsx EntryPoint.ts   OR   npm run start
- * */
-Server.initializeAndStart({
+YDB.Server.initializeAndStart({
   IP_Address: "127.0.0.1",
-  HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+  HTTP: { port: YDB.ProtocolDependentDefaultPorts.HTTP },
   routing: [
     {
-      HTTP_Method: HTTP_Methods.get,
+      HTTP_Method: YDB.HTTP_Methods.get,
       pathTemplate: "/",
-      async handler(request: Request, response: Response): Promise<void> {
+      async handler(request: YDB.Request, response: YDB.Response): Promise<void> {
         return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
       }
     }
@@ -84,36 +74,16 @@ See the ["Hello, world!"](https://backend-es.yamato-daiwa.com/Tutorials/00-Hello
 ### HTTPS Support
 
 ```typescript
-import {
-  Server,
-  Request,
-  Response,
-  ProtocolDependentDefaultPorts,
-  HTTP_Methods
-} from "@yamato-daiwa/backend";
-import Path from "path";
+import * as YDB from "@yamato-daiwa/backend";
 
-
-Server.initializeAndStart({
+YDB.Server.initializeAndStart({
   IP_Address: "127.0.0.1",
-  HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
-  HTTPS: {
-    
-    port: ProtocolDependentDefaultPorts.HTTPS,
-    
-    SSL_CertificateFileRelativeOrAbsolutePath: "SSL/SSL_Certificate.pem",
-    SSL_KeyFileRelativeOrAbsolutePath: "SSL/SSL_Key.pem",
-    
-    // Or pass the raw strings:
-    // SSL_CertificateFileRelativeOrAbsolutePath: Path.resolve(__dirname, "./SSL/SSL_Certificate.pem"),
-    // SSL_KeyFileRelativeOrAbsolutePath: Path.resolve(__dirname, "./SSL/SSL_Key.pem"),
-    
-  },
+  HTTP: { port: YDB.ProtocolDependentDefaultPorts.HTTP },
   routing: [
     {
-      HTTP_Method: HTTP_Methods.get,
+      HTTP_Method: YDB.HTTP_Methods.get,
       pathTemplate: "/",
-      async handler(request: Request, response: Response): Promise<void> {
+      async handler(request: YDB.Request, response: YDB.Response): Promise<void> {
         return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
       }
     }
@@ -198,24 +168,17 @@ HTTPS_Server.listen(443, "127.0.0.1");
 #### Minimal Example
 
 ```typescript
-import {
-  Server,
-  Request,
-  Response,
-  ProtocolDependentDefaultPorts,
-  HTTP_Methods
-} from "@yamato-daiwa/backend";
+import * as YDB from "@yamato-daiwa/backend";
 
-
-Server.initializeAndStart({
+YDB.Server.initializeAndStart({
   IP_Address: "127.0.0.1",
-  HTTP: { port: ProtocolDependentDefaultPorts.HTTP },
+  HTTP: { port: YDB.ProtocolDependentDefaultPorts.HTTP },
   routing: [
 
     {
-      HTTP_Method: HTTP_Methods.get,
+      HTTP_Method: YDB.HTTP_Methods.get,
       pathTemplate: "/",
-      async handler(_request: Request, response: Response): Promise<void> {
+      async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
         return response.submitWithSuccess({
           HTML_Content: "<h1>Top Page</h1>"
         });
@@ -223,9 +186,9 @@ Server.initializeAndStart({
     },
 
     {
-      HTTP_Method: HTTP_Methods.get,
+      HTTP_Method: YDB.HTTP_Methods.get,
       pathTemplate: "/products",
-      async handler(_request: Request, response: Response): Promise<void> {
+      async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
         return response.submitWithSuccess({
           HTML_Content: "<h1>Products</h1>"
         });
@@ -233,9 +196,9 @@ Server.initializeAndStart({
     },
 
     {
-      HTTP_Method: HTTP_Methods.get,
+      HTTP_Method: YDB.HTTP_Methods.get,
       pathTemplate: "/checkout",
-      async handler(_request: Request, response: Response): Promise<void> {
+      async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
         return response.submitWithSuccess({
           HTML_Content: "<h1>Checkout</h1>"
         });

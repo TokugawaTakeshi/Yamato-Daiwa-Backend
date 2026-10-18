@@ -2,9 +2,9 @@ $projectBuilding:
 
   $commonSettings:
 
-    $publicDirectoriesRelativePaths:
+    $publicDirectoriesRelativePaths: { $production: 03-ProductionBuild }
 
-      $localDevelopment: 02-LocalDevelopmentBuild
+    $filesWatching: { $excludeDirectoriesWithPathsRelativeToProjectRootDirectory: [ 03-ProductionBuild ] }
 
 
   # ━━━ Markup Processing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -20,10 +20,10 @@ $projectBuilding:
 
         $sourceFilesTopDirectoryRelativePath: 01-Source/Pages
 
-        $partialsRecognition:
-          $excludeFilesWithPrefixes: "_"
-          $excludeSubdirectoriesWithPrefixes: "_"
-          $excludeSubdirectoriesWithNames: [ TableOfContents ]
+        $sourceFilesSelection:
+          $prefixesOfExcludeFiles: "_"
+          $prefixesOfExcludedSubdirectories: "_"
+          $namesOfExcludeSubdirectories: [ TableOfContents, Data, ReusableFragments ]
 
         $buildingModeDependent:
           $localDevelopment:
@@ -60,9 +60,9 @@ $projectBuilding:
 
         $sourceFilesTopDirectoryRelativePath: 01-Source/Pages
 
-        $partialsRecognition:
-          $excludeFilesWithPrefixes: "_"
-          $excludeSubdirectoriesWithPrefixes: "_"
+        $sourceFilesSelection:
+          $prefixesOfExcludeFiles: "_"
+          $namesOfExcludeSubdirectories: "_"
 
         $buildingModeDependent:
           $localDevelopment:
@@ -158,10 +158,3 @@ $projectBuilding:
           $rootDirectoryRelativePath: 02-LocalDevelopmentBuild
 
         $openInBrowsers: chrome
-
-
-  # ━━━ Files Watching ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  $filesWatching:
-
-    $relativePathsOfExcludeDirectories:
-      - 03-ProductionBuild

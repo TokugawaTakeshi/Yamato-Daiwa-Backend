@@ -32,7 +32,7 @@ block append Metadata
       ]
     });
 
-    RoutingEmulator.setCurrentRoute("API.Server");
+    YDF.RoutingEmulator.setCurrentRoute("API.Server");
 
     LanguageDropDownList__YDF_DK.setLinks({
       japanese: routing.japanese.API.$children.Server.$URI,
@@ -87,7 +87,7 @@ block append SpecificContent
     //- ━━━ `Server` Class ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     h1.Article-Heading1!= localizedRouting.API.$children.Server.$heading
 
-    +ThisPageHasNotBeenCheckedByNativeSpeakersYetWarning
+    +PageNotReadyApology--YDPD({ currentState: PageNotReadyApology__YDPD.States.notCheckedByNativeSpeakers })
 
     +CompactTableOfContents--YDF_DK(localizedSectioning, { mustApplyAnchorsInsteadOfURIs: true })
 

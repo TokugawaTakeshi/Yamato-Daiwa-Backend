@@ -9,8 +9,7 @@ tutorials:
   helloWorld: { $heading: "Простейший пример «Привет мир!»" }
   HTTPS: { $heading: "Использование HTTPS" }
   routingAndControllers: { $heading: "Маршрутизация и контроллеры" }
-  routePathParameters: { $heading: "Параметры путей маршрутов" }
-  routeQueryParameters: { $heading: "Параметры запросов маршрутов" }
+  routeQueryParameters: { $heading: "Параметры поиска маршрутов" }
   dotEnvConfiguration: { $heading: "DotEnv конфигурация" }
   consoleLineInterfaceConfiguration: { $heading: "Конфигурация через консоль" }
 

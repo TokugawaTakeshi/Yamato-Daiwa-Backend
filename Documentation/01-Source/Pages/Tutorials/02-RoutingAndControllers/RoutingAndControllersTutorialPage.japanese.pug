@@ -18,8 +18,10 @@ block append Metadata
 
     RegularWebPageTemplate__YDF.configure({
       metadata: {
-        title: buildHTML_PageTitle("RoutingAndControllers"),
-        description: ""
+        title: buildHTML_PageTitle(topHeading),
+        description:
+          "Node.jsフレームワーク「Yamato Daiwa Backend」（略称：「YDB」）では、" +
+            "コントローラークラスを使用する方法と、使用せずにルーティングを設定する方法の両方が可能だ。"
       },
       stylesSheetsURIs: [
         "$CommonStyles",
@@ -29,7 +31,7 @@ block append Metadata
       ]
     });
 
-    RoutingEmulator.setCurrentRoute("tutorials.routingAndControllers");
+    YDF.RoutingEmulator.setCurrentRoute("tutorials.routingAndControllers");
 
     LanguageDropDownList__YDF_DK.setLinks({
       english: routing.english.tutorials.$children.routingAndControllers.$URI,
@@ -48,4 +50,669 @@ block append SpecificContent
 
   article
 
-    h1 ルーティング・コントローラー
+    //- ━━━ ルーティングとコントローラー ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    h1.Article-Heading1= topHeading
+
+    +TutorialCodeIsNotOpimizedForProductionWarning
+
+
+    //- ┅┅┅ 理論 ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅
+    +Heading--YDF({
+      level: 2,
+      text: localizedSectioning.theory.$heading,
+      HTML_ID: localizedSectioning.theory.$anchor
+    }).Article-Heading2
+
+
+    //- ╍╍╍ URL, URN, URI ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.URL_URN_URI.$heading,
+      HTML_ID: localizedSectioning.theory.$children.URL_URN_URI.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID URL]（#[+Term--YDID Unified Resource Locator]）、
+        #[+ImportantEntity--YDID URN]（#[+Term--YDID Unified Resource Name]）、
+        #[+ImportantEntity--YDID URI]（#[+Term--YDID Unified Resource Identifier]）という用語の違いや、
+        それらの要素への分解方法は、#[+Keyphrase--YDID 情報源に依って異なる場合が有る]。
+      #[+ImportantEntity--YDID URL]、#[+ImportantEntity--YDID URN]、#[+ImportantEntity--YDID URI]の構造（アトナミー）は
+        #[+Keyphrase--YDID フレームワークに依存しない]基礎知識だが、
+        #[+ImportantEntity--YDID YDB]に於いて具体的にどの様な解釈が適用されるかを此処で定義しておく#[+Keyword--YDID 必要]が
+        #[+Keyword__Contrast--YDID 有る]。
+
+    p.Article-Paragraph.
+      先ずは、現時点では#[+ImportantEntity--YDID URL]と#[+ImportantEntity--YDID URN]の違いについて議論する必要は#[+Keyword--YDID ない]。
+      現在重要なのは、#[+ImportantEntity--YDID URI]が#[+ImportantEntity--YDID URL]と#[+Term--YDID URN]を#[+Keyword--YDID 包含する]
+        #[+Keyword--YDID 完結した]実体であるという事。
+      そして、#[+ImportantEntity--YDID URL]と#[+Term--YDID URN]が被っているかどうか、解説は#[+Keyphrase--YDID 情報源に依ってい違う]。
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID URI]の概念がインターネット以外にもローカルコンピュータ上のファイル等にも適用されるが、
+        今は#[+Keyphrase--YDID ウェブ開発における#[+Term--YDID URI]]の特徴に焦点を当てる。
+
+
+    //- ─── URI解剖 ─────────────────────────────────────────────────────────────────────────────────────────────────────
+    +Heading--YDF({
+      level: 4,
+      text: localizedSectioning.theory.$children.URL_URN_URI.$children.URI_Anatomy.$heading,
+      HTML_ID: localizedSectioning.theory.$children.URL_URN_URI.$children.URI_Anatomy.$anchor
+    }).Article-Heading4
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID URI]の重要な構成要素を見ていこう。
+      此処では正規定義よりも、これ等の要素をどの様に使用するかに重点を置く為、以下の用語集は定義では#[+Keyword--YDID なく]
+        #[+Keyword__Contrast--YDID 説明]として提示する。
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/02-RoutingAndControllers/Images/URI_Decomposition.svg",
+      imageAlternateText: "URIの分解。要素はプロトコル、ドメイン、ポート、ソケット、パス等。"
+    })
+
+    dl.Article-DescriptionList
+
+      dt プロトコル (Protocol)
+      dd 現時点では、#[+ImportantEntity--YDID HTTP]及び#[+ImportantEntity--YDID HTTPS]プロトコルに注目する。
+
+      dt IPアドレス (IP address)
+      dd.
+        ローカル開発の場合、殆どは#[+Keyword--YDID ローカル]な#[+Term--YDID IPアドレス]
+          （#[+Keyword--YDID 通常]は#[+ImportantEntity--YDID 127.0.0.1]、#[+Keyword--YDID エリアス]#[+Term--YDID localhost]）
+          を使用する。
+        サイトやアプリケーションをサーバーにデプロイする際は、サーバーのレンタルプロバイダーから発行された#[+Term--YDID IPアドレス]になるが、
+          #[+Keyword--YDID サーバー上]此の#[+Term--YDID IPアドレス]の#[+Term--YDID localhost]になっている。
+        #[+Term--YDID ドメイン名]を取得して此の#[+Term--YDID IPアドレス]に紐付ける事で、#[+Term--YDID IPアドレス]の#[+Keyword--YDID 代わり]に
+          其の#[+Term--YDID ドメイン名]を使用出来る様に成る。
+
+      dt ドメイン (Domain)
+      dt ドメイン名 (Domain name)
+      dd.
+        #[+Term--YDID ドメイン名]は主にサイトやアプリケーションの公開段階で必要に成る。
+        技術的な側面以外に、#[+Term--YDID ドメイン名]は#[+Keyword--YDID ブランディング]の#[+Keyword__Contrast--YDID 一部]でもある。
+        然し、サイトやアプリケーションを開発する際は、ドメインの移行が簡単（理想的にはソースコードを変更せずに）に成る様に対策を講じる必要が有る。
+
+      dt ポート (Port)
+      dd.
+        #[+Term--YDID ポート]は多数（具体的には#[+ImportantEntity--YDID 65535個]）存在する為、1台のサーバーで複数のサイトやアプリケーションを
+          実行出来る。
+        #[+Keyword--YDID 一部の]#[+Term--YDID ポート]はソフトウェアに依って様々な目的で使用されるが、此処では#[+Term--YDID HTTPリクエスト]を
+          処理する為の1つ、#[+Keyword--YDID 最大で]#[+ImportantEntity--YDID 2つ]（#[+ImportantEntity--YDID HTTP]と
+          #[+ImportantEntity--YDID HTTPS]の両方をサポートする場合）の#[+Term--YDID ポート]に注目する。
+
+      dt ソケット (Socket)
+      dd.
+        #[+Term--YDID ドメイン]と#[+Term--YDID ポート]の#[+Keyword--YDID 組み合わせ]。
+        #[+Keyphrase--YDID #[+Term--YDID ソケット]の一部#[+Keyword--YDID ではない]#[+Term--YDID プロトコル]に依って]、
+          #[+Keyword--YDID 規定の]#[+Term--YDID ポート]番号が有り、
+          #[+Keyphrase--YDID #[+Term--YDID ポート]番号が該当している#[+Term--YDID ポート]に対して規定になっている限り]、
+          #[+Term--YDID ポート]番号を飛ばしてもも#[+Keyword--YDID 良い]。
+        例えば、#[+Keyphrase--YDID プロトコルが#[+SecondaryEntity__Code--YDID HTTPS]になっている限り]
+          #[+SecondaryEntity__Code--YDID https://example.com:443]は
+          #[+SecondaryEntity__Code--YDID https://example.com]と#[+Keyword--YDID 同じ]である。
+
+      dt オリジン (Origin)
+      dd #[+Keyword--YDID プロトコル]、#[+Term--YDID ドメイン]、#[+Term--YDID ポート]の#[+Keyword--YDID 組み合わせ]。
+
+      dt パス (Path)
+      dd.
+        此の部分こそ#[+Term--YDID ルーティング]に於いて#[+Keyword--YDID 最も]重要だ。
+        #[+Keyword--YDID 通常]、此れに応じて異なるデータが返されるからだ（サイトやアプリケーション開発では主に#[+ImportantEntity--YDID JSON]形式や
+          #[+ImportantEntity--YDID HTML]形式）。
+        #[+Term--YDID スラッシュ]で区切られた#[+Term--YDID セグメント]は複数存在し得るが、多すぎると#[+Term--YDID ルーティング]が複雑に成る。
+
+      dt クエリパラメータ (Query parameters)
+      dd.
+        通常、#[+Term--YDID パス]に基づいて返される特定のデータセット#[+Keyword--YDID 内]での検索・フィルタリングに使用される。
+        但し、上記がよく有る事はあるが、特定の#[+Term--YDID クエリパラメータ]が返されるデータにどの様に影響するかは実装次第の事だ。
+
+      dt ハッシュ (Hash)
+      dd.
+        此の部分は通常サーバー側のリクエスト処理では#[+Keyword--YDID 扱われず]、クライアント側（フロントエンド）でのみ意味を持つ。
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID URL]と#[+ImportantEntity--YDID URN]の#[+Keyphrase--YDID 解釈の一つ]によれば、
+        #[+ImportantEntity--YDID URL]は#[+Term--YDID オリジン]と同じであり、#[+ImportantEntity--YDID URN]は#[+Term--YDID パス]
+        から始まる部分を指す。
+      従って、#[+ImportantEntity--YDID URL]と#[+ImportantEntity--YDID URN]を結合すると#[+ImportantEntity--YDID URI]に成るはず。
+      然し、多くのプログラムインターフェースや日常生活に於いて、#[+ImportantEntity--YDID URL]という用語はしばしば
+        #[+ImportantEntity--YDID URI]の同義語として、或いは#[+ImportantEntity--YDID URI]の何れかの部分を指して使用される。
+      例えば、標準的な#[+ImportantEntity--YDID Node.js]の機能ではあるが、#[+ImportantEntity__Code--YDID http]モジュールの
+        #[+ImportantEntity__Code--YDID request]#[+Term--YDID オブジェクト]の#[+ImportantEntity__Code--YDID url]
+        #[+Term--YDID プロパティに]は#[+Term--YDID パス]と#[+Term--YDID クエリパラメータ]が含まれている
+        （公式ドキュメントの例：#[+SecondaryEntity__Code--YDID "/status?name=ryan"]）。
+      只、#[+SecondaryEntity__Code--YDID new URL(`https://${process.env.HOST ?? 'localhost'}${request.url}`);]という例だと、
+        再帰そうに見えて、#[+ImportantEntity--YDID URL]がそもそも何か、此の例からだけは言えないだろう。
+
+
+    //- ╍╍╍ 実体（エンティティ）の操作 ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.workingWithEntities.$heading,
+      HTML_ID: localizedSectioning.theory.$children.workingWithEntities.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      #[+Term--YDID ルーティング]を本格的に考察するには、其れが通常どの様な目的で使用されるかを理解する必要が有る。
+      一般的なサーバーアプリケーションに於いて、#[+Term--YDID ルーティング]の目的は#[+Keyphrase--YDID データ操作]を可能にする事だ。
+      然し「データ操作」は抽象的すぎ、もう少し具体化すると「オブジェクトの操作」或いは「実体（エンティティ）の操作」と成る。
+      とは言え、「オブジェクト」も「エンティティ」も未だ意味が幅広い用語なので混乱しやすいが、#[+Keyphrase--YDID 概念レベル]では、ユーザー、商品、
+        ブログの記事等、現実の物品や人物に対応する情報の#[+Keyword--YDID 集合]を指す。
+      此れらは、データベースのテーブルの行や、#[+Term--YDID 連想配列]の値や、
+        #[+Keyphrase--YDID #[+Term--YDID オブジェクト指向プログラミング]的な意味での]#[+Term__Contrast--YDID オブジェクト]等として表現される。
+
+    p.Article-Paragraph.
+      #[+Term__Contrast--YDID バックエンド開発]用#[+Term--YDID フレームワーク]が使用される主な目的の一つは、データの操作を簡単にする事だ。
+      もしデータが時間の経過と共に変化しないのであれば、サーバー側のプログラミングは不要な場合が多い。
+      実体（エンティティ）に対する主な操作の種類は以下の通りだ。
+
+    ul.Article-UnorderedList
+      li 特定の条件を満たす実体の取得（絞り込み、フィルタリング）
+      li ユニークな特徴を持つ特定の実体の検索
+      li 新しい実体の作成
+      li 既存の実体の変更
+      li 実体の削除
+
+    +AdmonitionBlock--YDF({
+      SVG_Icon: true,
+      geometricVariation: AdmonitionBlock__YDF.GeometricVariations.stickyNoteLike,
+      decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.notice
+    }).
+      実体を弄る概念はITで生まれたものではなく、古来より存在していた。
+      例えば、新しいリンゴを倉庫に持ってくる（オブジェクトの作成）行為や、逆にリンゴを取り出す行為や、腐ったリンゴをすべて見つける（フィルタリング）行為や、
+        そしてそれらを捨てる（削除）といった行為だ。
+      然し、随分逆説的ではあるが、抽象度が高いITこそ、サイトやアプリケーションの実装する時、実体の操作は明示的なものとなったが、日常生活では其れを意識する
+        事は少ない。
+
+
+    //- ╍╍╍ HTTPメソッド　╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.HTTP_Methods.$heading,
+      HTML_ID: localizedSectioning.theory.$children.HTTP_Methods.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      上記通り、サーバーのレスポンスはどの#[+ImportantEntity--YDID URI]に対して#[+Term--YDID HTTPリクエスト]が送信されたかに依存する。
+      但し、特定のサイトやアプリケーションのサーバー側開発に限って話しをすると、#[+Term--YDID オリジン]が#[+Keyword--YDID 固定]なので、
+        #[+Term--YDID 応答]は#[+Keyphrase--YDID 主に]#[+Term--YDID パス]と#[+Term--YDID クエリパラメータ]に依存。
+      然し、サーバーの応答に影響を与えるもう一つの要因がある、即ち#[+ImportantEntity--YDID URI]の一部に#[+Keyword--YDID なっていない]
+        #[+Term--YDID HTTPメソッド]というものだ。
+      本質的に、#[+DefinableTerm--YDID HTTPメソッド]とは#[+Term--YDID HTTPリクエスト]の#[+Keyword--YDID 種類]であり、
+        各種類が特徴を持ち、#[+Keyphrase--YDID ルートを論理的なグループ化]する事は重要な役割。
+
+    p.Article-Paragraph.
+      最も一般的な#[+Term--YDID HTTPメソッド]を列挙する前に、よく見落とされる幾つかの点に注意しよう。
+
+    +AdmonitionBlock--YDF({
+      title: "HTTPメソッドに関する重要な情報",
+      SVG_Icon: true,
+      geometricVariation: AdmonitionBlock__YDF.GeometricVariations.stickyNoteLike,
+      decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.guidance
+    })
+      ul.Article-UnorderedList
+
+        li.
+          #[+Term--YDID HTTPメソッド]の名称は#[+Keyphrase--YDID #[+Keyword--YDID 規約]に過ぎなく]、具体的な効果は
+            #[+Keyword--YDID 完全に]実装次第。
+          例えば、#[+SecondaryEntity--YDID DELETE]という#[+Term--YDID HTTPメソッド]名の直訳は「削除」になっていても、
+            何も削除せずに逆に何かを作成する様に実装する事が理論上には可能な事だ。
+          一方で、#[+Term--YDID ルーティング]を混乱させるべきではないため、実装はメソッドの名称に沿ったものであるべきだ。
+
+        li.
+          #[+Term--YDID ルーティング]を依り論理的で分かりやすくする為には、少なくとも#[+ImportantEntity--YDID 3〜4つ]の
+            #[+Keyword--YDID 複数]のメソッドを使用するのが望ましい。
+          とはいえ、此れは#[+Keyword--YDID 推奨]事項であり、技術的な要件では#[+Keyword__Contrast--YDID ない]。
+          現在でも#[+SecondaryEntity--YDID GET]と#[+SecondaryEntity--YDID POST]の2つの#[+Term--YDID HTTPメソッド]だけで済ませている
+            プロジェクトも多く、初心者の中には他の#[+SecondaryEntity--YDID HTTPメソッド]の存在すら知らない者も居る。
+
+    p.Article-Paragraph.
+      さて、#[+Keyword--YDID 最も]#[+Keyword__Contrast--YDID 人気な]#[+Term--YDID HTTPメソッド]は以下の通りだ。
+
+    dl.Article-DescriptionList
+
+      dt GET
+      dd.
+        単一の実体かこれらのコレクションを#[+Keyword--YDID 取得]するのに一般的に使われている。
+        ところで、ブラウザでページを開く時は此の#[+Term--YDID GETリクエスト]が送信される、一般的なブラウザに於いて、開発者ツールやプラグインを使用せずに他
+          の種類の#[+Term--YDID HTTPリクエスト]を送信する事は#[+Keyword--YDID 不可能]。
+
+      dt PUT
+      dd.
+        実体の#[+Keyword--YDID 作成]#[+Keyword__Contrast--YDID 又は]#[+Keyword--YDID 完全な]#[+Keyword--YDID 変更]のに
+          一般的に使われている。
+        然し、#[+Keyphrase--YDID 実践上]実体が#[+ImportantEntity--YDID 100%]変更される事は
+          #[+Keyword--YDID 極めて]#[+Keyword__Contrast--YDID 稀]で、通常実体には其の存続期間中変更されないユニークな識別子が有る様な事
+          は理由だ。
+
+      dt PATCH
+      dd.
+        実体の#[+Keyword--YDID 部分的な]#[+Keyword__Contrast--YDID 変更]のに一般的に使われている。
+
+      dt POST
+      dd.
+        実践上#[+ImportantEntity--YDID PUT]や#[+ImportantEntity--YDID PATCH]に対する#[+Keyword--YDID 包括的な]メソッドであり、
+          それらの代わりに使用される事が多い。
+
+      dt DELETE
+      dd.
+        実体の#[+Keyword--YDID 削除]のに一般的に使われている。
+
+    p.Article-Paragraph.
+      此の様に、#[+Keyword--YDID 全く]#[+Keyword__Contrast--YDID 同じ]#[+ImportantEntity--YDID URI]であっても、
+        #[+Term--YDID HTTPメソッド]に依って#[+Keyword--YDID 異なる]効果を持たせる事が出来る。
+      例えば、
+
+    dl.Article-DescriptionList
+
+      dt [GET] https://example.com/api/users/1
+      dd 識別子#[+SecondaryEntity--YDID 1]のユーザー情報の取得
+
+      dt [PATCH] https://example.com/api/users/1
+      dd 識別子#[+SecondaryEntity--YDID 1]のユーザー情報の部分的な変更
+
+      dt [DELETE] https://example.com/api/users/1
+      dd 識別子#[+SecondaryEntity--YDID 1]のユーザー情報の削除
+
+
+    //- ┅┅┅ ルーティング及び関連用語の定後 ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.routingDefinition.$heading,
+      HTML_ID: localizedSectioning.theory.$children.routingDefinition.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID URI]の構造について規約が明確になったところ、#[+Term--YDID ルーティング]（ローティング）の概念を導入する時間。
+      但し、下記の事の注意点を考慮してはならない。
+
+    +AdmonitionBlock--YDF({
+      decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.warning,
+      geometricVariation: AdmonitionBlock__YDF.GeometricVariations.stickyNoteLike,
+      SVG_Icon: true
+    }).
+      此処では#[+Keyphrase--YDID サーバー側の]#[+Term--YDID ルーティング]について説明する。
+      所謂#[+Term--YDID シングルページアプリケーション]（#[+ImportantEntity--YDID SPA]）の発展により、クライアント側にも
+        #[+Term--YDID ルーティング]は実装される様に成ったが、サーバー側の#[+Term--YDID ルーティング]と共通点が多くても、
+        #[+Keyphrase--YDID #[+Keyword--YDID 重要な]違いも有る]。
+
+    dl.Article-DescriptionList
+
+      dt サーバー側のルーティング
+      dd.
+        特定の#[+ImportantEntity--YDID URI]（主に#[+Term--YDID パス]と#[+Term--YDID クエリパラメータ]）又は其のテンプレート、
+          及び#[+Term--YDID URI]の一部に#[+Keyword--YDID なっていない]#[+Term__Contrast--YDID HTTPメソッド]に基づいて、
+          #[+Term--YDID HTTPリクエスト]に対する特定の#[+Term--YDID 応答]を生成する事。
+
+      dt ルート (Route)
+      dd.
+        #[+Term--YDID HTTPメソッド]と#[+ImportantEntity--YDID URI]（又は其のテンプレート）の#[+Keyword--YDID 組み合わせ]。
+
+      dt サーバーアプリケーションのAPI
+      dd #[+Keyword--YDID 実装された]#[+Term--YDID ルート]の組み合わせ。
+
+    p.Article-Paragraph.
+      簡単な例から始めて、小規模なコーポレートサイトの#[+Term--YDID ルーティング]を考察しよう。
+      殆どの#[+Term--YDID ルート]は#[+Term--YDID GET]型であり、応答には特定のページの#[+Term--YDID HTMLコード]が含まれる。
+      唯一の例外は、お問い合わせフォームを送信する為の#[+Term--YDID POSTリクエスト]だ。
+      一般的には何もデータを返さず、リクエストが正常に処理された合図だけすれば良い。
+
+    dl.Article-DescriptionList
+
+      dt [GET] https://example.com/
+      dd トップページ
+
+      dt [GET] https://example.com/about
+      dd 「会社概要」ページ
+
+      dt [GET] https://example.com/services
+      dd 「サービス」ページ
+
+      dt [GET] https://example.com/access
+      dd 「アクセス」ページ
+
+      dt [GET] https://example.com/contact
+      dd お問い合わせフォームがある「お問い合わせ」ページ
+
+      dt [POST] https://example.com/contact
+      dd お問い合わせフォームの送信
+
+    p.Article-Paragraph
+      | 仮に御問い合わせフォームの送信機能が不要だったとしたら、此のサイトはサーバー側のプログラミングを一切行わず、#[+Term--YDID HTMLファイル]の集合だけ
+      |   で実現できる。
+      | 但し、#[+ImportantEntity--YDID URI]が#[+Term--YDID HTMLファイル]へのリンク（例えば
+      |   #[+SecondaryEntity__Code--YDID 「https://example.com/about.html」]）ではなく、上記のルートに対応する様にするには、
+      |   ウェブサーバーの設定が必要に成る（
+      +Link--YDF({
+        unendorsedExternalURI: "https://nginx.org/en/docs/http/ngx_http_core_module.html#location"
+      }) nginxの例
+      | ）。
+      | 此れはウェブプログラミングをするよりは簡単だ。
+      | 又、サーバー側プログラミング無しでお問い合わせフォームが必要な場合でも、外部サービスを利用する事も出来る（
+      +Link--YDF({
+        endorsedExternalURI:
+            "https://aws.amazon.com/jp/blogs/architecture/" +
+              "create-dynamic-contact-forms-for-s3-static-websites-using-aws-lambda-amazon-api-gateway-and-amazon-ses/"
+      }) AWSの例
+      | ）。
+
+    p.Article-Paragraph.
+      より複雑なケースでは、#[+Term--YDID パス]に動的な要素が含まれる。
+      ネットショップの例では、#[+Term--YDID ルーティング]は以下の様になる（既に興味のない静的なルートは省略している）。
+
+    dl.Article-DescriptionList
+
+      dt [GET] https://example.com/
+      dd トップページ
+
+      dt [GET] https://example.com/products
+      dd 「商品一覧」ページ
+
+      dt [GET] https://example.com/products/{productID}
+      dd 商品ページ（#[+SecondaryEntity__Code--YDID {productID}]は商品識別子）
+
+      dt [POST] https://example.com/products/{productID}/cart
+      dd 商品をカートに追加
+
+      dt [DELETE] https://example.com/products/{productID}/cart
+      dd 商品をカートから削除
+
+      dt [GET] https://example.com/checkout
+      dd 注文手続きページ（注文がまだ完了していない為、注文識別子は存在しない）
+
+      dt [POST] https://example.com/checkout
+      dd 新規注文データの送信（注文がまだ完了していない為、注文識別子は存在しない）
+
+      dt [GET] https://example.com/vendors/{vendorID}
+      dd 仕入先ページ（#[+SecondaryEntity__Code--YDID {vendorID}]は仕入先識別子）
+
+      dt [POST] https://example.com/vendors
+      dd 新規仕入先の追加（管理者のみ）
+
+      dt [DELETE] https://example.com/vendors/{vendorID}
+      dd 仕入先の削除（管理者のみ）
+
+    +QuestionAndAnswerBox--YDF({
+      type: QuestionAndAnswerBox__YDF.Types.question,
+      question: "ルーティングは全ユーザーに共通なのか？ " +
+          "例えば、どのユーザーのカートに商品を追加すべきか、サーバーはどうやって判断するのか？"
+    })
+
+      p.Article-Paragraph.
+        はい、全ユーザーで共通だ。
+        特定のグループのみがアクセス出来るルートはあるが、特定のユーザー専用のルートというのは極めて稀だ。
+
+      p.Article-Paragraph.
+        ユーザーの識別は、#[+Term--YDID 認証]と#[+Term--YDID 認可]という別個の非常に大きな話題だ。
+        #[+Term--YDID 認証]と#[+Term--YDID 認可]の実装には多くの手法があるが、例を挙げると、
+          特定のユーザーを識別するデータは#[+Term--YDID HTTPヘッダー]を介して送信される、但しのデータの真実性を検証する仕組みが有る前提。
+
+
+    //- ╍╍╍ ルーティングの原始的な実装 ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.routingPrimitiveImplementation.$heading,
+      HTML_ID: localizedSectioning.theory.$children.routingPrimitiveImplementation.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID Node.js]を始めとする多くのプログラミング言語は、#[+Term--YDID ルーティング]を定義したり、送信された
+        #[+Term--YDID HTTPリクエスト]に対応する#[+Term--YDID ルート]を選択したりする機能を組み込みで#[+Keyword--YDID 持っていない]。
+      其の為、#[+Term--YDID ルーティング]はサーバー側開発用フレームワークが提供すべき最も重要な機能の一つだ。
+      フレームワークが貴方の代わりにどのような作業を行っているのか興味が有るなら、#[+Term--YDID ルーティング]を実装するには大まかに以下の事が必要に成る。
+
+    ol.Article-OrderedList
+
+      li.
+        #[+Term--YDID ルート]を定義する為のプログラムインターフェースと規約を提示する。
+
+      li.
+        #[+Term--YDID HTTPリクエスト]の処理時に、其れを分析して#[+Keyword--YDID 適切な]#[+Term--YDID ルート]を選択する。
+
+      li.
+        #[+Term--YDID ルート]に動的な部分（識別子など）が含まれる場合、フレームワークの利用者がアクセス出来る様に、
+          対応する値を#[+Keyword--YDID 保存]する必要がある。
+
+    p.Article-Paragraph
+      | 純粋な#[+ImportantEntity__Code--YDID Node.js]に夜#[+Term--YDID ルーティング]の実装例を以下に示す（
+      +Link--YDF({ unendorsedExternalURI: "https://usefulangle.com/post/89/nodejs-routing" }).Article-Link 此の記事
+      | をベースにしている）。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import HTTP from "http";
+
+
+        HTTP.createServer((request: HTTP.IncomingMessage): void => {
+
+          const HTTP_Method: string | undefined = request.method;
+          const currentURL: URL = new URL(request.url ?? "", `http://${ request.headers.host }`);
+          const pathName: string = currentURL.pathname;
+          const searchingParameters: URLSearchParams = currentURL.searchParams;
+
+          if (HTTP_Method === "GET" && pathName === "/posts" && !searchingParameters.has("id")) {
+            // /posts への GET リクエスト
+          } else if (HTTP_Method === "GET" && pathName === "/posts" && searchingParameters.has("id")) {
+            // /posts?id=123 への GET リクエスト
+          } else if (HTTP_Method === "POST" && pathName === "/posts") {
+            // /posts への POST リクエスト
+          }
+
+        });
+
+    p.Article-Paragraph.
+      前の例では商品識別子が#[+Term--YDID パス]に含まれていた（例えば#[+SecondaryEntity__Code--YDID https://example.com/products/1]）
+        のに対し、此処では投稿（英語で「post」だが#[+Term--YDID POSTリクエスト]とは#[+Keyword--YDID 無関係]）の識別子が
+        #[+Term--YDID クエリパラメータ]を介して渡されている点に注目してほしい。
+      識別子を#[+Term--YDID パス]で渡す実装は、他のルートでも動作させる必要がある場合、更に複雑になる。
+
+
+    //- ┅┅┅ YDBにおけるルーティング ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅
+    +Heading--YDF({
+      level: 2,
+      text: localizedSectioning.routingInYDB.$heading,
+      HTML_ID: localizedSectioning.routingInYDB.$anchor
+    }).Article-Heading2
+
+    //- ╍╍╍ 関数型API ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.routingInYDB.$children.functionalAPI.$heading,
+      HTML_ID: localizedSectioning.routingInYDB.$children.functionalAPI.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      以前のチュートリアルでは、例を最大限にシンプルにする為に、何らかの応答を得る為の#[+Keyword--YDID 唯一]の#[+Term--YDID ルート]を定義した。
+      此の#[+Term--YDID ルート]は#[+Term__Contrast--YDID HTTPメソッド]が#[+ImportantEntity--YDID GET]で、
+        #[+Term--YDID パス]が#[+ImportantEntity__Code--YDID /]だった。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import * as YDB from "@yamato-daiwa/backend";
+
+        YDB.Server.initializeAndStart({
+          IP_Address: "127.0.0.1",
+          HTTP: { port: YDB.ProtocolDependentDefaultPorts.HTTP },
+          routing: [
+            {
+              HTTP_Method: YDB.HTTP_Methods.get,
+              pathTemplate: "/",
+              async handler(request: YDB.Request, response: YDB.Response): Promise<void> {
+                return response.submitWithSuccess({ HTML_Content: "<h1>Hello, world!</h1>" });
+              }
+            }
+          ]
+        });
+
+    p.Article-Paragraph.
+      #[+ImportantEntity__Code--YDID routing]#[+Term--YDID プロパティ]は#[+Keyword--YDID 配列]であり、
+        他の#[+Term--YDID ルート]を定義するには、#[+Keyphrase--YDID 同様の方法で]対応する#[+Term--YDID 要素]を追加すればよい。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import * as YDB from "@yamato-daiwa/backend";
+
+        YDB.Server.initializeAndStart({
+          IP_Address: "127.0.0.1",
+          HTTP: { port: YDB.ProtocolDependentDefaultPorts.HTTP },
+          routing: [
+
+            {
+              HTTP_Method: YDB.HTTP_Methods.get,
+              pathTemplate: "/",
+              async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
+                return response.submitWithSuccess({
+                  HTML_Content: "<h1>Top Page</h1>"
+                });
+              }
+            },
+
+            {
+              HTTP_Method: YDB.HTTP_Methods.get,
+              pathTemplate: "/products",
+              async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
+                return response.submitWithSuccess({
+                  HTML_Content: "<h1>Products</h1>"
+                });
+              }
+            },
+
+            {
+              HTTP_Method: YDB.HTTP_Methods.get,
+              pathTemplate: "/checkout",
+              async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
+                return response.submitWithSuccess({
+                  HTML_Content: "<h1>Checkout</h1>"
+                });
+              }
+            }
+
+          ]
+        });
+
+    p.Article-Paragraph.
+      上記の例の様に、#[+ImportantEntity__Code--YDID routing]#[+Term--YDID 配列]の#[+Keyword--YDID 各]#[+Term--YDID 要素]は、
+        #[+ImportantEntity--YDID 3つ]の#[+Keyword--YDID 必須]#[+Term--YDID プロパティ]即ち
+        #[+ImportantEntity__Code--YDID HTTP_Method]、#[+ImportantEntity__Code--YDID pathTemplate]、
+        #[+ImportantEntity__Code--YDID handler]を持つ#[+Term--YDID オブジェクト]だ。
+      然し、何故#[+ImportantEntity--YDID 2つ目]の#[+Term--YDID プロパティ]名が単なる「path」（パス）ではなく「pathTemplate」
+        （パスのテンプレート）なのか？
+      一般的には#[+Term--YDID パス]に#[+Term--YDID パラメータ]が含まれる事が有るが、、その値は#[+Keyword--YDID 事前に]
+        #[+Keyword__Contrast--YDID 不明]な為、#[+Keyphrase--YDID 決められた規約に従って]指定する必要が有るからだ。
+
+
+    //- ╍╍╍ 引数付きルートの定義 ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.routingInYDB.$children.pathParameters.$heading,
+      HTML_ID: localizedSectioning.routingInYDB.$children.pathParameters.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID URI]内の#[+Term--YDID パス引数]
+      （例えば#[+SecondaryEntity__Code--YDID https://example.com/products/1]に於ける商品識別子#[+SecondaryEntity__Code--YDID 1]）
+        の値を検出する事は、どの人気フレームワークでも可能な筈だ。
+      然し、上記を#[+Term--YDID 型安全]を取り組んで行えるものは#[+Keyword--YDID 少ない]。
+      厳密に言うと、#[+ImportantEntity--YDID TypeScript]に於いて100%の#[+Term--YDID 型安全]を実現する事はほぼ不可能で、
+        理由を未だわかっていない方向けに其の理由は後述する。
+      とは言え、#[+Keyword--YDID 有害な]#[+ImportantEntity__Code--YDID any]型を避けるだけでなく、
+        より一般的な#[+Term--YDID 型]から具体的な型への#[+Term--YDID キャスト]を#[+Term__Contrast--YDID バリデーション]で補強することが可能だ。
+
+    p.Article-Paragraph.
+      比較の為に、#[+SecondaryEntity--YDID Express.js]の場合を考察しておこう。
+      #[+Term--YDID ルート]#[+SecondaryEntity__Code--YDID https://example.com/products/{ID}]は次の様に定義されるとする。
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import type { Express as ExpressApplication } from "express";
+        import type Express from "express";
+        import createExpressApplication from "express";
+
+
+        const expressApplication: ExpressApplication = createExpressApplication();
+
+        expressApplication.get(
+          "/products/:ID",
+          (request: Express.Request<{ ID: string; }>, response: Express.Response): void => {
+            response.send(`<h1>商品ID: ${ request.params.ID }</h1>`);
+          }
+        );
+
+        expressApplication.listen(80, "127.0.0.1");
+
+    p.Article-Paragraph.
+      #[+SecondaryEntity__Code--YDID Express.Request]型は#[+Term--YDID ジェネリクス]であり、
+        其の#[+ImportantEntity--YDID 第1引数]は、抽出された#[+Term--YDID ルートパラメータ]が格納される#[+Term--YDID オブジェクト]であり、
+        其れは#[+ImportantEntity__Code--YDID { &lsqb;key: string&rsqb;: string; }]という#[+Term--YDID 制約]を満たす必要がある。
+      此処にはどの様な問題があるだろうか？
+
+    dl.Article-DescriptionList
+
+      dt 型安全性の低さ
+      dd.
+        #[+ImportantEntity__Code--YDID { &lsqb;key: string&rsqb;: string; }]から
+          #[+ImportantEntity__Code--YDID { ID: string; }]への#[+Term--YDID 型キャスト]は何の根拠も#[+Keyword--YDID 無い]。
+        たとえ#[+Keyword--YDID 原形]が#[+SecondaryEntity__Code--YDID "/products/:ID"]であっても、
+          全く関係の無い#[+Term--YDID 型]（例えば#[+SecondaryEntity__Code--YDID { foo: string; bar: string; }])を指定しても、
+          #[+ImportantEntity--YDID TypeScript]は#[+Keyword--YDID 何も]#[+Keyword__Contrast--YDID 気付かない]。
+        #[+Term--YDID 型]の指定は#[+ImportantEntity--YDID TypeScript]から#[+ImportantEntity--YDID JavaScript]への
+          #[+Term--YDID トランスパイル]時に#[+Keyword--YDID 消滅]するので、#[+Keyword--YDID 根本的]に此の問題を解決する事は
+          #[+Keyword--YDID 不可能]。
+        従って、#[+Term__Contrast--YDID Node.jsサーバー]に依る#[+Term--YDID JavaScriptコード]の実行時に、
+          以前指定した#[+Term--YDID 型]を参照して、#[+ImportantEntity__Code--YDID request.params]#[+Term--YDID オブジェクト]が
+          其の#[+Term--YDID 型]に合致するかどうかを確認する事は#[+Keyword--YDID 出来ない]。
+        然し、#[+ImportantEntity__Code--YDID { &lsqb;key: string&rsqb;: string; }]から
+          #[+ImportantEntity__Code--YDID { ID: string; }]へのキャストには、何らかの裏付けが必要であり、#[+Keyphrase--YDID 何よりも先ず]
+            其れは#[+Term--YDID バリデーション]であるべきだ。
+        #[+SecondaryEntity--YDID Express.js]自体は其の様な機能を提供していないが、
+          #[+Link--YDF({ unendorsedExternalURI: "https://express-validator.github.io/docs" }).Article-Link express-validator]
+          等のサードパーティ製ライブラリが存在する。
+
+      dt 不便なAPI
+      dd
+        | #[+SecondaryEntity__Code--YDID Express.Request]#[+Term--YDID 型]には#[+ImportantEntity--YDID 5つ]もの
+        |   #[+Term--YDID ジェネリクス引数]が有り、例えば4番目の#[+Term--YDID 引数]（#[+Term--YDID オブジェクト]形式の
+        |   #[+Term__Contrast--YDID クエリパラメータ]）が必要な場合、たとえそれらが不要であっても前の3つも指定しなければならない。
+        | 其の為、#[+SecondaryEntity__Code--YDID Express.Request&lt;{}, {}, {}, { pageNumber: number; }&gt;]
+        |   の様な記述になり、
+        +Link--YDF({
+          unendorsedExternalURI: sharedExternalLinks.ESLint.plugins.typeScript.top
+        }).Article-Link typescript-eslint
+        |   は此の様なコードに対して
+        +Link--YDF({
+          unendorsedExternalURI: sharedExternalLinks.ESLint.plugins.typeScript.rules.noEmptyObjectType
+        }).Article-Link 難色を示す
+        |   事が有る。
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID YDB]では、#[+Keyword--YDID 両方]の問題が標準機能で解決されている。
+
+    +AdmonitionBlock--YDF({
+      title: "用語に注意",
+      SVG_Icon: true,
+      geometricVariation: AdmonitionBlock__YDF.GeometricVariations.stickyNoteLike,
+      decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.warning
+    })
+
+      p.Article-Paragraph.
+        #[+Term--YDID 「パラメータ」]という用語は非常に広範であり、此処では#[+Keyword--YDID 異なる意味]での#[+Keyword--YDID 3つ]の
+          #[+Term--YDID パラメータ]について言及する。
+
+      dl.Article-DescriptionList
+
+        dt 関数・メソッドの引数 (Parameter)
+        dd.
+          プログラミングに於いて#[+Term--YDID 「パラメータ」]という言葉が使われる際、先ず思い浮かぶのが此の意味だ。
+          然し、此の用語は関数やメソッドに対してのみ使用される訳ではない。
+
+        dt ジェネリクス引数 (Generic Parameter)
+        dd.
+          #[+Term--YDID 静的型付け]言語に関連する。
+          （無条件で発言しきれない事ではあるが、#[+ImportantEntity--YDID TypeScript]言語は#[+Term--YDID 静的型付け]言語だと思われる。）
+
+        dt ルートパラメータ (Route Parameter)
+        dd.
+          #[+Term--YDID ルーティング]全般に関連し、特定の#[+Term--YDID プログラミング言語]には依存しない。
+
+      p.Article-Paragraph.
+        これらの用語は#[+Keyword--YDID 一般的な]ものであり、#[+ImportantEntity--YDID YDB]フレームワーク固有のものではないが、
+          経験の浅いプログラマは混乱する事が有る。

@@ -41,8 +41,13 @@ tutorials:
 
     routeQueryParameters:
       $heading: `tutorials.routeQueryParameters.$heading`
-      $URI: "https://github.com/TokugawaTakeshi/Yamato-Daiwa-Backend/blob/master/Tutorials/05-RouteQueryParameters/README.md"
-      # $URI: `@All/Tutorials/02-RoutingAndControllers/RoutingAndControllers.${ fileNameLocalizationExtension }`
+      $URI: `@All/Tutorials/03-RouteQueryParameters/RouteQueryParametersTutorialPage.${ fileNameLocalizationExtension }`
+      $sectioning:
+        $specificationFileRelativePath: 01-Source/Pages/Tutorials/03-RouteQueryParameters/TableOfContents/RouteQueryParametersTutorialPage.toc.yaml
+        $localizations:
+          english: 01-Source/Pages/Tutorials/03-RouteQueryParameters/TableOfContents/RouteQueryParametersTutorialPage.toc.english.yaml
+          japanese: 01-Source/Pages/Tutorials/03-RouteQueryParameters/TableOfContents/RouteQueryParametersTutorialPage.toc.japanese.yaml
+          russian: 01-Source/Pages/Tutorials/03-RouteQueryParameters/TableOfContents/RouteQueryParametersTutorialPage.toc.russian.yaml
 
     dotEnvConfiguration:
       $heading: `tutorials.dotEnvConfiguration.$heading`

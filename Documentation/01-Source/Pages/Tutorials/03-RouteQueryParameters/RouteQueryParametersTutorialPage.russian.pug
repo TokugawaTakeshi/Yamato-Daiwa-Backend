@@ -1,0 +1,1439 @@
+extends ../../../../node_modules/@yamato-daiwa/programming_documentation/Layouts/TwoColumns/TwoColumnsLayout.pug
+
+
+block append Requirements
+
+  include ../../../SharedAssets/Markup/SharedAssets.russian.pug
+  include ../../../SharedComponents/SharedComponents.russian.pug
+
+
+block append Metadata
+
+  -
+
+    const {
+      $heading: topHeading,
+      $sectioning: localizedSectioning
+    } = routing.russian.tutorials.$children.routeQueryParameters;
+
+    RegularWebPageTemplate__YDF.configure({
+      metadata: {
+        title: buildHTML_PageTitle(topHeading),
+        description:
+            "Node.js-фреймворк «Yamato Daiwa Backend» (сокращённо: «YDB») позволяет гибко работать с параметрами " +
+              "поиска URI, в частности настраивать десериализацию и валидацию."
+      },
+      stylesSheetsURIs: [
+        "$CommonStyles",
+        "$LayoutsStyles/TwoColumns/TwoColumnsLayout.css",
+        "$PreMadesStyles",
+        "@CustomizedExternalComponents"
+      ]
+    });
+
+    YDF.RoutingEmulator.setCurrentRoute("tutorials.routeQueryParameters");
+
+    LanguageDropDownList__YDF_DK.setLinks({
+      english: routing.english.tutorials.$children.routeQueryParameters.$URI,
+      japanese: routing.japanese.tutorials.$children.routeQueryParameters.$URI,
+    });
+
+
+block append HeadScripts
+
+  if __IS_PRODUCTION_BUILDING_MODE__
+
+    +GoogleAnalyticsScript
+
+
+block append SpecificContent
+
+  article
+
+    //- ━━━ Параметры поиска маршрутов ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    h1.Article-Heading1= topHeading
+
+    +TutorialCodeIsNotOpimizedForProductionWarning
+
+    p.Article-Paragraph
+      | Если Вы, следуя нашей настойчивой рекомендации изучать уроки в предложенной последовательности, подробно
+      |   ознакомились с
+      |
+      +Link--YDF({ internalURI: localizedRouting.tutorials.$children.routingAndControllers.$URI }) предыдущим уроком
+      | , где разбиралась работа с #[+Term--YDID параметрами путей маршрутов], то работа с
+      | #[+Term--YDID параметрами поиска] (#[+Term--YDID запроса]) Вам покажется аналогичной:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        export default class ProductController extends Controller {
+
+          @Controller.RouteHandler({
+            HTTP_Method: HTTP_Methods.get,
+            pathTemplate: "products"
+          })
+          public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+            const {
+              fullOrPartialProductTitle,
+              paginationPageNumber,
+              itemsCountPerPaginationPage,
+            }: Readonly<{
+              fullOrPartialProductTitle: string;
+              paginationPageNumber: number;
+              itemsCountPerPaginationPage: number;
+            }> = request.validateAndProcessURI_QueryParameters({
+              fullOrPartialProductTitle: {
+                type: String,
+                isUndefinedForbidden: false,
+                isNullForbidden: true,
+                minimalCharactersCount: 2
+              },
+              paginationPageNumber: {
+                preValidationModifications: convertPotentialStringToNumberIfPossible,
+                type: Number,
+                isUndefinedForbidden: true,
+                isNullForbidden: true,
+                isNaN_Forbidden: true,
+                numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+              },
+              itemsCountPerPaginationPage: {
+                preValidationModifications: convertPotentialStringToNumberIfPossible,
+                type: Number,
+                isUndefinedForbidden: true,
+                isNullForbidden: true,
+                isNaN_Forbidden: true,
+                numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+              }
+            });
+
+            console.table({
+              name: fullOrPartialProductTitle,
+              page: paginationPageNumber,
+              size: itemsCountPerPaginationPage,
+            });
+
+            return response.submitWithSuccess({
+              HTML_Content: "<h1>Products list</h1>"
+            });
+
+          }
+
+        }
+
+    p.Article-Paragraph.
+      Однако, с #[+Term--YDID параметрами поиска] есть определённые тонкости, из-за которых пришлось вынести
+        соответствующий материал по ним в этот отдельный урок.
+
+
+    //- ┅┅┅ Теория ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅
+    +Heading--YDF({
+      level: 2,
+      text: localizedSectioning.theory.$heading,
+      HTML_ID: localizedSectioning.theory.$anchor
+    }).Article-Heading2
+
+    p.Article-Paragraph.
+      #[+Keyword--YDID Изначально] #[+Term--YDID параметры поиска], будучи #[+Keyword--YDID частью]
+        #[+ImportantEntity--YDID URI], являются #[+Keyword--YDID единой] #[+Term--YDID строкой], которую называют
+        #[+Term--YDID «query»] («запрос») или #[+Term--YDID «search»] («поиск»).
+      Как нетрудно заметить, #[+Keyword--YDID оба] термина #[+Keyword--YDID довольно]
+        #[+Keyword__Contrast--YDID многозначные], потому употребляя их, #[+Keyword--YDID необходимо] уточнить,
+        что речь идёт именно о #[+Keyword--YDID составляющей] #[+ImportantEntity--YDID URI].
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/03-RouteQueryParameters/Images/Tutorials-QueryParameters-1",
+      imageAlternateText:
+          "Параметры запроса (поиска) — часть URI, отделённая от пути вопросительным знаком, однако после неё могут " +
+            "идти и другие части URI, например отделённый решёткой хэш, хотя последний актуален для клиентской, " +
+            "но не серверной разработки.",
+      autoAspectRatioByYDA: true
+    })
+
+    p.Article-Paragraph.
+      Называемая #[+Term--YDID «поиском»] часть #[+ImportantEntity--YDID URI] отделена #[+Term--YDID вопросительным знаком]
+        от другой части, именуемой #[+Term--YDID «путём»] (была подробно рассмотрена в предыдущем уроке) .
+      После него идёт #[+Keyphrase--YDID представленный в виде #[+Term--YDID строки]]
+        #[+Term__Contrast--YDID ассоциативный массив].
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/03-RouteQueryParameters/Images/Tutorials-QueryParameters-2",
+      imageAlternateText:
+          "В Параметрах запроса (поиска) URI, каждый ключ отделён от соответствующего ему значения знаком =, а пары" +
+            "«ключ-значение» отделены друг от друга знаком &.",
+      autoAspectRatioByYDA: true
+    })
+
+    ul.Article-UnorderedList
+
+      li.
+        #[+Keyword--YDID Каждый] #[+Term--YDID ключ] отделён от #[+Keyphrase--YDID соответствующего ему]
+          #[+Term--YDID значения] знаком #[+ImportantEntity--YDID =].
+
+      li.
+        #[+Term--YDID Пары «ключ-значение»] отделены друг от друга знаком #[+ImportantEntity--YDID &].
+
+    p.Article-Paragraph.
+      Именно в таком виде #[+Term--YDID параметры поиска] отправляются с клиентской стороны на серверную (или с одного
+        сервера на другой), но это #[+Keyword--YDID не]&nbsp;тот вид, в котором удобно с ними работать на
+        при обработке #[+Term--YDID запроса].
+      Поэтому обрабатывая #[+Term--YDID запрос] на сервере, необходимо #[+Keyword--YDID проанализировать]
+      #[+Term--YDID параметры поиска], если таковые ожидаются на конкретном #[+Term--YDID маршруте], и затем
+        преобразовать их в удобный для обработки вид.
+
+    p.Article-Paragraph.
+      И вот в этом как раз проблема и заключается.
+      Дело в том, что #[+Keyword--YDID не]&nbsp;существует единого стандарта, который предписывает, как интерпретировать
+        те или иные #[+Term--YDID параметры поиска].
+      Если в случае в #[+Term--YDID параметрами] #[+Keyword--YDID путей] #[+Term__Contrast--YDID маршрутов] работа
+        в подавляющем большинстве случаев работа идёт со #[+Term--YDID строковыми] или #[+Term--YDID числовыми] значениями,
+        то в случае с #[+Term--YDID параметрами] #[+Keyword--YDID поиска] востребованы и #[+Term--YDID булевский] тип,
+        и #[+Term--YDID массивы] (#[+Keyword--YDID как] индексные, #[+Keyword--YDID так и] ассоциативные),
+        а в некоторых случаях даже многоуровневые #[+Term--YDID массивы] и #[+Term--YDID объекты].
+      Конечно, последних лучше избегать, так как они сильно запутывают #[+ImportantEntity--YDID API], но иногда это
+        не&nbsp;под нашим контролем (например, если используется сторонние сервисы или важный заказчик просит именно
+        такую сложную #[+ImportantEntity--YDID API]).
+
+
+    //- ╍╍╍ Десериализация ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.deserialization.$heading,
+      HTML_ID: localizedSectioning.theory.$children.deserialization.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      Итак, как и в случае с #[+Term--YDID параметрами путей маршрутов], #[+Keyword--YDID изначально]
+        #[+Keyword__Contrast--YDID все] #[+Term--YDID параметры поиска] являются #[+Keyword--YDID строками] (вернее
+        даже #[+Keyword--YDID подстроками] #[+Keyword__Contrast--YDID единой] #[+Term--YDID строки]).
+      Подобно #[+Term--YDID параметрам путей маршрутов], хорошо было бы и #[+Term--YDID параметры поиска]
+        преобразовать в обычный #[+Term--YDID объект], чтобы с ними было легко работать.
+      Преобразование в #[+Term--YDID объект] представленных в виде единой #[+Term--YDID строки] данных типа
+        #[+Term--YDID «массив»], подобных #[+Term--YDID параметрам поиска], называется
+        #[+DefinableTerm--YDID десериализацией].
+      Что имеется для этого из нативного #[+ImportantEntity--YDID API]?
+
+    p.Article-Paragraph.
+      Первый инструмент — это
+        #[+Link--YDF({ unendorsedExternalURI: "https://developer.mozilla.org/ru/docs/Web/API/URL" }) WHATWG URL].
+      Про #[+ImportantEntity--YDID WHATWG] пришлось упомянуть
+        потому, что в старых версиях #[+ImportantEntity--YDID Node.js] использовалась другая реализация
+        #[+ImportantEntity--YDID URL], которая теперь является устаревшей, а потому нерекомендуемой.
+      И тут сразу же упомянутая выше путаница с тем, что такое #[+ImportantEntity--YDID URL], а что —
+        #[+ImportantEntity--YDID URI].
+      #[+Keyword--YDID Нативный] #[+Term--YDID объект] #[+Term--YDID запроса] (тип
+        #[+ImportantEntity__Code--YDID HTTP.Request]) имеет #[+Term--YDID свойство] #[+ImportantEntity__Code--YDID url],
+        значение которого представляет собой
+        #[+Keyword--YDID часть] #[+ImportantEntity--YDID URI], #[+Keyphrase--YDID начинающуюся с #[+Keyword--YDID пути]],
+        при этом #[+Term--YDID объект] #[+ImportantEntity--YDID WHATWG URL] может быть создан #[+Keyword--YDID только]
+        #[+Keyword__Contrast--YDID если] указан #[+Term--YDID источник] наподобие
+        #[+SecondaryEntity__Code--YDID http://localhost:80/].
+      Если мы посмотрим #[+ImportantEntity--YDID JSDoc]-описание к свойству
+        #[+ImportantEntity__Code--YDID HTTP.Request.url] в пакете #[+ImportantEntity--YDID @types/node] (проверено
+        для версии #[+ImportantEntity--YDID 22.15.31]), то там будет такой пример:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        new URL(`http://${process.env.HOST ?? 'localhost'}${request.url}`);
+
+    p.Article-Paragraph.
+      Из этого примера как бы следует, что «#[+ImportantEntity--YDID URL] — это
+      #[+ImportantEntity__Code--YDID request.url] и ещё #[+Term--YDID источник]», что конечно с точки зрения логики
+        является абсурдом, потому аналогичным образом можно сказать, что «руль машины — это руль машины и ещё педали».
+      Но ввиду того, что эта #[+ImportantEntity--YDID API] не&nbsp;под нашим контролем, имеем что имеем.
+
+    p.Article-Paragraph.
+      Вернёмся к #[+Term--YDID параметрам запроса].
+      В #[+Term__Contrast--YDID объекте] #[+ImportantEntity--YDID WHATWG URL] есть #[+Keyword--YDID два]
+        #[+Term--YDID свойства], отвечающие за #[+Term--YDID параметры запроса]:
+
+    dl.Article-DescriptionList
+
+      dt #[+ImportantEntity__Code--YDID search]
+      dd.
+        Начинающаяся с #[+ImportantEntity--YDID ?] #[+Term--YDID подстрока], в виде которой представлены
+          #[+Keyword--YDID все] #[+Term--YDID параметры запроса].
+        На примере #[+SecondaryEntity__Code--YDID "https://example.com/?alpha=foo&bravo=bar"] у #[+Term--YDID свойства]
+          #[+ImportantEntity__Code--YDID search] будет значение #[+SecondaryEntity__Code--YDID "?alpha=foo&bravo=bar"].
+
+      dt #[+ImportantEntity__Code--YDID searchParams]
+      dd
+        | Особый вид #[+Term--YDID коллекции] типа #[+Term--YDID «ассоциативный массив»], похожий на
+        |
+        +Link--YDF({
+          unendorsedExternalURI: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"
+        }) Map
+        | .
+        | Его ключи и значения можно перебрать в цикле, а доступ к конкретному значению
+        |   осуществляется как в #[+ImportantEntity--YDID Map] — с помощью #[+Term--YDID метода]
+        |   #[+ImportantEntity__Code--YDID get] (например #[+SecondaryEntity__Code--YDID searchParams.get("alpha")]).
+        | Этот #[+Term--YDID метод] может вернуть #[+ImportantEntity__Code--YDID undefined], потому прежде чем можно
+        |   будет полноценно пользоваться возвращённым значением, #[+ImportantEntity--YDID TypeScript] при строгих
+        |   настройках обяжет сначала проверить его на #[+ImportantEntity__Code--YDID undefined] (что скорее хорошо,
+        |   чем плохо).
+
+    p.Article-Paragraph.
+      Таким образом #[+Term--YDID коллекция] #[+ImportantEntity__Code--YDID searchParams] — это самое близкое из того,
+        что нам надо, но #[+Keyword--YDID все] #[+Term--YDID параметры поиска], которые она содержит, имеют
+        #[+Keyword--YDID строковый] #[+Term--YDID тип].
+      Например, при
+        #[+SecondaryEntity__Code--YDID ?fullOrPartialProductTitle=test&paginationPageNumber=1&itemsCountPerPaginationPage=20]
+        вывод значения #[+Term--YDID свойства] #[+ImportantEntity__Code--YDID searchParams] будет:
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+          'fullOrPartialProductTitle' => 'test',
+          'paginationPageNumber' => '1',
+          'itemsCountPerPaginationPage' => '20' }
+
+    p.Article-Paragraph
+      | Другая альтернатива — нативный модуль
+      |
+      +Link--YDF({
+        unendorsedExternalURI: "https://nodejs.org/docs/latest-v22.x/api/querystring.html"
+      }) querystring
+      | .
+      | В отличие от #[+ImportantEntity--YDID WHATWG URL], он работает
+      |   #[+Keyword--YDID уже]&nbsp;#[+Keyword__Contrast--YDID не] с цельными #[+ImportantEntity--YDID URI],
+      |   а только с #[+Term--YDID подстрокой запроса]
+      |   #[+Keyphrase--YDID #[+Keyword--YDID не] включая #[+Term--YDID вопросительный знак]].
+      | Например если мы #[+Term--YDID методу] #[+ImportantEntity__Code--YDID parse]
+      |   (имеет #[+Keyword--YDID алиас] #[+ImportantEntity__Code--YDID decode]) передать #[+Term--YDID строку],
+      |   начинающуюся с #[+Term--YDID вопросительного знака], то он её воспримет как #[+Keyword--YDID часть]
+      |   #[+Keyword__Contrast--YDID первого] #[+Term--YDID параметра запроса]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        import Querystring from "node:querystring";
+
+        console.log(
+          Querystring.parse(
+            "?fullOrPartialProductTitle=test&" +
+              "paginationPageNumber=1&" +
+              "itemsCountPerPaginationPage=20"
+          )
+        );
+
+    +ConsoleOutput--YDF.
+      [Object: null prototype] {
+        '?fullOrPartialProductTitle': 'test',
+        paginationPageNumber: '1',
+        itemsCountPerPaginationPage: '20'
+      }
+
+    p.Article-Paragraph.
+      Также по кавычкам, в которые обёрнуты значения мы видим, что как и в случае с #[+ImportantEntity--YDID WHATWG URL],
+        числовые значения автоматически #[+Keyword--YDID не]&nbsp;преобразуются в числовой тип.
+      Однако в отличие от #[+ImportantEntity--YDID WHATWG URL], #[+ImportantEntity--YDID querystring] уже
+        распознаёт #[+Term--YDID массивы].
+      Допустим теперь мы в добавок ко всем указанным ранее #[+Term--YDID параметрам запроса] хотим найти товары
+        только категорий с идентификаторами #[+SecondaryEntity--YDID 1] и #[+SecondaryEntity--YDID 2]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "fullOrPartialProductTitle=test&" +
+            "paginationPageNumber=1&" +
+            "itemsCountPerPaginationPage=20&" +
+            "categoryID=1&" +
+            "categoryID=2";
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID WHATWG URL] добавит в #[+Term--YDID коллекцию] #[+Keyword--YDID два]
+        #[+Term--YDID элемента] с #[+Keyword--YDID одинаковыми] ключами, в чём важное его отличие от
+        #[+ImportantEntity--YDID Map], где дублирование ключей #[+Keyword--YDID невозможно]:
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+        'fullOrPartialProductTitle' => 'test',
+        'paginationPageNumber' => '1',
+        'itemsCountPerPaginationPage' => '20',
+        'categoryID' => '1',
+        'categoryID' => '2' }
+
+    p.Article-Paragraph.
+      А #[+ImportantEntity--YDID querystring] #[+Term--YDID свойству] #[+SecondaryEntity__Code--YDID categoryID]
+        установит #[+Term--YDID массив] в качестве значения:
+
+    +ConsoleOutput--YDF.
+      [Object: null prototype] {
+        fullOrPartialProductTitle: 'test',
+        paginationPageNumber: '1',
+        itemsCountPerPaginationPage: '20',
+        categoryID: [ '1', '2' ]
+      }
+
+    p.Article-Paragraph.
+      Но не&nbsp;следует забывать, что #[+Keyword--YDID нет]&nbsp;такого стандарта, при который однозначно устанавливает,
+        как #[+Term--YDID десериализовать] #[+Term__Contrast--YDID массивы], а потому повтор ключей в
+        #[+Term--YDID подстроке запроса] — это формат, который понимает #[+ImportantEntity--YDID querystring], но он
+        #[+Keyword--YDID не]&nbsp;является единственным возможным.
+      Есть, например, формат с квадратными скобками и явным #[+Term--YDID индексом массива]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "fullOrPartialProductTitle=test&" +
+            "paginationPageNumber=1&" +
+            "itemsCountPerPaginationPage=20&" +
+            "categoryID[0]=1&" +
+            "categoryID[1]=2";
+
+    p.Article-Paragraph.
+      #[+Keyword--YDID Ни]&nbsp;#[+ImportantEntity--YDID WHATWG URL],
+        #[+Keyword--YDID ни]&nbsp;#[+ImportantEntity__Code--YDID querystring] этого формата
+        #[+Keyword--YDID не]&nbsp;поймут:
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+        'fullOrPartialProductTitle' => 'test',
+        'paginationPageNumber' => '1',
+        'itemsCountPerPaginationPage' => '20',
+        'categoryID[0]' => '1',
+        'categoryID[1]' => '2' }
+
+      [Object: null prototype] {
+        fullOrPartialProductTitle: 'test',
+        paginationPageNumber: '1',
+        itemsCountPerPaginationPage: '20',
+        'categoryID[0]': '1',
+        'categoryID[1]': '2'
+      }
+
+    p.Article-Paragraph.
+      Ещё хуже обстроит дело с #[+Term--YDID объектами] — #[+Keyword--YDID ни]&nbsp;#[+ImportantEntity--YDID WHATWG URL],
+        #[+Keyword--YDID ни]&nbsp;#[+ImportantEntity--YDID querystring] #[+Keyword--YDID не]&nbsp;понимают
+        #[+Keyword--YDID ни]&nbsp;одного из популярных форматов #[+Term--YDID параметров запроса] типа
+        #[+Term--YDID «объект»].
+      Рассмотрим это на примере: у нас два #[+Term--YDID параметра] отвечают за #[+Term--YDID пагинацию] —
+        #[+SecondaryEntity__Code--YDID paginationPageNumber] и #[+SecondaryEntity__Code--YDID itemsCountPerPaginationPage].
+      Вынесем их в #[+Term--YDID объект] #[+SecondaryEntity__Code--YDID pagination].
+      Первый вариант синтаксиса — указание ключа #[+Term--YDID свойства] объекта в квадратных скобках:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "fullOrPartialProductTitle=test&" +
+            "pagination[pageNumber]=1&" +
+            "pagination[itemsCountPerPage]=20";
+
+    p.Article-Paragraph.
+      Упомянутые выше средства для работы с #[+Term--YDID параметрами запроса] десериализуют это следующим образом:
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+        'fullOrPartialProductTitle' => 'test',
+        'pagination[pageNumber]' => '1',
+        'pagination[itemsCountPerPage]' => '20' }
+
+      [Object: null prototype] {
+        'fullOrPartialProductTitle': 'test',
+        'pagination[pageNumber]': '1',
+        'pagination[itemsCountPerPage]': '20'
+      }
+
+    p.Article-Paragraph.
+      Как видно, вложенных #[+Term--YDID объектов] #[+Keyword--YDID не]&nbsp;было создано.
+      Аналогично для синтаксиса с точечным разделителем:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "fullOrPartialProductTitle=test&" +
+            "pagination.pageNumber=1&" +
+            "pagination.itemsCountPerPage=20";
+
+    +ConsoleOutput--YDF.
+      URLSearchParams {
+        'fullOrPartialProductTitle' => 'test',
+        'pagination.pageNumber' => '1',
+        'pagination.itemsCountPerPage' => '20' }
+
+      [Object: null prototype] {
+        '?fullOrPartialProductTitle': 'test',
+        'pagination.pageNumber': '1',
+        'pagination.itemsCountPerPage': '20'
+      }
+
+    p.Article-Paragraph.
+      Осталось рассмотреть #[+Keyword--YDID булевские] #[+Term--YDID параметры запроса].
+      Если кратко, то и для #[+ImportantEntity--YDID WHATWG URL], и для #[+ImportantEntity--YDID querystring]
+        как #[+ImportantEntity__Code--YDID true], так и #[+ImportantEntity__Code--YDID false] в составе
+        #[+ImportantEntity--YDID URI] — это просто #[+Keyword--YDID строки] и не&nbsp;более того:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript }): :code_listing--yda
+        const serializedQueryParameters: string =
+            "outOfStock=true&" +
+            "comingSoon=false&" +
+            "unavailableInUserRegion";
+
+    +ConsoleOutput--YDF.
+      URLSearchParams { 'outOfStock' => 'true', 'comingSoon' => 'false', 'unavailableInUserRegion' => '' }
+
+      [Object: null prototype] {
+        'outOfStock': 'true',
+        comingSoon: 'false',
+        unavailableInUserRegion: ''
+      }
+
+    p.Article-Paragraph.
+      В #[+Keyword--YDID некоторых] соглашениях, #[+Keyword--YDID булевский] #[+Term--YDID параметр запроса] может
+        не&nbsp;иметь явного значения (как #[+SecondaryEntity__Code--YDID unavailableInUserRegion] выше), и в этом
+        случае он интерпретируется как #[+ImportantEntity__Code--YDID true], а если в #[+ImportantEntity__Code--YDID URI]
+        ещё и соответствующего ключа нет, то это равносильно #[+ImportantEntity__Code--YDID false].
+      Но ещё раз повторимся, это #[+Keyword--YDID не]&nbsp;стандарт, а #[+Keyphrase--YDID одно из] возможных
+        #[+Keyword--YDID соглашений].
+
+
+    //- ╍╍╍ Сериализация ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.serialization.$heading,
+      HTML_ID: localizedSectioning.theory.$children.serialization.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      #[+Keyphrase--YDID По отношению к #[+Term--YDID параметрам поиска]], #[+DefinableTerm--YDID сериализацией]
+        называется #[+Term--YDID преобразование] представленного в виде #[+Term--YDID объекта]
+        #[+Term__Contrast--YDID параметров поиска]　в #[+Term--YDID строку], которая должна быть валидной частью
+        #[+ImportantEntity--YDID URI].
+      Это скорее про клиентскую разработку, чем про серверную, однако бывают случаи, когда сервер тоже отправляет
+        #[+Term--YDID HTTP-запросы] на другие сервера — в этом случае задача #[+Term--YDID сериализации]
+        #[+Term__Contrast--YDID параметров поиска] будет актуальна и на серверной стороне.
+
+    p.Article-Paragraph.
+      Здесь есть один важный момент — вроде бы совершенно очевидный, однако программисты (в особенно начинающие) его
+        часто упускают:
+
+    +AdmonitionBlock--YDF({
+      title: "Очевидно, но на практике часто упускается",
+      SVG_Icon: true,
+      geometricVariation: AdmonitionBlock__YDF.GeometricVariations.stickyNoteLike,
+      decorativeVariation: AdmonitionBlock__YDF.DecorativeVariations.error
+    }).
+      #[+Term--YDID Сериализация] и #[+Term--YDID десериализация] #[+Keyword--YDID должны] быть
+        #[+Keyword--YDID симметричными].
+
+    p.Article-Paragraph.
+      Это значит, что если #[+Term--YDID сериализовать] представленные в виде #[+Term--YDID объекта]
+        #[+Term__Contrast--YDID параметры поиска], а потом снова их #[+Term--YDID десериализовать], то полученный
+        #[+Keyword--YDID десериализованный] #[+Term--YDID объект] #[+Keyword--YDID должен] быть
+        #[+Keyword__Contrast--YDID эквивалентным] начальному
+        (#[+Keyphrase--YDID с точки зрения #[+ImportantEntity--YDID JavaScript]] это будут два
+        #[+Keyword--YDID независимых] #[+Term--YDID объекта], но #[+Keyword--YDID набор] #[+Keyword__Contrast--YDID всех]
+        #[+Term--YDID свойств] и их значений] #[+Keyword--YDID должен] #[+Keyword--YDID совпадать]
+        #[+Keyphrase--YDID вне зависимости от уровней вложенности]).
+
+    p.Article-Paragraph.
+      Если на #[+Term--YDID фронтенде] и на #[+Term--YDID бэкенде] используется один и тот же язык, то обеспечить это
+        соответствие гораздо проще за счёт использования одной библиотеки (например #[+ImportantEntity--YDID qs]).
+
+
+    //- ╍╍╍ Валидация ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.theory.$children.validation.$heading,
+      HTML_ID: localizedSectioning.theory.$children.validation.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      #[+Keyphrase--YDID Как и любые другие внешние данные], #[+Term--YDID параметры поиска] #[+Keyword--YDID должны]
+        быть #[+Term--YDID валидированы] перед началом использования.
+      В нативном #[+ImportantEntity--YDID Node.js] такой функциональности #[+Keyword--YDID нет] (да и вообще мало в
+        каком языке есть, потому что валидация — это хотя и затребованная на практике, но высокоуровневая задача,
+        подразумевающая множество соглашений).
+      Не&nbsp;входит валидация параметров запроса и в некоторые фреймворки, такие как
+        #[+SecondaryEntity--YDID Express.js] — для решения данной задачи используются сторонние библиотеки, такие как
+        #[+SecondaryEntity--YDID query-validation] или #[+SecondaryEntity--YDID ajv].
+
+
+    //- ┅┅┅ Параметры поиска в YDB ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅
+    +Heading--YDF({
+      level: 2,
+      text: localizedSectioning.queryParametersInYDB.$heading,
+      HTML_ID: localizedSectioning.queryParametersInYDB.$anchor
+    }).Article-Heading2
+
+    p.Article-Paragraph.
+      До сих пор, #[+Keyword--YDID метод] #[+SecondaryEntity__Code--YDID generateProductsPage] #[+Term--YDID контроллера]
+        #[+SecondaryEntity__Code--YDID ProductController] из прошлого урока лишь отдавал #[+Term--YDID HTML-заголовок]
+        с содержимым «Products list» — «Список товаров»:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      }): :code_listing--yda
+        export default class ProductController extends Controller {
+
+          @Controller.RouteHandler({
+            HTTP_Method: HTTP_Methods.get,
+            pathTemplate: "products"
+          })
+          public async generateProductsPage(_request: Request, response: Response): Promise<void> {
+            return response.submitWithSuccess({
+              HTML_Content: "<h1>Products list</h1>"
+            });
+          }
+
+          // ...
+
+        }
+
+    p.Article-Paragraph.
+      В будущем, разумеется, это будет полноценная #[+Term--YDID HTML-страница], а список товаров можно будет
+        фильтровать.
+      На данный же момент сконцентрируемся на том, чтобы #[+Term--YDID десериализовать] и валидировать
+        #[+Term--YDID параметры поиска].
+      #[+Keyword--YDID Начальные] #[+Term--YDID параметры поиска] будут пока те же, что и в теоретической части:
+
+    dl.Article-DescriptionList
+
+      dt: +SecondaryEntity__Code--YDID fullOrPartialProductTitle
+      dd Полное либо частичное наименование товара
+
+      dt: +SecondaryEntity__Code--YDID paginationPageNumber
+      dd Номер страницы пагинации. Ожидается #[+Term--YDID натуральное число].
+
+      dt: +SecondaryEntity__Code--YDID itemsCountPerPaginationPage
+      dd Число товаров на страницу пагинации. Ожидается #[+Term--YDID натуральное число].
+
+    p.Article-Paragraph.
+      В целях оптимизации производительности, #[+ImportantEntity--YDID YDB]&nbsp;#[+Keyword--YDID не]&nbsp;десериализует
+        #[+Term--YDID параметры запроса] #[+Keyphrase--YDID до тех пор, пока не&nbsp;будет приказано это сделать].
+      Если быть точнее, то у #[+Term--YDID объекта] #[+ImportantEntity__Code--YDID request] есть
+        #[+Term--YDID поле] #[+ImportantEntity--YDID URI] — это тот же самый #[+ImportantEntity--YDID WHATWG URL],
+        о котором упомяналось в теоретической части, только отсутствует #[+Term--YDID свойство]
+        #[+ImportantEntity__Code--YDID hash], потому что оно не&nbsp;актуально для серверной разработки.
+      Однако, как было рассмотрено выше, у #[+ImportantEntity--YDID WHATWG URL] #[+Term--YDID десериализация]
+        поддерживает #[+Keyword--YDID только] #[+Keyword__Contrast--YDID строчные] #[+Term--YDID типы данных], чего
+        может быть недостаточно как в нашем случае.
+      Для того, чтобы выполнить основную #[+Term--YDID десериализацию], а также валидацию данных, следует вызывать
+        метод #[+ImportantEntity__Code--YDID validateAndProcessURI_QueryParameters] у
+        #[+ImportantEntity__Code--YDID request] с #[+Keyword--YDID обязательным] указанием ограничений в формате
+        #[+ImportantEntity--YDID RawObjectDataProcessor]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      }): :code_listing--yda
+        @Controller.RouteHandler({
+          HTTP_Method: HTTP_Methods.get,
+          pathTemplate: "products"
+        })
+        public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+          const {
+            fullOrPartialProductTitle,
+            paginationPageNumber,
+            itemsCountPerPaginationPage,
+          }: Readonly<{
+            fullOrPartialProductTitle: string;
+            paginationPageNumber: number;
+            itemsCountPerPaginationPage: number;
+          }> = request.validateAndProcessURI_QueryParameters({
+            fullOrPartialProductTitle: {
+              type: String,
+              isUndefinedForbidden: false,
+              isNullForbidden: true,
+              minimalCharactersCount: 2
+            },
+            paginationPageNumber: {
+              preValidationModifications: convertPotentialStringToNumberIfPossible,
+              type: Number,
+              isUndefinedForbidden: true,
+              isNullForbidden: true,
+              isNaN_Forbidden: true,
+              numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+            },
+            itemsCountPerPaginationPage: {
+              preValidationModifications: convertPotentialStringToNumberIfPossible,
+              type: Number,
+              isUndefinedForbidden: true,
+              isNullForbidden: true,
+              isNaN_Forbidden: true,
+              numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+            }
+          });
+
+          console.table({
+            fullOrPartialProductTitle,
+            paginationPageNumber,
+            itemsCountPerPaginationPage
+          });
+
+          return response.submitWithSuccess({
+            HTML_Content: "<h1>Products list</h1>"
+          });
+
+        }
+
+    p.Article-Paragraph.
+      #[+Keyphrase--YDID По умолчанию], #[+ImportantEntity--YDID YDB] использует метод
+        #[+ImportantEntity__Code--YDID parse] библиотеки
+        #[+Link--YDF({ endorsedExternalURI: "https://www.npmjs.com/package/qs" }) qs] в качестве
+        #[+Term--YDID десериализатора].
+      Этот метод уже работает с #[+Keyword--YDID вложенными] #[+Term--YDID объектами] и #[+Term--YDID массивами],
+        хотя конечно, #[+Keyphrase--YDID только в рамках поддерживаемых нотаций], однако предлагается конфигурация.
+      Тем не&nbsp;менее, #[+Keyword--YDID автоматически] #[+Term--YDID строки] в #[+Term--YDID числа] эта библиотека
+        #[+Keyword--YDID не]&nbsp;преобразует, что скорее хорошо, чем плохо, так иначе на анализ каждой строки тратились
+        бы вычислительные ресурсы.
+
+    p.Article-Paragraph.
+      После того, как #[+Term--YDID десериализация] закончена, полученный #[+Term--YDID объект] принимается
+        #[+ImportantEntity--YDID RawObjectProcessor]-ом, который может не&nbsp;только валидировать #[+Term--YDID объекты],
+        но и модифицировать их при необходимости.
+      При этом разумеется, что необходимость в этих преобразованиях, а также валидация #[+Keyword--YDID должны] учитывать
+        алгоритм #[+Term--YDID десериализации].
+
+    p.Article-Paragraph
+      | Собственно, с этим примером всё — как уже говорилось в начале урока, тут за исключением необходимости учёта
+      |   #[+Term--YDID десериализации] всё аналогично работе с #[+Term--YDID параметрами пути].
+      | Протестируем этот код, отправив запрос на
+      |
+      +SecondaryEntity__Code--YDID.
+        http://localhost:80/products?fullOrPartialProductTitle=test&paginationPageNumber=1&itemsCountPerPaginationPage=20
+      | :
+
+    +SingleImageViewer--YDF({
+      imageURI: "@AssociatedWithPages/Tutorials/03-RouteQueryParameters/Images/Tutorials-QueryParameters-Step1-Output",
+      imageAlternateText:
+          "Вывод в консоль десериализованных параметров поиска: параметр \"fullOrPartialProductTitle\" имеет строчное" +
+            "значение \"test\", параметр \"paginationPageNumber\" имеет числовой значение 1, а параметр " +
+            "\"itemsCountPerPaginationPage\" имеет числовое значение 20.",
+      autoAspectRatioByYDA: true
+    })
+
+
+    //- ╍╍╍ Булевские параметры ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.queryParametersInYDB.$children.booleanParameters.$heading,
+      HTML_ID: localizedSectioning.queryParametersInYDB.$children.booleanParameters.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      Внедрим в приложение три #[+Keyword--YDID булевских] #[+Term--YDID параметра]:
+        #[+SecondaryEntity__Code--YDID outOfStock], #[+SecondaryEntity__Code--YDID comingSoon] и
+        #[+SecondaryEntity__Code--YDID unavailableInUserRegion].
+      Согласно #[+ImportantEntity--YDID API] #[+ImportantEntity--YDID RawObjectDataProcessor],
+        изменения в кода будут #[+Keyphrase--YDID как минимум] такими:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      }): :code_listing--yda
+
+        @Controller.RouteHandler({
+          HTTP_Method: HTTP_Methods.get,
+          pathTemplate: "products"
+        })
+        public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+          const {
+            outOfStock,
+            comingSoon,
+            // ...
+          }: Readonly<{
+            outOfStock?: boolean;
+            comingSoon?: boolean;
+            // ...
+          }> = request.validateAndProcessURI_QueryParameters({
+
+            outOfStock: {
+              type: Boolean,
+              isUndefinedForbidden: false,
+              isNullForbidden: true
+            },
+
+            comingSoon: {
+              type: Boolean,
+              isUndefinedForbidden: false,
+              isNullForbidden: true
+            },
+
+            unavailableInUserRegion: {
+              preValidationModifications: BooleanParameterDefaultPreValidationModifier,
+              type: Boolean,
+              isUndefinedForbidden: false,
+              isNullForbidden: true
+            },
+
+            // ...
+
+          });
+
+          // ...
+
+          return response.submitWithSuccess({
+            HTML_Content: "<h1>Products list</h1>"
+          });
+
+        }
+
+    p.Article-Paragraph.
+      Однако если #[+Keyphrase--YDID при текущем алгоритме #[+Term--YDID десериализации]] отправить
+        #[+Term--YDID запрос], содержащий упомянутые выше #[+Term--YDID параметры запроса]
+        (например включающий в себя #[+SecondaryEntity__Code--YDID outOfStock=true&comingSoon=false]),
+        то #[+Term--YDID параметры поиска] #[+Keyword--YDID не]&nbsp;пройдут валидацию, потому будет возвращён
+        ответ со статусом #[+ImportantEntity--YDID 404 Bad Request]:
+
+
+    p.Article-Paragraph.
+      Связано это с тем, что #[+Keyword--YDID стандартный] алгоритм #[+Term--YDID десериализации]
+        #[+Keyword--YDID не]&nbsp;проверяет каждое значение на последовательность символов
+        #[+ImportantEntity__Code--YDID true] и #[+ImportantEntity__Code--YDID false] с целью преобразовать их в
+        #[+Term--YDID булевские значения], что скорее хорошо, чем плохо, так иначе на анализ каждой строки тратились
+        бы вычислительные ресурсы.
+      Однако, как и в случае в #[+Term--YDID числовыми значениями], можно воспользоваться функциональностью
+        #[+Term--YDID предвалидационных преобразований]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      }): :code_listing--yda
+
+        @Controller.RouteHandler({
+          HTTP_Method: HTTP_Methods.get,
+          pathTemplate: "products"
+        })
+        public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+          const {
+            outOfStock,
+            comingSoon,
+            // ...
+          }: Readonly<{
+            outOfStock?: boolean;
+            comingSoon?: boolean;
+            // ...
+          }> = request.validateAndProcessURI_QueryParameters({
+
+            outOfStock: {
+
+              type: Boolean,
+
+              preValidationModifications:
+
+                  (rawValue: unknown): unknown => {
+
+                    if (isString(rawValue)) {
+
+                      if (rawValue === "true") {
+                        return true;
+                      }
+
+
+                      if (rawValue === "false") {
+                        return false;
+                      }
+                    }
+
+
+                    return rawValue;
+
+                  },
+
+              isUndefinedForbidden: false,
+              isNullForbidden: true
+
+            },
+
+            // Так и же и для остальных двух булевских параметро
+
+            // ...
+
+          });
+
+          // ...
+
+          return response.submitWithSuccess({
+            HTML_Content: "<h1>Products list</h1>"
+          });
+
+        }
+
+    p.Article-Paragraph.
+      Рутинного кода сильно прибавилось, но разве мы можем заставить пользователей нашего фреймворка писать такие
+        количество подобного кода?
+      Конечно же нет, а потому во фреймворк был добавлена функция-модификатор
+        #[+ImportantEntity__Code--YDID BooleanQueryParameterDefaultPreValidationModifier], содержащая в себе приведённый
+        выше код:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      }): :code_listing--yda
+
+        @Controller.RouteHandler({
+          HTTP_Method: HTTP_Methods.get,
+          pathTemplate: "products"
+        })
+        public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+          const {
+            outOfStock,
+            comingSoon,
+            // ...
+          }: Readonly<{
+            outOfStock?: boolean;
+            comingSoon?: boolean;
+            // ...
+          }> = request.validateAndProcessURI_QueryParameters({
+
+            outOfStock: {
+              preValidationModifications: BooleanQueryParameterDefaultPreValidationModifier,
+              type: Boolean,
+              isUndefinedForbidden: false,
+              isNullForbidden: true
+            },
+
+            comingSoon: {
+              preValidationModifications: BooleanQueryParameterDefaultPreValidationModifier,
+              type: Boolean,
+              isUndefinedForbidden: false,
+              isNullForbidden: true
+            },
+
+            unavailableInUserRegion: {
+              preValidationModifications: BooleanQueryParameterDefaultPreValidationModifier,
+              type: Boolean,
+              isUndefinedForbidden: false,
+              isNullForbidden: true
+            },
+
+            // ...
+
+          });
+
+          console.table({
+            fullOrPartialProductTitle,
+            outOfStock,
+            comingSoon,
+            unavailableInUserRegion,
+            paginationPageNumber,
+            itemsCountPerPaginationPage,
+          });
+
+          // ...
+
+          return response.submitWithSuccess({
+            HTML_Content: "<h1>Products list</h1>"
+          });
+
+        }
+
+    p.Article-Paragraph.
+      Теперь #[+Term--YDID запросы] содержащие #[+Term--YDID булевские параметры] уже можно отправлять.
+      Например, если #[+ImportantEntity--YDID URI] будет включать в себя
+      #[+SecondaryEntity__Code--YDID outOfStock=true&comingSoon=false], то значения
+      #[+SecondaryEntity__Code--YDID outOfStock] и #[+SecondaryEntity__Code--YDID comingSoon] будут распознаны
+      и приведены к булевскому типу, а  #[+SecondaryEntity__Code--YDID unavailableInUserRegion] будет иметь значение
+      #[+SecondaryEntity__Code--YDID undefined]:
+
+
+    p.Article-Paragraph.
+      Дополнительно, #[+ImportantEntity__Code--YDID BooleanQueryParameterDefaultPreValidationModifier] поддерживает
+        преобразование #[+Keyword--YDID пустых] #[+Term--YDID строк] к #[+ImportantEntity__Code--YDID true] —
+        #[+Keyphrase--YDID при алгоритме десериализации по умолчанию], такие #[+Keyword--YDID пустые]
+        #[+Term--YDID строки] возникают когда в #[+ImportantEntity--YDID URI] #[+Term--YDID ключу]
+        не&nbsp;указано значение наподобие #[+SecondaryEntity__Code--YDID outOfStock] в
+        #[+SecondaryEntity__Code--YDID outOfStock&comingSoon=false].
+
+    p.Article-Paragraph.
+      Что ещё можно улучшить?
+      Хорошо было бы преобразовать #[+ImportantEntity__Code--YDID undefined] к #[+ImportantEntity__Code--YDID false],
+        ведь #[+Term--YDID булевские параметры] на то и #[+Term--YDID булевские] что могут принимать
+        #[+Keyword--YDID только] #[+ImportantEntity--YDID 2] значения — #[+ImportantEntity__Code--YDID true] и
+        #[+ImportantEntity__Code--YDID false], #[+Keyword--YDID но]&nbsp;#[+Keyword__Contrast--YDID не]
+        #[+ImportantEntity__Code--YDID true], #[+ImportantEntity__Code--YDID false] и
+        #[+ImportantEntity__Code--YDID undefined].
+      Таким образом, #[+Keyword--YDID не]&nbsp;указанный #[+Keyword--YDID булевский] #[+Term--YDID параметр]
+        #[+Keyword--YDID равносилен] #[+Keyword__Contrast--YDID явно] указанному со значением
+        #[+ImportantEntity__Code--YDID false].
+      В #[+ImportantEntity--YDID API] #[+ImportantEntity--YDID RawObjectDataProcessor] этот эффект достигается
+        путём замены #[+ImportantEntity__Code--YDID isUndefinedForbidden: true] на
+        #[+ImportantEntity__Code--YDID undefinedValueSubstitution: false]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      }): :code_listing--yda
+
+        @Controller.RouteHandler({
+          HTTP_Method: HTTP_Methods.get,
+          pathTemplate: "products"
+        })
+        public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+          const {
+            outOfStock,
+            comingSoon,
+            // ...
+          }: Readonly<{
+            outOfStock: boolean;
+            comingSoon: boolean;
+            // ...
+          }> = request.validateAndProcessURI_QueryParameters({
+
+            outOfStock: {
+              preValidationModifications: BooleanQueryParameterDefaultPreValidationModifier,
+              type: Boolean,
+              undefinedValueSubstitution: false,
+              isNullForbidden: true
+            },
+
+            comingSoon: {
+              preValidationModifications: BooleanQueryParameterDefaultPreValidationModifier,
+              type: Boolean,
+              undefinedValueSubstitution: false,
+              isNullForbidden: true
+            },
+
+            unavailableInUserRegion: {
+              preValidationModifications: BooleanQueryParameterDefaultPreValidationModifier,
+              type: Boolean,
+              undefinedValueSubstitution: false,
+              isNullForbidden: true
+            },
+
+            // ...
+
+          });
+
+          // ...
+
+          return response.submitWithSuccess({
+            HTML_Content: "<h1>Products list</h1>"
+          });
+
+        }
+
+
+    //- ╍╍╍ Объектные параметры ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.queryParametersInYDB.$children.objectParameters.$heading,
+      HTML_ID: localizedSectioning.queryParametersInYDB.$children.objectParameters.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      Алгоритм #[+Term--YDID десериализации] #[+Keyphrase--YDID по умолчанию] поддерживает
+      #[+Term--YDID скобочную нотацию] #[+Keyword--YDID объектных] #[+Term--YDID параметров запроса]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.HTTP }): :code_listing--yda
+        http://localhost:80/products?pagination[pageNumber]=1&pagination[itemsCountPerPage]=20
+
+    p.Article-Paragraph.
+      Теперь у нас #[+Term--YDID ключу] #[+SecondaryEntity__Code--YDID pagination] в #[+Keyword--YDID десериализованном]
+        #[+Term--YDID объекте] будет соответствовать #[+Keyword--YDID дочерний] #[+Term--YDID объект]
+        со #[+Term--YDID свойствами] #[+SecondaryEntity__Code--YDID pageNumber] и
+        #[+SecondaryEntity__Code--YDID itemsCountPerPage].
+      С точки зрения #[+ImportantEntity--YDID API] #[+ImportantEntity--YDID RawObjectDataProcessor],
+        #[+Keyword--YDID необходимо] валидировать #[+Keyphrase--YDID не&nbsp;только] #[+Term--YDID свойства]
+        #[+SecondaryEntity__Code--YDID pageNumber] и #[+SecondaryEntity__Code--YDID itemsCountPerPage], но и
+        #[+Term--YDID объект] #[+SecondaryEntity__Code--YDID page] в целом, и это #[+Keyphrase--YDID как минимум]
+        указание, является ли этот объект обязательным.
+      Может показаться, что это очевидно: раз #[+Term--YDID свойства] #[+SecondaryEntity__Code--YDID pageNumber] и
+        #[+SecondaryEntity__Code--YDID itemsCountPerPage] являются обязательными, значит и #[+Term--YDID объект]
+        #[+SecondaryEntity__Code--YDID page], к которому они принадлежат, тоже обязательным.
+      Однако, #[+Term--YDID валидатор] #[+Keyword--YDID не]&nbsp;знает об алгоритме #[+Term--YDID десериализации], а
+        такой сценарий, как необязательный объект только с обязательными свойствами #[+Keyword--YDID возможен].
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      }): :code_listing--yda
+
+        @Controller.RouteHandler({
+          HTTP_Method: HTTP_Methods.get,
+          pathTemplate: "products"
+        })
+        public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+          const {
+            fullOrPartialProductTitle,
+            outOfStock,
+            comingSoon,
+            unavailableInUserRegion,
+            pagination: {
+              pageNumber: paginationPageNumber,
+              itemsCountPerPage: itemsCountPerPaginationPage
+            }
+          }: Readonly<{
+            fullOrPartialProductTitle: string;
+            outOfStock: boolean;
+            comingSoon: boolean;
+            unavailableInUserRegion: boolean;
+            pagination: Readonly<{
+              pageNumber: number;
+              itemsCountPerPage: number;
+            }>;
+          }> = request.validateAndProcessURI_QueryParameters({
+
+            pagination: {
+
+              type: Object,
+              isUndefinedForbidden: true,
+              isNullForbidden: true,
+
+              properties: {
+
+                pageNumber: {
+                  preValidationModifications: convertPotentialStringToNumberIfPossible,
+                  type: Number,
+                  isUndefinedForbidden: true,
+                  isNullForbidden: true,
+                  isNaN_Forbidden: true,
+                  numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+                },
+
+                itemsCountPerPage: {
+                  preValidationModifications: convertPotentialStringToNumberIfPossible,
+                  type: Number,
+                  isUndefinedForbidden: true,
+                  isNullForbidden: true,
+                  isNaN_Forbidden: true,
+                  numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+                }
+
+              }
+
+            },
+
+            // ...
+
+          });
+
+          // ...
+
+          console.table({
+            fullOrPartialProductTitle,
+            outOfStock,
+            comingSoon,
+            unavailableInUserRegion,
+            paginationPageNumber,
+            itemsCountPerPaginationPage,
+          });
+
+          return response.submitWithSuccess({
+            HTML_Content: "<h1>Products list</h1>"
+          });
+
+        }
+
+
+    //- ╍╍╍ Массивные параметры ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.queryParametersInYDB.$children.arrayedParameters.$heading,
+      HTML_ID: localizedSectioning.queryParametersInYDB.$children.arrayedParameters.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      Алгоритм #[+Term--YDID десериализации] #[+Keyphrase--YDID по умолчанию] поддерживает
+        #[+Term--YDID скобочную нотацию] #[+Keyword--YDID массивных] #[+Term--YDID параметров запроса].
+      При этом, в скобках можно #[+Keyword--YDID либо] указывать явно номер элемента, #[+Keyword--YDID либо] просто
+        указать пустые скобки, однако если использовать оба способа одновременно, то могут возникнуть проблемы.
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.HTTP }): :code_listing--yda
+        http://localhost:80/products?categoryID[]=1&categoryID=2[]
+        ### Или
+        http://localhost:80/products?categoryID=1[0]&categoryID=2[1]
+
+    p.Article-Paragraph.
+      При валидации #[+Term--YDID массивных параметров запроса], необходимо учитывать следующие моменты:
+
+    +CodeViewer--YDF
+      +CodeViewer-TabPanel--YDF({ codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript })
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda
+          @Controller.RouteHandler({
+            HTTP_Method: HTTP_Methods.get,
+            pathTemplate: "products"
+          })
+          public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+            const {
+              fullOrPartialProductTitle,
+              outOfStock,
+              comingSoon,
+              unavailableInUserRegion,
+              categoryID: categoriesIDs,
+              pagination: {
+                pageNumber: paginationPageNumber,
+                itemsCountPerPage: itemsCountPerPaginationPage
+              }
+            }: Readonly<{
+              fullOrPartialProductTitle: string;
+              outOfStock: boolean;
+              comingSoon: boolean;
+              unavailableInUserRegion: boolean;
+              categoryID: ReadonlyArray<string>;
+              pagination: Readonly<{
+                pageNumber: number;
+                itemsCountPerPage: number;
+              }>;
+            }> = request.validateAndProcessURI_QueryParameters({
+
+              categoryID: {
+
+                type: Array,
+        +CodeViewer-Explanation--YDF.
+          Свойство, соответствующее #[+Term--YDID параметру запроса] #[+SecondaryEntity__Code--YDID categoryID],
+            содержит в себе слово «идентификатор» в единственном числе, но при этом является #[+Term--YDID массивом]
+            #[+Keyword--YDID идентификаторов].
+          Логично было бы назвать это массивное свойство #[+ImportantEntity__Code--YDID categoriesIDs], но тогда и в
+            #[+ImportantEntity--YDID URI] при определении каждого идентификатора нужно будет указывать
+            #[+SecondaryEntity__Code--YDID categoriesIDs], и тогда получится что-то наподобие
+            #[+SecondaryEntity__Code--YDID http://localhost:80/products?categoriesIDs=1&lsqb;0&rsqb;&categoriesIDs=2&lsqb;1&rsqb;],
+            что не&nbsp;менее странно.
+          Данная проблема решаема с помощью #[+ImportantEntity--YDID API RawObjectProcessor] и позже будет
+            продемонстрировано, как именно, но пока мы, чтобы не смещать фокус внимания с главной темы, переименуем
+            #[+SecondaryEntity__Code--YDID categoryID] в #[+SecondaryEntity__Code--YDID categoriesIDs] с помощью
+            #[+Term--YDID деструктурирующего присваивания].
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="5" indentationString="  ")
+                undefinedValueSubstitution: [],
+        +CodeViewer-Explanation--YDF.
+          Если массивный #[+Term--YDID параметр] необязателен, то можно разрешить значение #[+Term--YDID типа]
+            #[+ImportantEntity__Code--YDID undefined] через #[+ImportantEntity__Code--YDID isUndefinedForbidden: false],
+            но удобнее, если #[+Term--YDID массив] #[+Keyword--YDID всегда] будет всегда, пусть даже пустой.
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="5" indentationString="  ")
+                isNullForbidden: true,
+                areUndefinedElementsForbidden: true,
+                areNullElementsForbidden: true,
+        +CodeViewer-Explanation--YDF.
+          С точки зрения #[+ImportantEntity--YDID API] #[+ImportantEntity--YDID RawObjectDataProcessor],
+            #[+Keyword--YDID необходимо] #[+Keyphrase--YDID в явном виде] указать, разрешены или запрещены
+            #[+Term--YDID элементы] типа #[+ImportantEntity__Code--YDID undefined] и #[+ImportantEntity__Code--YDID null].
+          В нашем случае смысла их разрешать пока нет.
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="5" indentationString="  ")
+                element: {
+                  preValidationModifications: convertPotentialStringToNumberIfPossible,
+                  type: Number,
+                  isNaN_Forbidden: true,
+                  numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+        +CodeViewer-Explanation--YDF.
+          Для числовых элементов массива ограничения указываются так же, как я для числовых свойств объекта за исключением
+            того, что не&nbsp;нужно указывать ограничения на #[+ImportantEntity__Code--YDID undefined] и
+            #[+ImportantEntity__Code--YDID null] — их мы уже указали выше для всех элементов сразу.
+
+        +CodeViewer-PartialListing--YDF: :code_listing--yda(indentationMultiplier="2" indentationString="  ")
+                }
+
+              },
+
+              // ...
+
+            });
+
+            console.table({
+              fullOrPartialProductTitle,
+              outOfStock,
+              comingSoon,
+              unavailableInUserRegion,
+              categoriesIDs,
+              paginationPageNumber,
+              itemsCountPerPaginationPage,
+            });
+
+            return response.submitWithSuccess({
+              HTML_Content: "<h1>Products list</h1>"
+            });
+
+        }
+          }
+
+
+    //- ╍╍╍ Переименование ключей ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍
+    +Heading--YDF({
+      level: 3,
+      text: localizedSectioning.queryParametersInYDB.$children.renamingOfKeys.$heading,
+      HTML_ID: localizedSectioning.queryParametersInYDB.$children.renamingOfKeys.$anchor
+    }).Article-Heading3
+
+    p.Article-Paragraph.
+      Некоторые инженеры возразят по поводу разобранного выше кода: «Имена переменных и свойств слишком слишком длинные!
+        Они должны быть короче!».
+      Что же, это утверждение является #[+Keyword--YDID мнением], а также #[+Keyphrase--YDID предметов споров].
+      Официальная позиция нашей компании по данному вопросу полностью совпадает с тем, что утверждается в
+        «Чистом коде»:
+
+    p.Article-Paragraph.
+      Имя переменной, функции или класса должно отвечать на все главные вопросы.
+      Оно должно сообщить, почему эта переменная (и т. д.) существует, что она делает и как используется.
+      Если имя требует дополнительных комментариев, значит оно не передает намерений программиста.
+
+    p.Article-Paragraph.
+      Так что критика по поводу длины имён переменных, извините, отклонена.
+      Но некоторые дополнительно возразят, что «насчёт имён переменных, функций и классов может и так, но вот насчёт
+        параметров запроса в URI-строке длинные ключи нежелательны, так как это не&nbsp;очень хорошо с точки зрения
+        оптимизации, да и раскрывать смысл URI тем, что его анализирует, но не&nbsp;имеет отношения к разработке проекта
+         — тоже нежелательно».
+      Хотя здесь тоже имеется пространство для споров, здесь мы уже скорее согласны, чем нет, а потому
+        #[+Keyphrase--YDID при условии сохранения прежних имён переменных и в целом прежнего уровня понятности кода]
+        рассмотрим, как переименовать #[+Term--YDID параметры запроса].
+
+    p.Article-Paragraph.
+      #[+ImportantEntity--YDID API RawObjectDataProcessor] требует указания ключей свойств в соответствии с теми ключами,
+        что присутствуют в #[+Keyword--YDID исходном] объекте.
+      Однако, в процессе обработки #[+Term--YDID объекта] #[+Term__Contrast--YDID свойства] можно переименовать,
+        воспользовавшись опцией #[+ImportantEntity__Code--YDID newName]:
+
+    +CodeViewer--YDF
+      +CodeViewer-Listing--YDF({
+        codeLanguage: CodeViewer__YDF.SupportedCodesLanguages.TypeScript,
+        fileLabel: "Controllers/ProductController.ts"
+      }): :code_listing--yda
+
+        @Controller.RouteHandler({
+          HTTP_Method: HTTP_Methods.get,
+          pathTemplate: "products"
+        })
+        public async generateProductsPage(request: Request, response: Response): Promise<void> {
+
+          const {
+            fullOrPartialProductTitle,
+            outOfStock,
+            comingSoon,
+            unavailableInUserRegion,
+            categoryID: categoriesIDs,
+            pagination: {
+              pageNumber: paginationPageNumber,
+              itemsCountPerPage: itemsCountPerPaginationPage
+            }
+          }: Readonly<{
+            fullOrPartialProductTitle: string;
+            outOfStock: boolean;
+            comingSoon: boolean;
+            unavailableInUserRegion: boolean;
+            categoryID: ReadonlyArray<string>;
+            pagination: Readonly<{
+              pageNumber: number;
+              itemsCountPerPage: number;
+            }>;
+          }> = request.validateAndProcessURI_QueryParameters({
+
+            pt: {
+              newName: "fullOrPartialProductTitle",
+              type: String,
+              isUndefinedForbidden: false,
+              isNullForbidden: true,
+              minimalCharactersCount: 2
+            },
+
+            os: {
+              newName: "outOfStock",
+              preValidationModifications: BooleanQueryParameterDefaultPreValidationModifier,
+              type: Boolean,
+              undefinedValueSubstitution: false,
+              isNullForbidden: true
+            },
+
+            cs: {
+              newName: "comingSoon",
+              preValidationModifications: BooleanQueryParameterDefaultPreValidationModifier,
+              type: Boolean,
+              undefinedValueSubstitution: false,
+              isNullForbidden: true
+            },
+
+            ur: {
+              newName: "unavailableInUserRegion",
+              preValidationModifications: BooleanQueryParameterDefaultPreValidationModifier,
+              type: Boolean,
+              undefinedValueSubstitution: false,
+              isNullForbidden: true
+            },
+
+            ci: {
+
+              newName: "categoriesIDs",
+              type: Array,
+              undefinedValueSubstitution: [],
+              isNullForbidden: true,
+              areUndefinedElementsForbidden: true,
+              areNullElementsForbidden: true,
+
+              element: {
+                preValidationModifications: convertPotentialStringToNumberIfPossible,
+                type: Number,
+                isNaN_Forbidden: true,
+                numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+              }
+
+            },
+
+            pg: {
+
+              newName: "pagination",
+              type: Object,
+              isUndefinedForbidden: true,
+              isNullForbidden: true,
+
+              properties: {
+
+                pn: {
+                  newName: "pageNumber",
+                  preValidationModifications: convertPotentialStringToNumberIfPossible,
+                  type: Number,
+                  isUndefinedForbidden: true,
+                  isNullForbidden: true,
+                  isNaN_Forbidden: true,
+                  numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+                },
+
+                ic: {
+                  newName: "itemsCountPerPage",
+                  preValidationModifications: convertPotentialStringToNumberIfPossible,
+                  type: Number,
+                  isUndefinedForbidden: true,
+                  isNullForbidden: true,
+                  isNaN_Forbidden: true,
+                  numbersSet: RawObjectDataProcessor.NumbersSets.naturalNumber
+                }
+
+              }
+
+            }
+
+          });
+
+          console.table({
+            fullOrPartialProductTitle,
+            outOfStock,
+            comingSoon,
+            unavailableInUserRegion,
+            categoriesIDs,
+            paginationPageNumber,
+            itemsCountPerPaginationPage,
+          });
+
+          return response.submitWithSuccess({
+            HTML_Content: "<h1>Products list</h1>"
+          });
+
+        }
+
+    p.Article-Paragraph.
+      Поскольку указание #[+ImportantEntity__Code--YDID newName] находится рядом с соответствующим сверхкоротким ключом,
+        а в коде используются те же имена переменных, что и ранее, то прежний уровень понятности кода сохраняется.
+
+
+
+
+
+    //-
+
+
