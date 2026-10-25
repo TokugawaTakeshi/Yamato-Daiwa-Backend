@@ -15,3 +15,23 @@ GET http://127.0.0.1:1337/api/foo
 ###
 
 GET http://127.0.0.1:1337/api/products/foo
+
+###
+
+POST http://127.0.0.1:1337/foo
+
+###
+
+POST http://127.0.0.1:1337/foo/bar
+
+###
+
+POST http://127.0.0.1:1337/foo/bar/bar
+
+###
+
+POST http://127.0.0.1:1337/foo/bar/bar/hoge
+
+###
+
+POST http://127.0.0.1:1337/foo/bar/bar/hoge/fuga

@@ -25,13 +25,12 @@ export type { default as URI_QueryParametersDeserializer } from "./URI_QueryPara
 export { default as BooleanQueryParameterDefaultPreValidationModifier } from
     "./DefaultConventions/BooleanQueryParameterDefaultPreValidationModifier";
 
-
+export { HTTP_Methods } from "./HTTP_Methods";
 export {
   HTTP_DEFAULT_PORT,
   HTTPS_DEFAULT_PORT,
   NETWORK_PORT_MAXIMAL_VALUE,
   NETWORK_PORT_MINIMAL_VALUE,
-  HTTP_Methods,
   HTTP_StatusCodes,
   InformationalResponsesHTTP_StatusCodes,
   SuccessfulResponsesHTTP_StatusCodes,
