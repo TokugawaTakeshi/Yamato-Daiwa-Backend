@@ -26,12 +26,12 @@ POST http://127.0.0.1:1337/foo/bar
 
 ###
 
-POST http://127.0.0.1:1337/foo/bar/bar
+POST http://127.0.0.1:1337/foo/bar/baz
 
 ###
 
-POST http://127.0.0.1:1337/foo/bar/bar/hoge
+POST http://127.0.0.1:1337/foo/bar/baz/hoge
 
 ###
 
-POST http://127.0.0.1:1337/foo/bar/bar/hoge/fuga
+POST http://127.0.0.1:1337/foo/bar/baz/hoge/fuga

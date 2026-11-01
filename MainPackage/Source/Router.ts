@@ -1,3 +1,5 @@
+/* eslint-disable max-depth -- Keep current nesting level for this version. */
+
 /* ━━━ < Imports ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 /* ┅┅┅ Framework Constituents ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
 import type Request from "./Request";
@@ -103,9 +105,6 @@ abstract class Router {
      *   registration of non-wildcard routes. */
     Router.registerWildcardRoutes(sortedByHTTP_MethodWildcardRoutes, normalizedRouting);
 
-    console.log("==========");
-    console.dir(normalizedRouting, { depth: null });
-
     for (const [ route, handler ] of mappedRoutesAndHandlers.entries()) {
 
       /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-enum-assignment --
@@ -124,7 +123,8 @@ abstract class Router {
 
     }
 
-    console.log(normalizedRouting);
+    console.log("================================");
+    console.dir(normalizedRouting, { depth: null });
 
     return normalizedRouting;
 
@@ -408,34 +408,28 @@ abstract class Router {
             [ pathSegmentsCount: number ]:
                 Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths;
           } =
+              // TODO Map this type
               sortedByHTTP_MethodWildcardRoutes[HTTP_Method] as
                   {
                     [ pathSegmentsCount: number ]:
                         Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths;
                   };
 
-      // TODO isEmptyObjectはダメ
+      /* [ Theory ] `isEmptyObject` function can not be used here. */
       if (Object.entries(wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndEachSegmentsNumber).length === 0) {
         continue;
       }
 
 
-      // const maximalSegmentCount: number =
-      //     Math.max(
-      //       ...Object.keys(wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndEachSegmentsNumber).
-      //           map((stringifiedSegmentsCount: string): number => Number(stringifiedSegmentsCount))
-      //     );
+      type InterimPath = string;
+      const registeredWildcardRoutes: Map<InterimPath, Router.RouteAndHandler> = new Map();
 
 
-      // TODO 逆化
       /* [ Approach ]
        * Soring of `wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndSpecificSegmentsNumber` by segments number
-       *   in descending order is critical for this algorithm. */
+       *   in ascending order is critical for this algorithm. */
       for (
-        const [
-          stringifiedPathSegmentsCountInCurrentWildcardRoute,
-          wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndSpecificSegmentsNumber
-        ] of
+        const [ , wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndSpecificSegmentsNumber ] of
             Object.entries(wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndEachSegmentsNumber).
                 toSorted(
                   (
@@ -450,30 +444,27 @@ abstract class Router {
                           Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths
                         ]>
                   ): number =>
-                      (pathSegmentsStringifiedNumber1 > pathSegmentsStringifiedNumber2 ? -1 : 1)
+                      (pathSegmentsStringifiedNumber1 < pathSegmentsStringifiedNumber2 ? -1 : 1)
                 )
       ) {
 
-        const pathSegmentsCountInCurrentWildcardRoute: number =
-            Number(stringifiedPathSegmentsCountInCurrentWildcardRoute);
-
         for (
-          const [ path, wildcardRoute ] of
+          const [ path, _wildcardRoute ] of
               Object.entries(wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndSpecificSegmentsNumber)
         ) {
 
-          console.log("/////////");
-          console.log(path);
-          console.log(wildcardRoute);
-
           const pathSegments: ReadonlyArray<string> = splitString(path, "/");
+
+          /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions --
+           * Has been made undefinable to express that not for every key the value presents, but the undefined values
+           *   not being stored parent object. */
+          const wildcardRoute: Router.RouteAndHandler = _wildcardRoute as Router.RouteAndHandler;
 
           let routingDataForCurrentPathSegment: Router.NormalizedRouting.RoutingDataForSpecificPathSegment =
               routesOfCurrentHTTP_Method[pathSegments[0]] ??
               (routesOfCurrentHTTP_Method[pathSegments[0]] = {});
 
-          console.log("--");
-          console.log(routingDataForCurrentPathSegment);
+          let bestWildcardRouteForCurrentInterimPath: Router.RouteAndHandler | undefined;
 
           for (
             let pathSegmentNumber__numerationFrom1: number = 1;
@@ -481,15 +472,16 @@ abstract class Router {
                 pathSegmentNumber__numerationFrom1++
           ) {
 
+            const interimPath: string = pathSegments.slice(0, pathSegmentNumber__numerationFrom1).join("/");
             const isLastPathSegment: boolean = pathSegmentNumber__numerationFrom1 === pathSegments.length;
-
-            console.log("===");
-            console.log(isLastPathSegment);
 
             if (isLastPathSegment) {
 
               if (isUndefined(routingDataForCurrentPathSegment.wildcardRouteForPathAtLeastOfCurrentLength)) {
+
                 routingDataForCurrentPathSegment.wildcardRouteForPathAtLeastOfCurrentLength = wildcardRoute;
+                registeredWildcardRoutes.set(interimPath, wildcardRoute);
+
               }
 
               break;
@@ -497,9 +489,18 @@ abstract class Router {
             }
 
 
-            if (pathSegmentNumber__numerationFrom1 >= pathSegmentsCountInCurrentWildcardRoute) {
-              console.log("%%%%%%%%%%");
+            const previouslyRegisteredWildcardRouteForCurrentInterimPath: Router.RouteAndHandler | undefined =
+                registeredWildcardRoutes.get(interimPath);
+
+            if (isNotUndefined(previouslyRegisteredWildcardRouteForCurrentInterimPath)) {
+              bestWildcardRouteForCurrentInterimPath = previouslyRegisteredWildcardRouteForCurrentInterimPath;
             }
+
+            if (isNotUndefined(bestWildcardRouteForCurrentInterimPath)) {
+              routingDataForCurrentPathSegment.wildcardRouteForPathAtLeastOfCurrentLength =
+                  bestWildcardRouteForCurrentInterimPath;
+            }
+
 
             const nextPathSegment: string = pathSegments[pathSegmentNumber__numerationFrom1];
 
@@ -511,7 +512,9 @@ abstract class Router {
 
               if (isUndefined(routingDataForNextPathSegment)) {
 
-                routingDataForNextPathSegment = { parameterName: nextPathSegment.replace(/^:/gu, "") };
+                routingDataForNextPathSegment = {
+                  parameterName: nextPathSegment.replace(/^:/gu, "")
+                };
 
                 routingDataForCurrentPathSegment.routingForRoutePathParameterAtNextPosition =
                     routingDataForNextPathSegment;
@@ -522,17 +525,27 @@ abstract class Router {
 
             } else {
 
+              const routingForStaticPathSegmentsAtNextPosition:
+                  Router.NormalizedRouting.RoutingForStaticPathSegmentsAtNextPosition | undefined =
+                      routingDataForCurrentPathSegment.routingForStaticPathSegmentsAtNextPosition;
+
               let routingDataForNextPathSegment:
                   Router.NormalizedRouting.RoutingDataForSpecificPathSegment | undefined =
-                      routingDataForCurrentPathSegment.routingForStaticPathSegmentsAtNextPosition?.[nextPathSegment];
+                      routingForStaticPathSegmentsAtNextPosition?.[nextPathSegment];
 
-              if (isUndefined(routingDataForNextPathSegment)) {
+              if (isUndefined(routingForStaticPathSegmentsAtNextPosition)) {
 
                 routingDataForNextPathSegment = {};
 
                 routingDataForCurrentPathSegment.routingForStaticPathSegmentsAtNextPosition = {
                   [nextPathSegment]: routingDataForNextPathSegment
                 };
+
+              } else if (isUndefined(routingDataForNextPathSegment)) {
+
+                routingDataForNextPathSegment = {};
+
+                routingForStaticPathSegmentsAtNextPosition[nextPathSegment] = routingDataForNextPathSegment;
 
               }
 
@@ -546,76 +559,7 @@ abstract class Router {
 
       }
 
-      // for (let pathSegmentsCount: number = 1; pathSegmentsCount <= maximalSegmentCount; pathSegmentsCount++) {
-      //
-      //   console.log("============");
-      //   console.log(pathSegmentsCount);
-      //
-      //   const wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndCurrentSegmentsNumber:
-      //       Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths | undefined =
-      //           wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndEachSegmentsNumber[pathSegmentsCount];
-      //
-      //   if (isUndefined(wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndCurrentSegmentsNumber)) {
-      //     continue;
-      //   }
-      //
-      //
-      //   for (
-      //     const [ path, routesMappedByPaths ] of
-      //       Object.entries(wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndEachSegmentsNumber[pathSegmentsCount])
-      //   ) {
-      //
-      //     console.log("---");
-      //     console.log(path);
-      //     console.log(routesMappedByPaths);
-      //
-      //   }
-      //
-      // }
-
     }
-
-    // for (
-    //   const [ HTTP_Method, routesMappedByPathsForEachSegmentsNumber ] of
-    //       Object.entries(sortedByHTTP_MethodWildcardRoutes)
-    // ) {
-    //
-    //   const currentHTTP_Method: SpecificHTTP_Methods = HTTP_Method as SpecificHTTP_Methods;
-    //
-    //   const routesOfCurrentHTTP_Method: Router.NormalizedRouting.RoutesOfSpecificHTTP_Method =
-    //       normalizedRouting[currentHTTP_Method];
-    //
-    //   for (
-    //     const [ pathSegmentsCount, routesMappedByPaths ] of
-    //         Object.entries(routesMappedByPathsForEachSegmentsNumber)
-    //   ) {
-    //
-    //     for (
-    //       const [ path, routeAndHandler ] of
-    //           Object.entries(
-    //             routesMappedByPaths as
-    //                 Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths
-    //           )
-    //     ) {
-    //
-    //       console.log(path);
-    //       console.log(pathSegmentsCount);
-    //       console.log(routeAndHandler);
-    //
-    //
-    //     }
-    //
-    //     console.log(pathSegmentsCount);
-    //     console.log(routesMappedByPathsForEachSegmentsNumber);
-    //     console.log(routesMappedByPaths);
-    //
-    //   }
-    //
-    //
-    //   console.log(currentHTTP_Method);
-    //   console.log(routesOfCurrentHTTP_Method);
-
-    // }
 
   }
 
