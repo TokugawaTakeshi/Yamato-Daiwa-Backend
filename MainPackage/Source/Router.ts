@@ -1,3 +1,5 @@
+/* eslint-disable max-depth -- Keep current nesting level for this version. */
+
 /* ━━━ < Imports ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 /* ┅┅┅ Framework Constituents ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
 import type Request from "./Request";
@@ -5,14 +7,14 @@ import type Response from "./Response";
 import type Controller from "./Controller";
 import type { ControllerInheritingClass } from "./Controller";
 import type URI_QueryParametersDeserializer from "./URI_QueryParametersDeserializer";
+import { HTTP_Methods, SpecificHTTP_Methods } from "./HTTP_Methods";
 
 /* ┅┅┅ Utils ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
 import {
-  HTTP_Methods,
   isUndefined,
   isNotUndefined,
   removeSpecificCharacterFromCertainPosition,
-  filterMap,
+  splitString,
   InvalidConfigError,
   Logger
 } from "@yamato-daiwa/es-extensions";
@@ -26,7 +28,19 @@ abstract class Router {
   public static normalizeRouting(routesAndHandlersData: Router.RawRouting): Router.NormalizedRouting {
 
     const mappedRoutesAndHandlers: Map<Router.Route, Router.RouteHandler> = new Map();
-    const mappedWildcardRoutes: Map<string, Router.RouteAndHandler> = new Map();
+
+    const sortedByHTTP_MethodWildcardRoutes: Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers = {
+      [HTTP_Methods.get]: {},
+      [HTTP_Methods.post]: {},
+      [HTTP_Methods.create]: {},
+      [HTTP_Methods.put]: {},
+      [HTTP_Methods.delete]: {},
+      [HTTP_Methods.options]: {},
+      [HTTP_Methods.head]: {},
+      [HTTP_Methods.connect]: {},
+      [HTTP_Methods.trace]: {},
+      [HTTP_Methods.patch]: {}
+    };
 
     let notFoundMasterHandler: Router.RouteHandler | undefined;
 
@@ -34,18 +48,11 @@ abstract class Router {
 
       if ("handler" in polymorphicArrayElement) {
 
-        if (polymorphicArrayElement.pathTemplate.endsWith("/*")) {
-
-          mappedWildcardRoutes.set(
-            removeDanglingSlashes(polymorphicArrayElement.pathTemplate, { leading: true, trailing: false }).replace(/\/\*$/u, ""),
-            polymorphicArrayElement
-          );
-
-        } else {
-
-          mappedRoutesAndHandlers.set(polymorphicArrayElement, polymorphicArrayElement.handler);
-
-        }
+        Router.collectRouteAndHandler(
+          polymorphicArrayElement,
+          mappedRoutesAndHandlers,
+          sortedByHTTP_MethodWildcardRoutes
+        );
 
       } else if ("notFound" in polymorphicArrayElement) {
 
@@ -68,35 +75,16 @@ abstract class Router {
         const SpecificControllerClass: new () => Controller = polymorphicArrayElement;
         const controller: Controller = new SpecificControllerClass();
 
-        for (const [ route, handler ] of controller.getRoutesAndHandlers()) {
-
-          /* eslint-disable-next-line max-depth --
-           * Currently, the code is not so complicated to extract this iteration to another method. */
-          if (route.pathTemplate.endsWith("/*")) {
-
-            mappedWildcardRoutes.set(
-              removeDanglingSlashes(route.pathTemplate.replace(/\/\*$/u, ""), { leading: true, trailing: false }),
-              { ...route, handler }
-            );
-
-          } else {
-
-            mappedRoutesAndHandlers.set(
-              {
-                ...isNotUndefined(controller.URI_QueryParametersDeserializer) ?
-                    { URI_QueryParametersDeserializer: controller.URI_QueryParametersDeserializer } : null,
-                ...route
-              },
-              handler.bind(controller)
-            );
-
-          }
-
-        }
+        Router.collectRoutesOfController(
+          controller,
+          mappedRoutesAndHandlers,
+          sortedByHTTP_MethodWildcardRoutes
+        );
 
       }
 
     }
+
 
     const normalizedRouting: Router.NormalizedRouting = {
       [HTTP_Methods.get]: {},
@@ -112,24 +100,31 @@ abstract class Router {
       notFound: notFoundMasterHandler
     };
 
+    /* [ Approach ]
+     * Register wildcard routers first to normalized routing to reduce the complexity of
+     *   registration of non-wildcard routes. */
+    Router.registerWildcardRoutes(sortedByHTTP_MethodWildcardRoutes, normalizedRouting);
+
     for (const [ route, handler ] of mappedRoutesAndHandlers.entries()) {
 
+      /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-enum-assignment --
+       * All routes with `HTTP_Method === HTTP_Methods.all` has been filtered out above. */
+      const targetHTTP_Method: SpecificHTTP_Methods = route.HTTP_Method as SpecificHTTP_Methods;
+
       const normalizedRoutesOfCurrentHTTP_Method: Router.NormalizedRouting.RoutesOfSpecificHTTP_Method =
-          normalizedRouting[route.HTTP_Method];
+          normalizedRouting[targetHTTP_Method];
 
       Router.addRouteAndHandlerPairToNormalizedRoutesOfSpecificHTTP_MethodMutableObject({
         normalizedRoutesOfTargetHTTP_Method: normalizedRoutesOfCurrentHTTP_Method,
         route,
         handler,
-        mappedWildcardRoutesOfTargetHTTP_Method:
-            filterMap(
-              mappedWildcardRoutes,
-              (_pathTemplateAsKey: string, routeAndHandler: Router.RouteAndHandler): boolean =>
-                  routeAndHandler.HTTP_Method === route.HTTP_Method
-            )
+        wildcardRoutesOfTargetHTTP_Method: sortedByHTTP_MethodWildcardRoutes[targetHTTP_Method]
       });
 
     }
+
+    console.log("================================");
+    console.dir(normalizedRouting, { depth: null });
 
     return normalizedRouting;
 
@@ -142,7 +137,7 @@ abstract class Router {
       normalizedRouting
     }: {
       URI_Path: string;
-      HTTP_Method: HTTP_Methods;
+      HTTP_Method: SpecificHTTP_Methods;
       normalizedRouting: Router.NormalizedRouting;
     }
   ): Router.RouteMatch | null {
@@ -293,17 +288,295 @@ abstract class Router {
 
 
   /* ━━━ Protected Methods ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  /* ┅┅┅ Routes Registration ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
+  protected static collectRouteAndHandler(
+    routeAndHandler: Router.RouteAndHandler,
+    mappedRoutesAndHandlers: Map<Router.Route, Router.RouteHandler>,
+    sortedByHTTP_MethodWildcardRoutes: Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers
+  ): void {
+
+    for (
+      const specificHTTP_Method of
+          routeAndHandler.HTTP_Method === HTTP_Methods.all ?
+              Object.values(SpecificHTTP_Methods) : [ routeAndHandler.HTTP_Method ]
+    ) {
+
+      if (routeAndHandler.pathTemplate.endsWith("/*")) {
+
+        const pathWithoutDanglingSlashesAndAsterisk: string =
+            routeAndHandler.pathTemplate.
+                replace(/^\//u, "").
+                replace(/\/\*$/u, "");
+
+        const pathSegmentsCount: number = splitString(pathWithoutDanglingSlashesAndAsterisk, "/").length;
+
+        let routesWithHandlersForCurrentPathSegmentsCount:
+            Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths | undefined =
+                sortedByHTTP_MethodWildcardRoutes[specificHTTP_Method][pathSegmentsCount];
+
+        if (isUndefined(routesWithHandlersForCurrentPathSegmentsCount)) {
+          routesWithHandlersForCurrentPathSegmentsCount = {};
+          sortedByHTTP_MethodWildcardRoutes[specificHTTP_Method][pathSegmentsCount] =
+              routesWithHandlersForCurrentPathSegmentsCount;
+        }
+
+        routesWithHandlersForCurrentPathSegmentsCount[pathWithoutDanglingSlashesAndAsterisk] =
+            { ...routeAndHandler };
+
+      } else {
+
+        mappedRoutesAndHandlers.set({ ...routeAndHandler, HTTP_Method: specificHTTP_Method }, routeAndHandler.handler);
+
+      }
+
+    }
+
+  }
+
+  protected static collectRoutesOfController(
+    controller: Controller,
+    mappedRoutesAndHandlers: Map<Router.Route, Router.RouteHandler>,
+    sortedByHTTP_MethodWildcardRoutes: Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers
+  ): void {
+
+    for (const [ route, handler ] of controller.getRoutesAndHandlers()) {
+
+      for (
+        const specificHTTP_Method of
+            route.HTTP_Method === HTTP_Methods.all ?
+                Object.values(SpecificHTTP_Methods) : [ route.HTTP_Method ]
+      ) {
+
+        if (route.pathTemplate.endsWith("/*")) {
+
+          const pathWithoutDanglingSlashesAndAsterisk: string =
+            route.pathTemplate.
+                replace(/^\//u, "").
+                replace(/\/\*$/u, "");
+
+          const pathSegmentsCount: number = splitString(pathWithoutDanglingSlashesAndAsterisk, "/").length;
+
+          let routesWithHandlersForCurrentPathSegmentsCount:
+            Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths | undefined =
+                sortedByHTTP_MethodWildcardRoutes[specificHTTP_Method][pathSegmentsCount];
+
+          if (isUndefined(routesWithHandlersForCurrentPathSegmentsCount)) {
+            routesWithHandlersForCurrentPathSegmentsCount = {};
+            sortedByHTTP_MethodWildcardRoutes[specificHTTP_Method][pathSegmentsCount] =
+                routesWithHandlersForCurrentPathSegmentsCount;
+          }
+
+          routesWithHandlersForCurrentPathSegmentsCount[pathWithoutDanglingSlashesAndAsterisk] =
+              {
+                ...route,
+                HTTP_Method: specificHTTP_Method,
+                handler
+              };
+
+        } else {
+
+          mappedRoutesAndHandlers.set(
+            {
+              ...isNotUndefined(controller.URI_QueryParametersDeserializer) ?
+                  { URI_QueryParametersDeserializer: controller.URI_QueryParametersDeserializer } : null,
+              ...route,
+              HTTP_Method: specificHTTP_Method
+            },
+            handler.bind(controller)
+          );
+
+        }
+
+      }
+
+    }
+
+  }
+
+  protected static registerWildcardRoutes(
+    sortedByHTTP_MethodWildcardRoutes: Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers,
+    normalizedRouting: Router.NormalizedRouting
+  ): void {
+
+    for (const HTTP_Method of Object.values(SpecificHTTP_Methods)) {
+
+      const routesOfCurrentHTTP_Method: Router.NormalizedRouting.RoutesOfSpecificHTTP_Method =
+          normalizedRouting[HTTP_Method];
+
+      const wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndEachSegmentsNumber:
+          {
+            [ pathSegmentsCount: number ]:
+                Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths;
+          } =
+              // TODO Map this type
+              sortedByHTTP_MethodWildcardRoutes[HTTP_Method] as
+                  {
+                    [ pathSegmentsCount: number ]:
+                        Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths;
+                  };
+
+      /* [ Theory ] `isEmptyObject` function can not be used here. */
+      if (Object.entries(wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndEachSegmentsNumber).length === 0) {
+        continue;
+      }
+
+
+      type InterimPath = string;
+      const registeredWildcardRoutes: Map<InterimPath, Router.RouteAndHandler> = new Map();
+
+
+      /* [ Approach ]
+       * Soring of `wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndSpecificSegmentsNumber` by segments number
+       *   in ascending order is critical for this algorithm. */
+      for (
+        const [ , wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndSpecificSegmentsNumber ] of
+            Object.entries(wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndEachSegmentsNumber).
+                toSorted(
+                  (
+                    [ pathSegmentsStringifiedNumber1 ]:
+                        Readonly<[
+                          string,
+                          Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths
+                        ]>,
+                    [ pathSegmentsStringifiedNumber2 ]:
+                        Readonly<[
+                          string,
+                          Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths
+                        ]>
+                  ): number =>
+                      (pathSegmentsStringifiedNumber1 < pathSegmentsStringifiedNumber2 ? -1 : 1)
+                )
+      ) {
+
+        for (
+          const [ path, _wildcardRoute ] of
+              Object.entries(wildcardRoutesMappedByPathsForCurrentHTTP_MethodAndSpecificSegmentsNumber)
+        ) {
+
+          const pathSegments: ReadonlyArray<string> = splitString(path, "/");
+
+          /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions --
+           * Has been made undefinable to express that not for every key the value presents, but the undefined values
+           *   not being stored parent object. */
+          const wildcardRoute: Router.RouteAndHandler = _wildcardRoute as Router.RouteAndHandler;
+
+          let routingDataForCurrentPathSegment: Router.NormalizedRouting.RoutingDataForSpecificPathSegment =
+              routesOfCurrentHTTP_Method[pathSegments[0]] ??
+              (routesOfCurrentHTTP_Method[pathSegments[0]] = {});
+
+          let bestWildcardRouteForCurrentInterimPath: Router.RouteAndHandler | undefined;
+
+          for (
+            let pathSegmentNumber__numerationFrom1: number = 1;
+                pathSegmentNumber__numerationFrom1 <= pathSegments.length;
+                pathSegmentNumber__numerationFrom1++
+          ) {
+
+            const interimPath: string = pathSegments.slice(0, pathSegmentNumber__numerationFrom1).join("/");
+            const isLastPathSegment: boolean = pathSegmentNumber__numerationFrom1 === pathSegments.length;
+
+            if (isLastPathSegment) {
+
+              if (isUndefined(routingDataForCurrentPathSegment.wildcardRouteForPathAtLeastOfCurrentLength)) {
+
+                routingDataForCurrentPathSegment.wildcardRouteForPathAtLeastOfCurrentLength = wildcardRoute;
+                registeredWildcardRoutes.set(interimPath, wildcardRoute);
+
+              }
+
+              break;
+
+            }
+
+
+            const previouslyRegisteredWildcardRouteForCurrentInterimPath: Router.RouteAndHandler | undefined =
+                registeredWildcardRoutes.get(interimPath);
+
+            if (isNotUndefined(previouslyRegisteredWildcardRouteForCurrentInterimPath)) {
+              bestWildcardRouteForCurrentInterimPath = previouslyRegisteredWildcardRouteForCurrentInterimPath;
+            }
+
+            if (isNotUndefined(bestWildcardRouteForCurrentInterimPath)) {
+              routingDataForCurrentPathSegment.wildcardRouteForPathAtLeastOfCurrentLength =
+                  bestWildcardRouteForCurrentInterimPath;
+            }
+
+
+            const nextPathSegment: string = pathSegments[pathSegmentNumber__numerationFrom1];
+
+            if (Router.isSegmentTheRouteParameter(nextPathSegment)) {
+
+              let routingDataForNextPathSegment:
+                  Router.NormalizedRouting.RoutingForRouteParameterAtNextPosition | undefined =
+                      routingDataForCurrentPathSegment.routingForRoutePathParameterAtNextPosition;
+
+              if (isUndefined(routingDataForNextPathSegment)) {
+
+                routingDataForNextPathSegment = {
+                  parameterName: nextPathSegment.replace(/^:/gu, "")
+                };
+
+                routingDataForCurrentPathSegment.routingForRoutePathParameterAtNextPosition =
+                    routingDataForNextPathSegment;
+
+              }
+
+              routingDataForCurrentPathSegment = routingDataForNextPathSegment;
+
+            } else {
+
+              const routingForStaticPathSegmentsAtNextPosition:
+                  Router.NormalizedRouting.RoutingForStaticPathSegmentsAtNextPosition | undefined =
+                      routingDataForCurrentPathSegment.routingForStaticPathSegmentsAtNextPosition;
+
+              let routingDataForNextPathSegment:
+                  Router.NormalizedRouting.RoutingDataForSpecificPathSegment | undefined =
+                      routingForStaticPathSegmentsAtNextPosition?.[nextPathSegment];
+
+              if (isUndefined(routingForStaticPathSegmentsAtNextPosition)) {
+
+                routingDataForNextPathSegment = {};
+
+                routingDataForCurrentPathSegment.routingForStaticPathSegmentsAtNextPosition = {
+                  [nextPathSegment]: routingDataForNextPathSegment
+                };
+
+              } else if (isUndefined(routingDataForNextPathSegment)) {
+
+                routingDataForNextPathSegment = {};
+
+                routingForStaticPathSegmentsAtNextPosition[nextPathSegment] = routingDataForNextPathSegment;
+
+              }
+
+              routingDataForCurrentPathSegment = routingDataForNextPathSegment;
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
   protected static addRouteAndHandlerPairToNormalizedRoutesOfSpecificHTTP_MethodMutableObject(
     {
       normalizedRoutesOfTargetHTTP_Method,
       route,
       handler,
-      mappedWildcardRoutesOfTargetHTTP_Method
+      wildcardRoutesOfTargetHTTP_Method
     }: {
       normalizedRoutesOfTargetHTTP_Method: Router.NormalizedRouting.RoutesOfSpecificHTTP_Method;
       route: Router.Route;
       handler: Router.RouteHandler;
-      mappedWildcardRoutesOfTargetHTTP_Method: Map<string, Router.RouteAndHandler>;
+      wildcardRoutesOfTargetHTTP_Method: {
+        [ pathSegmentsCount: number ]:
+            Router.InterimRouting.SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths | undefined;
+      };
     }
   ): void {
 
@@ -340,15 +613,14 @@ abstract class Router {
 
     let wildcardRouteWithHandler: Router.RouteAndHandler | undefined;
 
-    for (const [ index ] of pathSegments.entries()) {
+    for (const [ pathSegmentNumber__numerationFrom0 ] of pathSegments.entries()) {
 
-      const isLastSegment: boolean = index === pathSegments.length - 1;
-
-      const interimRoute: string = pathSegments.slice(0, index + 1).join("/");
+      const pathSegmentNumber__numerationFrom1: number = pathSegmentNumber__numerationFrom0 + 1;
+      const isLastSegment: boolean = pathSegmentNumber__numerationFrom1 === pathSegments.length;
+      const interimPath: string = pathSegments.slice(0, pathSegmentNumber__numerationFrom1).join("/");
 
       wildcardRouteWithHandler =
-          Router.getBestWildcardRoute(mappedWildcardRoutesOfTargetHTTP_Method, interimRoute) ??
-          wildcardRouteWithHandler;
+          wildcardRoutesOfTargetHTTP_Method[pathSegmentNumber__numerationFrom1]?.[interimPath];
 
       if (isNotUndefined(wildcardRouteWithHandler)) {
 
@@ -375,18 +647,19 @@ abstract class Router {
       }
 
 
-      const pathSegmentAtNextPosition: string = pathSegments[index + 1];
+      const pathSegmentAtNextPosition: string = pathSegments[pathSegmentNumber__numerationFrom0 + 1];
 
-      if (Router.isSegmentIsRouteParameter(pathSegmentAtNextPosition)) {
+      if (Router.isSegmentTheRouteParameter(pathSegmentAtNextPosition)) {
 
         if (isUndefined(normalizedRoutingDataForSpecificPathSegment.routingForRoutePathParameterAtNextPosition)) {
 
           normalizedRoutingDataForSpecificPathSegment.routingForRoutePathParameterAtNextPosition = {
-            parameterName: removeSpecificCharacterFromCertainPosition({
-              targetString: pathSegmentAtNextPosition,
-              targetCharacter: ":",
-              fromFirstPosition: true
-            })
+            parameterName:
+                removeSpecificCharacterFromCertainPosition({
+                  targetString: pathSegmentAtNextPosition,
+                  targetCharacter: ":",
+                  fromFirstPosition: true
+                })
           };
           normalizedRoutingDataForSpecificPathSegment = normalizedRoutingDataForSpecificPathSegment.
               routingForRoutePathParameterAtNextPosition;
@@ -440,24 +713,8 @@ abstract class Router {
 
   }
 
-  private static isSegmentIsRouteParameter(targetURL_Segment: string): boolean {
+  protected static isSegmentTheRouteParameter(targetURL_Segment: string): boolean {
     return targetURL_Segment.startsWith(":");
-  }
-
-  private static getBestWildcardRoute(
-    mappedWildcardRoutes: Map<string, Router.RouteAndHandler>,
-    currentPath: string
-  ): Router.RouteAndHandler | undefined {
-    return Array.from(mappedWildcardRoutes.entries()).
-        filter(([ partialPath ]: Readonly<[ string, Router.RouteAndHandler ]>): boolean => currentPath.startsWith(partialPath)).
-        toSorted(
-          (
-            [ onePath ]: Readonly<[ string, Router.RouteAndHandler ]>,
-            [ otherPath ]: Readonly<[ string, Router.RouteAndHandler ]>
-          ): number =>
-              onePath.length - otherPath.length
-        ).
-        toReversed()[0]?.[1];
   }
 
 }
@@ -472,10 +729,6 @@ namespace Router {
     pathTemplate: string;
     URI_QueryParametersDeserializer?: URI_QueryParametersDeserializer;
   }>;
-
-  export namespace Route {
-    export const ANY_HTTP_METHOD: string = "ANY_HTTP_METHOD";
-  }
 
   export type RouteHandler = (request: Request, response: Response) => Promise<void>;
 
@@ -492,6 +745,51 @@ namespace Router {
   export type RoutePathParameters = { [pathSegment: string]: string | undefined; };
 
   export type NotFoundHandlerDefinition = Readonly<{ notFound: RouteHandler; }>;
+
+  export namespace InterimRouting {
+
+    export type SortedByHTTP_MethodsWildcardRoutesWithHandlers = Readonly<{
+      [HTTP_Methods.get]: {
+        [ pathSegmentsCount: number ]: SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths | undefined;
+      };
+      [HTTP_Methods.post]: {
+        [ pathSegmentsCount: number ]: SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths | undefined;
+      };
+      [HTTP_Methods.create]: {
+        [ pathSegmentsCount: number ]: SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths | undefined;
+      };
+      [HTTP_Methods.put]: {
+        [ pathSegmentsCount: number ]: SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths | undefined;
+      };
+      [HTTP_Methods.delete]: {
+        [ pathSegmentsCount: number ]: SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths | undefined;
+      };
+      [HTTP_Methods.options]: {
+        [ pathSegmentsCount: number ]: SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths | undefined;
+      };
+      [HTTP_Methods.head]: {
+        [ pathSegmentsCount: number ]: SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths | undefined;
+      };
+      [HTTP_Methods.connect]: {
+        [ pathSegmentsCount: number ]: SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths | undefined;
+      };
+      [HTTP_Methods.trace]: {
+        [ pathSegmentsCount: number ]: SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths | undefined;
+      };
+      [HTTP_Methods.patch]: {
+        [ pathSegmentsCount: number ]: SortedByHTTP_MethodsWildcardRoutesWithHandlers.RoutesMappedByPaths | undefined;
+      };
+    }>;
+
+    export namespace SortedByHTTP_MethodsWildcardRoutesWithHandlers {
+
+      export type RoutesMappedByPaths = {
+        [ path: string ]: RouteAndHandler | undefined;
+      };
+
+    }
+
+  }
 
   export type NormalizedRouting = Readonly<{
     [HTTP_Methods.get]: NormalizedRouting.RoutesOfSpecificHTTP_Method;
@@ -515,9 +813,9 @@ namespace Router {
 
     export type RoutingDataForSpecificPathSegment = {
       routeForPathOfCurrentLength?: RouteForPathOfSpecificDepth;
+      wildcardRouteForPathAtLeastOfCurrentLength?: RouteForPathOfSpecificDepth;
       routingForStaticPathSegmentsAtNextPosition?: RoutingForStaticPathSegmentsAtNextPosition;
       routingForRoutePathParameterAtNextPosition?: RoutingForRouteParameterAtNextPosition;
-      wildcardRouteForPathAtLeastOfCurrentLength?: RouteForPathOfSpecificDepth;
     };
 
     export type RouteForPathOfSpecificDepth = {
@@ -529,7 +827,9 @@ namespace Router {
     export type RoutingForStaticPathSegmentsAtNextPosition = {
       [routePathSegment: string]: RoutingDataForSpecificPathSegment | undefined;
     };
+
     export type RoutingForRouteParameterAtNextPosition = RoutingDataForSpecificPathSegment & Readonly<{ parameterName: string; }>;
+
   }
 
 }

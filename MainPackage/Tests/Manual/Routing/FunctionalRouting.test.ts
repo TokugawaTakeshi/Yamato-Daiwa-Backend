@@ -1,4 +1,4 @@
-import { ClientErrorsHTTP_StatusCodes, HTTP_Methods } from "@yamato-daiwa/es-extensions";
+import { ClientErrorsHTTP_StatusCodes } from "@yamato-daiwa/es-extensions";
 import * as YDB from "../../../Source";
 
 
@@ -7,8 +7,9 @@ YDB.Server.initializeAndStart({
   HTTP: { port: 1337 },
   routing: [
 
+    /* ━━━ Plausible Cases ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
     {
-      HTTP_Method: HTTP_Methods.get,
+      HTTP_Method: YDB.HTTP_Methods.get,
       pathTemplate: "/",
       async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
         return response.submitWithSuccess({
@@ -18,7 +19,7 @@ YDB.Server.initializeAndStart({
     },
 
     {
-      HTTP_Method: HTTP_Methods.get,
+      HTTP_Method: YDB.HTTP_Methods.get,
       pathTemplate: "/products",
       async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
         return response.submitWithSuccess({
@@ -28,7 +29,7 @@ YDB.Server.initializeAndStart({
     },
 
     {
-      HTTP_Method: HTTP_Methods.get,
+      HTTP_Method: YDB.HTTP_Methods.get,
       pathTemplate: "/api/products",
       async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
         return response.submitWithSuccess({
@@ -40,23 +41,80 @@ YDB.Server.initializeAndStart({
     },
 
     {
-      HTTP_Method: HTTP_Methods.get,
+      HTTP_Method: YDB.HTTP_Methods.all,
       pathTemplate: "/api/*",
       async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
         return response.submitWithError({
           statusCode: ClientErrorsHTTP_StatusCodes.notFound,
-          JSON_Content: { message: "Nor appropriate API at all." }
+          JSON_Content: { message: "Not appropriate API at all." }
         });
       }
     },
 
     {
-      HTTP_Method: HTTP_Methods.get,
+      HTTP_Method: YDB.HTTP_Methods.all,
       pathTemplate: "/api/products/*",
       async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
         return response.submitWithError({
           statusCode: ClientErrorsHTTP_StatusCodes.notFound,
-          JSON_Content: { message: "Nor appropriate API for products." }
+          JSON_Content: { message: "Unknown API for products." }
+        });
+      }
+    },
+
+
+    /* ━━━ Optimized for Testing Cases ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    {
+      HTTP_Method: YDB.HTTP_Methods.all,
+      pathTemplate: "/foo/*",
+      async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
+        return response.submitWithError({
+          statusCode: ClientErrorsHTTP_StatusCodes.notFound,
+          JSON_Content: { message: "Not such api for subpath of \"/foo\"." }
+        });
+      }
+    },
+
+    {
+      HTTP_Method: YDB.HTTP_Methods.all,
+      pathTemplate: "/foo/bar/baz/hoge/fuga/*",
+      async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
+        return response.submitWithError({
+          statusCode: ClientErrorsHTTP_StatusCodes.notFound,
+          JSON_Content: { message: "Not such api for subpath of \"/foo/bar/baz/hoge/fuga/*\"." }
+        });
+      }
+    },
+
+    {
+      HTTP_Method: YDB.HTTP_Methods.all,
+      pathTemplate: "/foo/bar/baz/*",
+      async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
+        return response.submitWithError({
+          statusCode: ClientErrorsHTTP_StatusCodes.notFound,
+          JSON_Content: { message: "Not such api for subpath of \"/foo/bar/baz/*\"." }
+        });
+      }
+    },
+
+    {
+      HTTP_Method: YDB.HTTP_Methods.all,
+      pathTemplate: "/foo/bar/piyo/*",
+      async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
+        return response.submitWithError({
+          statusCode: ClientErrorsHTTP_StatusCodes.notFound,
+          JSON_Content: { message: "Not such api for subpath of \"/foo/bar/piyo/*\"." }
+        });
+      }
+    },
+
+    {
+      HTTP_Method: YDB.HTTP_Methods.all,
+      pathTemplate: "/foo/bar/baz/spam/ham/*",
+      async handler(_request: YDB.Request, response: YDB.Response): Promise<void> {
+        return response.submitWithError({
+          statusCode: ClientErrorsHTTP_StatusCodes.notFound,
+          JSON_Content: { message: "Not such api for subpath of \"/foo/bar/baz/spam/ham/*\"." }
         });
       }
     },

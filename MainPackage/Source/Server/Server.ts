@@ -18,6 +18,7 @@ import type URI_QueryParametersDeserializer from "../URI_QueryParametersDeserial
 import Middleware from "../Middleware/Middleware";
 import ClassTypeMiddleware from "../Middleware/ClassTypeMiddleware";
 import type FunctionTypeMiddleware from "../Middleware/FunctionTypeMiddleware";
+import { SpecificHTTP_Methods } from "../HTTP_Methods";
 
 /* ┅┅┅ Applied Utils ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
 import ConfigurationNormalizer from "../ConfigurationNormalizer";
@@ -27,7 +28,6 @@ import getSubdomainConfig from "../Utils/getSubdomainConfig";
 /* ┅┅┅ General Utils ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
 import {
   HTTP_StatusCodes,
-  HTTP_Methods,
   Logger,
   UnsupportedScenarioError,
   UnexpectedEventError,
@@ -267,7 +267,7 @@ class Server {
     }
 
 
-    if (!isElementOfEnumeration(rawRequest.method, HTTP_Methods)) {
+    if (!isElementOfEnumeration(rawRequest.method, SpecificHTTP_Methods)) {
 
       Logger.logError({
         errorType: UnsupportedScenarioError.NAME,
@@ -282,7 +282,7 @@ class Server {
     }
 
 
-    const HTTP_Method: HTTP_Methods = rawRequest.method;
+    const HTTP_Method: SpecificHTTP_Methods = rawRequest.method;
 
     /* [ Reference ] https://stackoverflow.com/q/68830828/4818123 */
     if (isUndefined(rawRequest.url)) {
